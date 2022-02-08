@@ -95,6 +95,7 @@ int main(void)
             delay_1ms(500);
             gd_eval_led_off(LED3);
             gd_eval_led_toggle(LED4);
+            printf("\r\nhello world!\r\n");
         }
     }
 }
