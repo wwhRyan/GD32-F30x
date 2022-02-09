@@ -107,9 +107,9 @@ void UsageFault_Handler(void)
     \param[out] none
     \retval     none
 */
-void SVC_Handler(void)
-{
-}
+// void SVC_Handler(void)
+// {
+// }
 
 /*!
     \brief      this function handles DebugMon exception
@@ -127,9 +127,9 @@ void DebugMon_Handler(void)
     \param[out] none
     \retval     none
 */
-void PendSV_Handler(void)
-{
-}
+// void PendSV_Handler(void)
+// {
+// }
 
 /*!
     \brief      this function handles SysTick exception
@@ -139,6 +139,9 @@ void PendSV_Handler(void)
 */
 void SysTick_Handler(void)
 {
-    led_spark();
     delay_decrement();
+    if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) //系统已经运行
+    {
+        xPortSysTickHandler();
+    }
 }
