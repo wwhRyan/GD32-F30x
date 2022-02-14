@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,GD32F30X_HD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS</IncludePath>
+              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS;..\..\Application\ExecThread;..\..\Application\service</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -380,7 +380,7 @@
       </TargetOption>
       <Groups>
         <Group>
-          <GroupName>Application</GroupName>
+          <GroupName>Main</GroupName>
           <Files>
             <File>
               <FileName>gd32f30x_it.c</FileName>
@@ -692,6 +692,26 @@
               <FileName>port.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\FreeRTOS\portable\RVDS\ARM_CM4F\port.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Application</GroupName>
+          <Files>
+            <File>
+              <FileName>ThreadIdle.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Application\ExecThread\ThreadIdle.c</FilePath>
+            </File>
+            <File>
+              <FileName>ThreadSectionalCurrent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Application\ExecThread\ThreadSectionalCurrent.c</FilePath>
+            </File>
+            <File>
+              <FileName>ThreadUartDecode.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Application\ExecThread\ThreadUartDecode.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -38,8 +38,14 @@ OF SUCH DAMAGE.
 #ifndef MAIN_H
 #define MAIN_H
 
+/* libc */
+#include <stdio.h>
+
 /* FreeRTOS function */
 #include "FreeRTOS.h"
 #include "task.h"
+
+/* Application */
+#include "ExecThread.h"
 
 #endif /* MAIN_H */
