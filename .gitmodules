@@ -1,0 +1,3 @@
+[submodule "easy-mcu"]
+	path = easy-mcu
+	url = git@github.com:wwhRyan/easy-mcu.git
