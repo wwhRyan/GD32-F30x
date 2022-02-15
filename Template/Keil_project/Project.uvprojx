@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>USE_STDPERIPH_DRIVER,GD32F30X_HD</Define>
+              <Define>USE_STDPERIPH_DRIVER,GD32F30X_HD,DEBUG</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS;..\..\Application\ExecThread;..\..\Application\service</IncludePath>
             </VariousControls>
@@ -637,6 +637,11 @@
               <FileName>gd32f307c_eval.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Utilities\gd32f307c_eval.c</FilePath>
+            </File>
+            <File>
+              <FileName>utils.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Utilities\utils.c</FilePath>
             </File>
           </Files>
         </Group>

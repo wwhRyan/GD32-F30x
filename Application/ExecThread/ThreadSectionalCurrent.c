@@ -16,7 +16,7 @@ void TaskUartDecode(void *pvParameters)
 {
     while (1)
     {
-        printf("TaskUartDecode\r\n");
+        debug_printf("TaskUartDecode\r\n");
         vTaskDelay(500);
     }
 }

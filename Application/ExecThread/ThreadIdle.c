@@ -16,8 +16,7 @@ void TaskIdle(void *pvParameters)
 {
     while (1)
     {
-        printf("TaskIdle\r\n");
+        debug_printf("TaskIdle\r\n");
         vTaskDelay(500);
     }
-
 }

@@ -40,6 +40,14 @@ OF SUCH DAMAGE.
 
 /* libc */
 #include <stdio.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 /* FreeRTOS function */
 #include "FreeRTOS.h"
@@ -48,4 +56,6 @@ OF SUCH DAMAGE.
 /* Application */
 #include "ExecThread.h"
 
+/* utils */
+#include "utils.h"
 #endif /* MAIN_H */

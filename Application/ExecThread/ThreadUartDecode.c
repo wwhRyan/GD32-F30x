@@ -16,7 +16,7 @@ void TaskSectionCurrent(void *pvParameters)
 {
     while (1)
     {
-        printf("TaskSectionCurrent\r\n");
+        debug_printf("TaskSectionCurrent\r\n");
         vTaskDelay(500);
     }
 }

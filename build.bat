@@ -18,7 +18,8 @@
 @echo ...
 
 :: -t"%1"
-D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -b -j0 -t"Athena" .\Template\Keil_project\Project.uvprojx -o .\..\..\log.d
+D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -b -j0 -t"Athena" .\Template\Keil_project\Project.uvprojx -o .\..\..\log.txt
+if not %ERRORLEVEL% == 0 goto ERROR
 
 @REM if not %ERRORLEVEL% == 0 goto ERROR
 
@@ -30,7 +31,7 @@ D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -b -j0 -t"Athena" .\Template\Keil_p
 @echo #####   ####  #    # #    # ######  ####  #    # #####  
 @echo ...
 
-D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -f -j0 -t"Athena" .\Template\Keil_project\Project.uvprojx -o .\..\..\log.d
+D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -f -j0 -t"Athena" .\Template\Keil_project\Project.uvprojx -o .\..\..\log.txt
 
 if %ERRORLEVEL% == 0 goto SUCCESS
 if not %ERRORLEVEL% == 0 goto ERROR
