@@ -19,7 +19,7 @@
     do                                                      \
     {                                                       \
         if (condition)                                      \
-            NULL;                                           \
+            ;                                               \
         else                                                \
         {                                                   \
             printf("\nERROR:%s, %d\n", __FILE__, __LINE__); \
@@ -28,7 +28,7 @@
         }                                                   \
     } while (0)
 #else
-#define assert(condition) NULL
+#define assert(condition)
 #endif
 
 void debug_printf(const char *fmt, ...);

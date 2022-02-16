@@ -12,25 +12,28 @@
 #include "main.h"
 #include "gd32f30x.h"
 #include "AtProtocol.h"
+#include "CmdLine.h"
 
-void TaskSectionCurrent(void *pvParameters)
+void TaskUartDecode(void *pvParameters)
 {
-        asAtProtocol obj;
+    asAtProtocol obj;
     IInitAtLib(&obj, kAtNormalMode, NULL, debug_printf);
 
     char str[0xff] = {0};
 
-    debug_printf("Start At Example!\n");
-
     while (1)
     {
-        debug_printf("\nPlease Input AT cmd:\n");
+        debug_printf("Please Input:\n");
         scanf("%s", str);
-        str[strlen(str)] = '\n';  //add '\n' to end of str
+        str[strlen(str)] = '\n'; //add '\n' to end of str
+        debug_printf("Input:%s\n", str);
+        ICmdLinesInput(str);
         IAtCmdDecodeAndRun(&obj, str);
-        memset(str, 0 ,0xff);
+        memset(str, 0, 0xff);
 
-        debug_printf("TaskSectionCurrent\r\n");
+        // debug_printf("TaskUartDecode\r\n");
+        debug_printf("TaskUartDecode min free stack size %d\r\n",(int)uxTaskGetStackHighWaterMark(NULL));
+
         vTaskDelay(500);
     }
 }

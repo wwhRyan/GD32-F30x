@@ -12,11 +12,11 @@
 #include "main.h"
 #include "gd32f30x.h"
 
-void TaskUartDecode(void *pvParameters)
+void TaskSectionCurrent(void *pvParameters)
 {
     while (1)
     {
-        debug_printf("TaskUartDecode\r\n");
+        // debug_printf("TaskSectionCurrent\r\n");
         vTaskDelay(500);
     }
 }

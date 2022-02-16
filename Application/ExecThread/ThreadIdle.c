@@ -16,7 +16,8 @@ void TaskIdle(void *pvParameters)
 {
     while (1)
     {
-        debug_printf("TaskIdle\r\n");
+        // debug_printf("TaskIdle\r\n");
+        // debug_printf("TaskIdle min free stack size %d\r\n",(int)uxTaskGetStackHighWaterMark(NULL));
         vTaskDelay(500);
     }
 }

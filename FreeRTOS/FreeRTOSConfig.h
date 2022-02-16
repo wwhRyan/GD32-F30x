@@ -35,6 +35,7 @@ extern "C" {
 
 #include "gd32f30x.h"
 #include <stdio.h>
+#define INCLUDE_uxTaskGetStackHighWaterMark 1	//获取对应任务自启动起来最小剩余栈空间大小
 
 /*-----------------------------------------------------------
  * Application specific definitions.
