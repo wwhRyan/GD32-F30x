@@ -56,6 +56,8 @@ OF SUCH DAMAGE.
 /* Application */
 #include "ExecThread.h"
 
+void application_init(void);
+
 /* utils */
 #include "utils.h"
 #endif /* MAIN_H */

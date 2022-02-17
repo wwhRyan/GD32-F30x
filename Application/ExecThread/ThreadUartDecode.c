@@ -24,7 +24,7 @@ void TaskUartDecode(void *pvParameters)
     while (1)
     {
         debug_printf("Please Input:\n");
-        scanf("%s", str);
+        scanf("%200s", str);
         str[strlen(str)] = '\n'; //add '\n' to end of str
         debug_printf("Input:%s\n", str);
         ICmdLinesInput(str);
@@ -32,7 +32,7 @@ void TaskUartDecode(void *pvParameters)
         memset(str, 0, 0xff);
 
         // debug_printf("TaskUartDecode\r\n");
-        debug_printf("TaskUartDecode min free stack size %d\r\n",(int)uxTaskGetStackHighWaterMark(NULL));
+        debug_printf("TaskUartDecode min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(NULL));
 
         vTaskDelay(500);
     }

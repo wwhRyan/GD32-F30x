@@ -65,30 +65,21 @@ static void m_getMutiNumber(const char *cmd, ...)
 static void m_getIndefinitelengthNumber(const char *cmd, ...)
 {
     uint8_t i = 0;
-    uint32_t data[MAX_WRITE_LEN];
+    int data[MAX_WRITE_LEN] = {0};
     int cmdsize = m_CatchCmdSizeBeforeFlag(cmd, "=");
 
-    char *tmp = (char *)malloc(strlen((char *)cmd));
-
-    memset(tmp, 0, strlen((char *)tmp));
-    memset(data, 0, MAX_WRITE_LEN * sizeof(uint32_t));
-
-    strcpy(tmp, cmd + cmdsize);
     char *token = NULL;
-    token = strtok((char *)tmp, ",");
+    token = strtok((char *)(cmd + cmdsize), ",");
 
     while (token)
     {
-        data[i++] = (hex2dec((unsigned char *)token)) & 0xFFFFFFFF;
+        sscanf((const char *)token, "%d", &data[i++]);
         token = strtok(NULL, ",");
     }
 
     int len = i;
-
     for (size_t i = 0; i < len; i++)
     {
-        printf("%X \n", data[i]);
+        printf("%d \n", data[i]);
     }
-
-    free(tmp);
 }

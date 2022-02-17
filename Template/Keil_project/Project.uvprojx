@@ -723,6 +723,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\Application\service\at.c</FilePath>
             </File>
+            <File>
+              <FileName>MainInit.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Application\ExecThread\MainInit.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

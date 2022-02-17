@@ -68,3 +68,5 @@ Template/My_Keil_project/Core_Board.uvguix.APPO
 Template/My_Keil_project/Core_Board.uvoptx
 
 log.txt
+*.cppcheck
+*cppcheck-build-dir*
