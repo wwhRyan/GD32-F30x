@@ -338,7 +338,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,GD32F30X_HD,DEBUG</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS;..\..\Application\ExecThread;..\..\Application\service;..\..\easy-mcu\AtProtocol;..\..\easy-mcu\AtProtocol\Src\At_internal;..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine;..\..\easy-mcu\AtProtocol\Src\At_HashTable;..\..\easy-mcu\CmdProtocol</IncludePath>
+              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS;..\..\Application\ExecThread;..\..\Application\service;..\..\easy-mcu\AtProtocol;..\..\easy-mcu\AtProtocol\Src\At_internal;..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine;..\..\easy-mcu\AtProtocol\Src\At_HashTable;..\..\easy-mcu\CmdProtocol;..\..\easy-mcu\Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -728,6 +728,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\Application\ExecThread\MainInit.c</FilePath>
             </File>
+            <File>
+              <FileName>uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Application\service\uart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -769,9 +774,9 @@
               <FilePath>..\..\easy-mcu\CmdProtocol\CmdLine.c</FilePath>
             </File>
             <File>
-              <FileName>cmd.c</FileName>
+              <FileName>CmdlineRegister.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\Application\service\cmd.c</FilePath>
+              <FilePath>..\..\easy-mcu\CmdProtocol\CmdlineRegister.c</FilePath>
             </File>
           </Files>
         </Group>
