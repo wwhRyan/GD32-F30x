@@ -17,16 +17,16 @@
 
 #define BAUDRATE (115200)
 #define DMA_BUFFER_SIZE (255)
-#define MAX_BUFF_CACHE (1) /* uart buffer number, more buffer, more memery need, more safety for uart receive. */
+#define BUFF_CACHE_SIZE (3) /* uart buffer number, more buffer, more memery need, more safety for uart receive. */
 
 #define USART0_DATA_ADDRESS ((uint32_t)&USART_DATA(USART0))
 
 typedef struct __uart_buffer
 {
-	uint8_t buffer[MAX_BUFF_CACHE][DMA_BUFFER_SIZE];
+	uint8_t buffer[BUFF_CACHE_SIZE][DMA_BUFFER_SIZE];
 	uint16_t count;
-	uint8_t head;	/* buffer cache head idx */
-	uint8_t tail;	/* buffer cache tail idx */
+	uint8_t head; /* buffer cache head idx */
+	uint8_t tail; /* buffer cache tail idx */
 } UartBuffer;
 
 typedef struct __Uarter Uarter;
@@ -39,8 +39,8 @@ typedef struct __Uarter
 	uint32_t uart_base; /* uart base address */
 	uint32_t dma_base;	/* dma base address */
 
-	IRQn_Type Irqn;							  /* uart irqn for nvic setting*/
-	usart_interrupt_enum uart_interrupt_type; /* uart interrupt type enable setting*/
+	IRQn_Type Irqn;								   /* uart irqn for nvic setting*/
+	usart_interrupt_enum uart_interrupt_type;	   /* uart interrupt type enable setting*/
 	usart_interrupt_flag_enum uart_interrupt_flag; /* uart interrupt type enable setting*/
 
 	uint32_t baudrate;
@@ -61,8 +61,8 @@ typedef struct __Uarter
 	dma_channel_enum dma_tx_channel;
 	dma_channel_enum dma_rx_channel;
 
-	UartBuffer* p_rx_buffer;
-	UartBuffer* p_tx_buffer;
+	UartBuffer *p_rx_buffer;
+	UartBuffer *p_tx_buffer;
 } Uarter;
 
 void uarter_init(const Uarter *uarter);

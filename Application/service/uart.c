@@ -103,10 +103,11 @@ void uarter_init(const Uarter *pUarter)
     pUarter->p_rx_buffer->tail = 0;
     pUarter->p_tx_buffer->count = 0;
     pUarter->p_rx_buffer->count = 0;
-    memset(pUarter->p_tx_buffer->buffer, 0, DMA_BUFFER_SIZE * MAX_BUFF_CACHE * sizeof(uint8_t));
-    memset(pUarter->p_rx_buffer->buffer, 0, DMA_BUFFER_SIZE * MAX_BUFF_CACHE * sizeof(uint8_t));
+    memset(pUarter->p_tx_buffer->buffer, 0, DMA_BUFFER_SIZE * BUFF_CACHE_SIZE * sizeof(uint8_t));
+    memset(pUarter->p_rx_buffer->buffer, 0, DMA_BUFFER_SIZE * BUFF_CACHE_SIZE * sizeof(uint8_t));
 }
 
+//TODO: fix the bug if data is larger than the buffer size 255.
 void uarter_IRQ(const Uarter *pUarter)
 {
     assert(pUarter != NULL);
@@ -117,7 +118,7 @@ void uarter_IRQ(const Uarter *pUarter)
         usart_data_receive(pUarter->uart_base);
 
         pUarter->p_rx_buffer->head++;
-        if (pUarter->p_rx_buffer->head >= MAX_BUFF_CACHE)
+        if (pUarter->p_rx_buffer->head >= BUFF_CACHE_SIZE)
             pUarter->p_rx_buffer->head = 0;
 
         pUarter->p_rx_buffer->count = abs(DMA_BUFFER_SIZE - dma_transfer_number_get(pUarter->dma_base, pUarter->dma_rx_channel));
@@ -130,7 +131,7 @@ void uarter_IRQ(const Uarter *pUarter)
 char *GetRxData(const Uarter *pUarter)
 {
     assert(pUarter != NULL);
-    return (char *)pUarter->p_rx_buffer->buffer[pUarter->p_rx_buffer->head];
+    return (char *)pUarter->p_rx_buffer->buffer[pUarter->p_rx_buffer->tail];
 }
 
 int GetRxlen(const Uarter *pUarter)
@@ -142,7 +143,9 @@ int GetRxlen(const Uarter *pUarter)
 void ClearRxData(const Uarter *pUarter)
 {
     assert(pUarter != NULL);
-    pUarter->p_rx_buffer->head = pUarter->p_rx_buffer->tail;
     pUarter->p_rx_buffer->count = 0;
-    memset(pUarter->p_rx_buffer->buffer[pUarter->p_rx_buffer->head], 0, DMA_BUFFER_SIZE);
+    memset(pUarter->p_rx_buffer->buffer[pUarter->p_rx_buffer->tail], 0, DMA_BUFFER_SIZE);
+    pUarter->p_rx_buffer->tail++;
+    if (pUarter->p_rx_buffer->tail >= BUFF_CACHE_SIZE)
+        pUarter->p_rx_buffer->tail = 0;
 }
