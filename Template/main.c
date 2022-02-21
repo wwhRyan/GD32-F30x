@@ -12,6 +12,13 @@
 #include "gd32f30x.h"
 #include "systick.h"
 #include "main.h"
+#include "timers.h"
+
+TaskHandle_t TaskIdleHandle = NULL;
+TaskHandle_t TaskUartDecodeHandle = NULL;
+TaskHandle_t TaskCurrentHandle = NULL;
+
+void TimerCallFunc(TimerHandle_t xTimer);
 
 /*!
     \brief      main function
@@ -30,12 +37,28 @@ int main(void)
     // init all the peripherals.
     application_init();
 
-    xTaskCreate(TaskIdle, "TaskIdle", TASK_IDLE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(TaskUartDecode, "TaskUartDecode", TASK_UART_DECODE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(TaskSectionCurrent, "TaskSectionCurrent", TASK_SECTION_CURENT_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+
+    xTaskCreate(TaskIdle, "TaskIdle", TASK_IDLE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskIdleHandle);
+    // xTaskCreate(TaskUartDecode, "TaskUartDecode", TASK_UART_DECODE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskUartDecodeHandle);
+    xTaskCreate(TaskSectionCurrent, "TaskSectionCurrent", TASK_SECTION_CURENT_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskCurrentHandle);
+
+    TimerHandle_t xTimer;
+
+    xTimer = xTimerCreate("Timer", pdMS_TO_TICKS(10000), pdTRUE, NULL, TimerCallFunc);
+    assert(xTimer != NULL);
+
+    xTimerStart(xTimer, 0);
 
     vTaskStartScheduler();
 
     for (;;)
         ;
+}
+
+
+void TimerCallFunc(TimerHandle_t xTimer)
+{
+    debug_printf("TaskIdle min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskIdleHandle));
+    debug_printf("TaskUartDecode min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskUartDecodeHandle));
+    debug_printf("TaskCurrent min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskCurrentHandle));
 }
