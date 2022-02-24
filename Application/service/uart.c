@@ -101,8 +101,8 @@ void uarter_init(const Uarter *pUarter)
     pUarter->p_tx_buffer->tail = 0;
     pUarter->p_rx_buffer->head = 0;
     pUarter->p_rx_buffer->tail = 0;
-    pUarter->p_tx_buffer->count = 0;
-    pUarter->p_rx_buffer->count = 0;
+    memset(pUarter->p_tx_buffer->count, 0, BUFF_CACHE_SIZE * sizeof(uint16_t));
+    memset(pUarter->p_rx_buffer->count, 0, BUFF_CACHE_SIZE * sizeof(uint16_t));
     memset(pUarter->p_tx_buffer->buffer, 0, DMA_BUFFER_SIZE * BUFF_CACHE_SIZE * sizeof(uint8_t));
     memset(pUarter->p_rx_buffer->buffer, 0, DMA_BUFFER_SIZE * BUFF_CACHE_SIZE * sizeof(uint8_t));
 }
@@ -117,13 +117,14 @@ void uarter_IRQ(const Uarter *pUarter)
         usart_interrupt_flag_clear(pUarter->uart_base, pUarter->uart_interrupt_flag);
         usart_data_receive(pUarter->uart_base);
 
+        pUarter->p_rx_buffer->count[pUarter->p_rx_buffer->head] = abs(DMA_BUFFER_SIZE - dma_transfer_number_get(pUarter->dma_base, pUarter->dma_rx_channel));
+
         pUarter->p_rx_buffer->head++;
         if (pUarter->p_rx_buffer->head >= BUFF_CACHE_SIZE)
             pUarter->p_rx_buffer->head = 0;
 
-        pUarter->p_rx_buffer->count = abs(DMA_BUFFER_SIZE - dma_transfer_number_get(pUarter->dma_base, pUarter->dma_rx_channel));
         dma_memory_address_config(pUarter->dma_base, pUarter->dma_rx_channel, (uint32_t)&pUarter->p_rx_buffer->buffer[pUarter->p_rx_buffer->head]);
-        dma_transfer_number_config(pUarter->dma_base, pUarter->dma_rx_channel, DMA_BUFFER_SIZE);
+        // dma_transfer_number_config(pUarter->dma_base, pUarter->dma_rx_channel, DMA_BUFFER_SIZE);
         dma_channel_enable(pUarter->dma_base, pUarter->dma_rx_channel);
     }
 }
@@ -137,13 +138,13 @@ char *GetRxData(const Uarter *pUarter)
 int GetRxlen(const Uarter *pUarter)
 {
     assert(pUarter != NULL);
-    return (int)pUarter->p_rx_buffer->count;
+    return (int)pUarter->p_rx_buffer->count[pUarter->p_rx_buffer->tail];
 }
 
 void ClearRxData(const Uarter *pUarter)
 {
     assert(pUarter != NULL);
-    pUarter->p_rx_buffer->count = 0;
+    pUarter->p_rx_buffer->count[pUarter->p_rx_buffer->tail] = 0;
     memset(pUarter->p_rx_buffer->buffer[pUarter->p_rx_buffer->tail], 0, DMA_BUFFER_SIZE);
     pUarter->p_rx_buffer->tail++;
     if (pUarter->p_rx_buffer->tail >= BUFF_CACHE_SIZE)

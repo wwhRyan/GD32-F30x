@@ -20,11 +20,12 @@
 #define BUFF_CACHE_SIZE (3) /* uart buffer number, more buffer, more memery need, more safety for uart receive. */
 
 #define USART0_DATA_ADDRESS ((uint32_t)&USART_DATA(USART0))
+#define USART1_DATA_ADDRESS ((uint32_t)&USART_DATA(USART1))
 
 typedef struct __uart_buffer
 {
 	uint8_t buffer[BUFF_CACHE_SIZE][DMA_BUFFER_SIZE];
-	uint16_t count;
+	uint16_t count[BUFF_CACHE_SIZE];
 	uint8_t head; /* buffer cache head idx */
 	uint8_t tail; /* buffer cache tail idx */
 } UartBuffer;

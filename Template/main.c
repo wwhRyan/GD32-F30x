@@ -39,12 +39,12 @@ int main(void)
 
 
     xTaskCreate(TaskIdle, "TaskIdle", TASK_IDLE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskIdleHandle);
-    // xTaskCreate(TaskUartDecode, "TaskUartDecode", TASK_UART_DECODE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskUartDecodeHandle);
+    xTaskCreate(TaskUartDecode, "TaskUartDecode", TASK_UART_DECODE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskUartDecodeHandle);
     xTaskCreate(TaskSectionCurrent, "TaskSectionCurrent", TASK_SECTION_CURENT_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskCurrentHandle);
 
     TimerHandle_t xTimer;
 
-    xTimer = xTimerCreate("Timer", pdMS_TO_TICKS(10000), pdTRUE, NULL, TimerCallFunc);
+    xTimer = xTimerCreate("Timer", pdMS_TO_TICKS(30000), pdTRUE, NULL, TimerCallFunc);
     assert(xTimer != NULL);
 
     xTimerStart(xTimer, 0);

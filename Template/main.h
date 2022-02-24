@@ -55,6 +55,7 @@ OF SUCH DAMAGE.
 
 /* Application */
 #include "ExecThread.h"
+#include "port.h"
 
 void application_init(void);
 

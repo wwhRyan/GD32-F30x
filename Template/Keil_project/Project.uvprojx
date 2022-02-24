@@ -733,6 +733,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\Application\service\uart.c</FilePath>
             </File>
+            <File>
+              <FileName>port.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\Application\service\port.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
