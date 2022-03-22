@@ -13,10 +13,10 @@
 #include "gd32f30x.h"
 #include "AtProtocol.h"
 #include "CmdLine.h"
-#include "ExecThread.h"
+#include "BoardInit.h"
 
 asAtProtocol at_obj;
-extern const Uarter uart0_debug;
+extern const Uarter uart0_output;
 
 void TaskUartDecode(void *pvParameters)
 {
@@ -39,14 +39,14 @@ void TaskUartDecode(void *pvParameters)
         debug_printf("TaskUartDecode min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(NULL));
 #endif
 
-        if (0 != GetRxlen(&uart0_debug))
+        if (0 != GetRxlen(&uart0_output))
         {
-            debug_printf("%s\r\n", GetRxData(&uart0_debug));
-            ICmdLinesInput(GetRxData(&uart0_debug));
+            debug_printf("%s\r\n", GetRxData(&uart0_output));
+            ICmdLinesInput(GetRxData(&uart0_output));
             IAtCmdDecodeAndRun(&at_obj, str);
-            ClearRxData(&uart0_debug);
+            ClearRxData(&uart0_output);
         }
 
-        vTaskDelay(500);
+        vTaskDelay(10);
     }
 }

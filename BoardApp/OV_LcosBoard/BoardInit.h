@@ -1,38 +1,34 @@
 /**
- * @file port.h
+ * @file ExecThread.h
  * @author Wu Wenhao (whwu@appotronics.com)
  * @brief 
  * @version 1.02
- * @date 2022-02-24
+ * @date 2022-02-14
  * 
  * @copyright Copyright@appotronics 2022. All Rights Reserved
  * 
  */
 
-#ifndef __PORT_H__
-#define __PORT_H__
+#ifndef EXECTHREAD_H
+#define EXECTHREAD_H
+#include "uart.h"
+#include "timer.h"
+#include "adc_mcu.h"
+#include "dac.h"
+#include "port.h"
 
-#ifdef __cplusplus
-extern "C"
-{
+#ifndef ATHENA_OV_LCOS
+#error "Please define ATHENA_OV_LCOS"
 #endif
 
-#include "gd32f30x.h"
+//configMINIMAL_STACK_SIZE
+#define TASK_IDLE_STACK_SIZE configMINIMAL_STACK_SIZE
+#define TASK_UART_DECODE_STACK_SIZE 1024
+#define TASK_SECTION_CURENT_STACK_SIZE configMINIMAL_STACK_SIZE
 
-    typedef struct __NTC_ADC_Channel_t
-    {
-        uint32_t adc_base;
-        uint8_t channel;
-    } NTC_ADC_Channel_t;
-
-    typedef enum
-    {
-        eRed_laser_NTC,
-        eGreen_LED_NTC,
-        eEnvironmemt_NTC,
-        eHardware_Version_NTC,
-        eMax_NTC_Channel,
-    }eNTC_Idx;
+void TaskIdle(void *pvParameters);
+void TaskUartDecode(void *pvParameters);
+void TaskSectionCurrent(void *pvParameters);
 
 /*<! Red laser NTC !>*/
 #define LD_NTC_PORT GPIOB
@@ -73,8 +69,8 @@ extern "C"
 #define EE_WP_PORT GPIOA
 #define EE_WP_PIN GPIO_PIN_8
 
-#define VOP921_RESET_PORT GPIOB
-#define VOP921_RESET_PIN GPIO_PIN_12
+#define OVP921_RESET_PORT GPIOB
+#define OVP921_RESET_PIN GPIO_PIN_12
 
 #define MCU_R_LED_EN_PORT GPIOB
 #define MCU_R_LED_EN_PIN GPIO_PIN_13
@@ -143,16 +139,5 @@ extern "C"
 /*<!  !>*/
 #define I_SPOKER_PORT GPIOC
 #define I_SPOKER_PIN GPIO_PIN_13
-
-    //whole chip init
-    void Whole_MCU_init(void);
-
-    uint16_t Get_NTC_Voltage(int ntc_idx);
-
-    void Set_DAC_Value(uint16_t value);
-
-    void Set_DAC_PWM_percent(uint16_t percent);
-
-    uint32_t Get_FAN_FG(void);
 
 #endif

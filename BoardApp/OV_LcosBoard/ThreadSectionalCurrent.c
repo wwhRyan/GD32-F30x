@@ -11,9 +11,9 @@
 
 #include "main.h"
 #include "gd32f30x.h"
-#include "ExecThread.h"
+#include "BoardInit.h"
 
-extern const Uarter uart0_debug;
+extern const Uarter uart0_output;
 
 void TaskSectionCurrent(void *pvParameters)
 {
@@ -24,10 +24,10 @@ void TaskSectionCurrent(void *pvParameters)
         vTaskDelay(500);
 #endif
 #if 0
-        if (0 != GetRxlen(&uart0_debug))
+        if (0 != GetRxlen(&uart0_output))
         {
-            debug_printf("%s\r\n", GetRxData(&uart0_debug));
-            ClearRxData(&uart0_debug);
+            debug_printf("%s\r\n", GetRxData(&uart0_output));
+            ClearRxData(&uart0_output);
         }
 #endif
         vTaskDelay(10);

@@ -54,7 +54,7 @@ OF SUCH DAMAGE.
 #include "task.h"
 
 /* Application */
-#include "ExecThread.h"
+#include "BoardInit.h"
 #include "port.h"
 
 void application_init(void);
