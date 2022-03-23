@@ -48,5 +48,7 @@ void TaskSectionCurrent(void *pvParameters);
 #define PANEL_12V_ON_PORT GPIOA
 #define PANEL_12V_ON_PIN GPIO_PIN_4
 
+#define LED_PORT GPIOB
+#define LED_PIN GPIO_PIN_13
 
 #endif

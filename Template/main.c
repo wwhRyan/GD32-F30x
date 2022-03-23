@@ -43,7 +43,7 @@ int main(void)
 
     TimerHandle_t xTimer;
 
-    xTimer = xTimerCreate("Timer", pdMS_TO_TICKS(2000), pdTRUE, NULL, TimerCallFunc);
+    xTimer = xTimerCreate("Timer", pdMS_TO_TICKS(20000), pdTRUE, NULL, TimerCallFunc);
     assert(xTimer != NULL);
 
     xTimerStart(xTimer, 0);
@@ -59,13 +59,4 @@ void TimerCallFunc(TimerHandle_t xTimer)
     debug_printf("TaskIdle min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskIdleHandle));
     debug_printf("TaskUartDecode min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskUartDecodeHandle));
     debug_printf("TaskCurrent min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskCurrentHandle));
-
-    if (gpio_output_bit_get(GPIOB, GPIO_PIN_13) == RESET)
-    {
-        gpio_bit_set(GPIOB, GPIO_PIN_13);
-    }
-    else
-    {
-        gpio_bit_reset(GPIOB, GPIO_PIN_13);
-    }
 }

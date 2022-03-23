@@ -106,6 +106,12 @@ void timer_counter_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint
     timer_parameter_struct timer_initpara;
 
     rcu_periph_clock_enable(timer_clock);
+    rcu_periph_clock_enable(RCU_AF);
+
+    // nvic_priority_group_set(NVIC_PRIGROUP_PRE1_SUB3);
+    nvic_irq_enable(TIMER2_IRQn, 0, 0);
+
+    gpio_init(gpio_port, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, gpio_pin);
 
     // timer_deinit(timer_base);
 
@@ -129,9 +135,11 @@ void timer_counter_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint
     /* auto-reload preload enable */
     timer_auto_reload_shadow_enable(timer_base);
     /* clear channel 0 interrupt bit */
-    // timer_interrupt_flag_clear(timer_base,TIMER_INT_FLAG_CH3);
+    timer_interrupt_flag_clear(timer_base, TIMER_INT_FLAG_CH1);
     /* channel 0 interrupt enable */
-    // timer_interrupt_enable(timer_base,TIMER_INT_CH3);
+    timer_interrupt_enable(timer_base, TIMER_INT_CH1);
+
+    // timer_primary_output_config(timer_base, ENABLE);
 
     /* timer_base counter enable */
     timer_enable(timer_base);
@@ -147,7 +155,8 @@ void timer_counter_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint
 uint32_t get_timer_counter(uint32_t timer_base, uint16_t timer_channel)
 {
     uint32_t timer_counter;
-    timer_counter = timer_channel_capture_value_register_read(timer_base, timer_channel) + 1;
+    // timer_counter = timer_channel_capture_value_register_read(timer_base, timer_channel) + 1;
+    timer_counter = timer_counter_read(timer_base) + 1;
     timer_counter_value_config(timer_base, 0); //clear counter
     return timer_counter;
 }

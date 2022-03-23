@@ -57,6 +57,7 @@ static void m_fan_set(const char *cmd, ...)
         Set_fan_timer_pwm(&fan2_pwm, data[1]);
 }
 
+extern __IO uint16_t fre;
 static void m_fan_get(const char *cmd, ...)
 {
     int data[2] = {0};
@@ -83,7 +84,7 @@ static void m_fan_get(const char *cmd, ...)
         return;
     }
     if (data[0] == 1)
-        printf("fan 1:%d\n", (int)Get_fan_timer_FG(&fan1_FG));
+        printf("fan fre 1:%d\n", (int)fre);
 
     if (data[0] == 2)
         printf("fan 2:%d\n", (int)Get_fan_timer_FG(&fan2_FG));

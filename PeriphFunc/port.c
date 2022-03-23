@@ -15,6 +15,7 @@
 
 void gpio_table_init(gpio_config_t *table, uint32_t num)
 {
+    rcu_periph_clock_enable(RCU_AF);
     rcu_periph_clock_enable(RCU_GPIOA);
     rcu_periph_clock_enable(RCU_GPIOB);
     rcu_periph_clock_enable(RCU_GPIOC);
@@ -36,5 +37,6 @@ void gpio_table_init(gpio_config_t *table, uint32_t num)
                 gpio_bit_reset(table->gpio_port, table->gpio_pin);
             }
         }
+        table++;
     }
 }
