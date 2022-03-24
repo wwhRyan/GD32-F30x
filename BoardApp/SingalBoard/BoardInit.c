@@ -26,6 +26,9 @@
 static UartBuffer uart0_rx_buffer = {0};
 static UartBuffer uart1_rx_buffer = {0};
 
+static timer_capture_calc_t fan1_fg_calc = {0};
+static timer_capture_calc_t fan2_fg_calc = {0};
+
 const Uarter uart0_output = {
     .uart_periph = RCU_USART0,
     .dma_periph = RCU_DMA0,
@@ -90,6 +93,10 @@ const fan_timer_config_t fan1_FG = {
     .timer_channel = TIMER_CH_1,
     .gpio_port = GPIOB,
     .gpio_pin = GPIO_PIN_5,
+    .timer_IRQ = TIMER2_IRQn,
+    .channel_interrupt_flag = TIMER_INT_FLAG_CH1,
+    .channel_interrupt_enable = TIMER_INT_CH1,
+    .p_st_calc = &fan1_fg_calc,
 };
 
 const fan_timer_config_t fan2_pwm = {
@@ -106,16 +113,20 @@ const fan_timer_config_t fan2_FG = {
     .timer_channel = TIMER_CH_0,
     .gpio_port = GPIOA,
     .gpio_pin = GPIO_PIN_15,
+    .timer_IRQ = TIMER1_IRQn,
+    .channel_interrupt_flag = TIMER_INT_FLAG_CH0,
+    .channel_interrupt_enable = TIMER_INT_CH0,
+    .p_st_calc = &fan2_fg_calc,
 };
 
 gpio_config_t gpio_config_table[] = {
-    {SLAVE_3_3_EN_PORT, SLAVE_3_3_EN_PIN,   GPIO_MODE_OUT_PP,       GPIO_OSPEED_50MHZ, RESET},
-    {MCU_GPIO_1_PORT,   MCU_GPIO_1_PIN,     GPIO_MODE_OUT_PP,       GPIO_OSPEED_50MHZ, RESET},
-    {GD32_BOOT_PORT,    GD32_BOOT_PIN,      GPIO_MODE_IN_FLOATING,  GPIO_OSPEED_50MHZ, RESET},
-    {MCU_GPIO_3_PORT,   MCU_GPIO_3_PIN,     GPIO_MODE_OUT_PP,       GPIO_OSPEED_50MHZ, RESET},
-    {LT6911C_RST_PORT,  LT6911C_RST_PIN,    GPIO_MODE_OUT_PP,       GPIO_OSPEED_50MHZ, RESET},
-    {PANEL_12V_ON_PORT, PANEL_12V_ON_PIN,   GPIO_MODE_OUT_PP,       GPIO_OSPEED_50MHZ, SET},
-    {LED_PORT,          LED_PIN,            GPIO_MODE_OUT_PP,       GPIO_OSPEED_50MHZ, SET},
+    {SLAVE_3_3_EN_PORT, SLAVE_3_3_EN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+    {MCU_GPIO_1_PORT, MCU_GPIO_1_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+    {GD32_BOOT_PORT, GD32_BOOT_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
+    {MCU_GPIO_3_PORT, MCU_GPIO_3_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+    {LT6911C_RST_PORT, LT6911C_RST_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+    {PANEL_12V_ON_PORT, PANEL_12V_ON_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET},
+    {LED_PORT, LED_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET},
 };
 
 void application_init()
@@ -125,6 +136,12 @@ void application_init()
 
     /* initilize the USART */
     uarter_init(&uart1_debug);
+
+    /* GPIO remap */
+    rcu_periph_clock_enable(RCU_AF);
+    gpio_pin_remap_config(GPIO_TIMER2_PARTIAL_REMAP, ENABLE);
+    gpio_pin_remap_config(GPIO_SWJ_SWDPENABLE_REMAP, ENABLE);
+    gpio_pin_remap_config(GPIO_TIMER1_PARTIAL_REMAP0, ENABLE);
 
     gpio_table_init(gpio_config_table, ARRAYNUM(gpio_config_table));
 
@@ -149,39 +166,12 @@ void USART1_IRQHandler(void)
     uarter_IRQ(&uart1_debug);
 }
 
-uint16_t readvalue1 = 0, readvalue2 = 0;
-__IO uint16_t ccnumber = 0;
-__IO uint32_t count = 0;
-__IO uint16_t fre = 0;
 void TIMER2_IRQHandler(void)
 {
-    if (SET == timer_interrupt_flag_get(TIMER2, TIMER_INT_FLAG_CH1))
-    {
-        /* clear channel 0 interrupt bit */
-        timer_interrupt_flag_clear(TIMER2, TIMER_INT_FLAG_CH1);
+    timer_input_capture_IRQ(&fan1_FG);
+}
 
-        if (0 == ccnumber)
-        {
-            /* read channel 0 capture value */
-            readvalue1 = timer_channel_capture_value_register_read(TIMER2, TIMER_CH_1) + 1;
-            ccnumber = 1;
-        }
-        else if (1 == ccnumber)
-        {
-            /* read channel 0 capture value */
-            readvalue2 = timer_channel_capture_value_register_read(TIMER2, TIMER_CH_1) + 1;
-
-            if (readvalue2 > readvalue1)
-            {
-                count = (readvalue2 - readvalue1);
-            }
-            else
-            {
-                count = ((0xFFFFU - readvalue1) + readvalue2);
-            }
-
-            fre = 1000000U / count;
-            ccnumber = 0;
-        }
-    }
+void TIMER1_IRQHandler(void)
+{
+    timer_input_capture_IRQ(&fan2_FG);
 }

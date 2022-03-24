@@ -15,13 +15,9 @@
 
 void gpio_table_init(gpio_config_t *table, uint32_t num)
 {
-    rcu_periph_clock_enable(RCU_AF);
     rcu_periph_clock_enable(RCU_GPIOA);
     rcu_periph_clock_enable(RCU_GPIOB);
     rcu_periph_clock_enable(RCU_GPIOC);
-
-    /* SWD remap */
-    gpio_pin_remap_config(GPIO_SWJ_SWDPENABLE_REMAP, ENABLE);
 
     for (size_t i = 0; i < num; i++)
     {

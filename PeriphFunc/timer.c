@@ -94,7 +94,8 @@ void set_timer_counter(uint32_t timer_base, uint16_t timer_channel, uint16_t per
  * @param gpio_port 
  * @param gpio_pin 
  */
-void timer_counter_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint16_t timer_channel, uint32_t gpio_port, uint16_t gpio_pin)
+void timer_counter_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint16_t timer_channel,
+                          uint32_t gpio_port, uint16_t gpio_pin, IRQn_Type timer_IRQ, uint32_t channel_interrupt_flag, uint32_t channel_interrupt_enable)
 {
     /* timer_base configuration: input capture mode -------------------
     the external signal is connected to timer_base timer_channel pin (gpio_port gpio_pin)
@@ -106,10 +107,8 @@ void timer_counter_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint
     timer_parameter_struct timer_initpara;
 
     rcu_periph_clock_enable(timer_clock);
-    rcu_periph_clock_enable(RCU_AF);
 
-    // nvic_priority_group_set(NVIC_PRIGROUP_PRE1_SUB3);
-    nvic_irq_enable(TIMER2_IRQn, 0, 0);
+    nvic_irq_enable(timer_IRQ, 1, 1);
 
     gpio_init(gpio_port, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, gpio_pin);
 
@@ -135,9 +134,9 @@ void timer_counter_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint
     /* auto-reload preload enable */
     timer_auto_reload_shadow_enable(timer_base);
     /* clear channel 0 interrupt bit */
-    timer_interrupt_flag_clear(timer_base, TIMER_INT_FLAG_CH1);
+    timer_interrupt_flag_clear(timer_base, channel_interrupt_flag);
     /* channel 0 interrupt enable */
-    timer_interrupt_enable(timer_base, TIMER_INT_CH1);
+    timer_interrupt_enable(timer_base, channel_interrupt_enable);
 
     // timer_primary_output_config(timer_base, ENABLE);
 
@@ -145,40 +144,64 @@ void timer_counter_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint
     timer_enable(timer_base);
 }
 
-/**
- * @brief Get the timer counter object
- * 
- * @param timer_base 
- * @param timer_channel 
- * @return uint32_t 
- */
-uint32_t get_timer_counter(uint32_t timer_base, uint16_t timer_channel)
-{
-    uint32_t timer_counter;
-    // timer_counter = timer_channel_capture_value_register_read(timer_base, timer_channel) + 1;
-    timer_counter = timer_counter_read(timer_base) + 1;
-    timer_counter_value_config(timer_base, 0); //clear counter
-    return timer_counter;
-}
-
 void fan_timer_pwm_config(const fan_timer_config_t *fan_timer_config)
 {
+    assert(fan_timer_config != NULL);
     timer_pwm_config(fan_timer_config->timer_clock, fan_timer_config->timer_base,
                      fan_timer_config->timer_channel, fan_timer_config->gpio_port, fan_timer_config->gpio_pin);
 }
 
 void fan_timer_FG_config(const fan_timer_config_t *fan_timer_config)
 {
+    assert(fan_timer_config != NULL);
     timer_counter_config(fan_timer_config->timer_clock, fan_timer_config->timer_base,
-                         fan_timer_config->timer_channel, fan_timer_config->gpio_port, fan_timer_config->gpio_pin);
+                         fan_timer_config->timer_channel, fan_timer_config->gpio_port, fan_timer_config->gpio_pin,
+                         fan_timer_config->timer_IRQ, fan_timer_config->channel_interrupt_flag, fan_timer_config->channel_interrupt_enable);
 }
 
 void Set_fan_timer_pwm(const fan_timer_config_t *fan_timer_config, uint16_t percent)
 {
+    assert(fan_timer_config != NULL);
     set_timer_counter(fan_timer_config->timer_base, fan_timer_config->timer_channel, percent);
 }
 
 uint32_t Get_fan_timer_FG(const fan_timer_config_t *fan_timer_config)
 {
-    return get_timer_counter(fan_timer_config->timer_base, fan_timer_config->timer_channel);
+    assert(fan_timer_config != NULL);
+    return fan_timer_config->p_st_calc->fre;
+}
+
+void timer_input_capture_IRQ(const fan_timer_config_t *fan_timer_config)
+{
+    assert(fan_timer_config != NULL);
+    assert(fan_timer_config->p_st_calc != NULL);
+    if (SET == timer_interrupt_flag_get(fan_timer_config->timer_base, fan_timer_config->channel_interrupt_flag))
+    {
+        /* clear channel 0 interrupt bit */
+        timer_interrupt_flag_clear(fan_timer_config->timer_base, fan_timer_config->channel_interrupt_flag);
+
+        if (0 == fan_timer_config->p_st_calc->ccnumber)
+        {
+            /* read channel 0 capture value */
+            fan_timer_config->p_st_calc->readvalue1 = timer_channel_capture_value_register_read(fan_timer_config->timer_base, fan_timer_config->timer_channel) + 1;
+            fan_timer_config->p_st_calc->ccnumber = 1;
+        }
+        else if (1 == fan_timer_config->p_st_calc->ccnumber)
+        {
+            /* read channel 0 capture value */
+            fan_timer_config->p_st_calc->readvalue2 = timer_channel_capture_value_register_read(fan_timer_config->timer_base, fan_timer_config->timer_channel) + 1;
+
+            if (fan_timer_config->p_st_calc->readvalue2 > fan_timer_config->p_st_calc->readvalue1)
+            {
+                fan_timer_config->p_st_calc->count = (fan_timer_config->p_st_calc->readvalue2 - fan_timer_config->p_st_calc->readvalue1);
+            }
+            else
+            {
+                fan_timer_config->p_st_calc->count = ((0xFFFFU - fan_timer_config->p_st_calc->readvalue1) + fan_timer_config->p_st_calc->readvalue2);
+            }
+
+            fan_timer_config->p_st_calc->fre = 1000000U / fan_timer_config->p_st_calc->count;
+            fan_timer_config->p_st_calc->ccnumber = 0;
+        }
+    }
 }

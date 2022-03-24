@@ -84,7 +84,7 @@ static void m_fan_get(const char *cmd, ...)
         return;
     }
     if (data[0] == 1)
-        printf("fan fre 1:%d\n", (int)fre);
+        printf("fan fre 1:%d\n", (int)Get_fan_timer_FG(&fan1_FG));
 
     if (data[0] == 2)
         printf("fan 2:%d\n", (int)Get_fan_timer_FG(&fan2_FG));
