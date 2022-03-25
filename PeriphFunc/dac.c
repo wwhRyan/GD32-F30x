@@ -37,6 +37,13 @@ void laser_dac_init(const laser_dac_config_t *laser_dac_config)
     software_triggle_dac_init(laser_dac_config->dac_clock, laser_dac_config->dac_base,
                               laser_dac_config->gpio_port, laser_dac_config->gpio_pin);
 }
+
+/**
+ * @brief 
+ * 
+ * @param laser_dac_config laser_dac_config_t *
+ * @param value 0~4095
+ */
 void laser_dac_set_value(const laser_dac_config_t *laser_dac_config, uint32_t value)
 {
     set_dac_value(laser_dac_config->dac_base, value);

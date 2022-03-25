@@ -139,8 +139,8 @@ void application_init()
 
     /* GPIO remap */
     rcu_periph_clock_enable(RCU_AF);
-    gpio_pin_remap_config(GPIO_TIMER2_PARTIAL_REMAP, ENABLE);
     gpio_pin_remap_config(GPIO_SWJ_SWDPENABLE_REMAP, ENABLE);
+    gpio_pin_remap_config(GPIO_TIMER2_PARTIAL_REMAP, ENABLE);
     gpio_pin_remap_config(GPIO_TIMER1_PARTIAL_REMAP0, ENABLE);
 
     gpio_table_init(gpio_config_table, ARRAYNUM(gpio_config_table));

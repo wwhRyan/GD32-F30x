@@ -26,6 +26,8 @@
 static UartBuffer uart0_rx_buffer = {0};
 static UartBuffer uart1_rx_buffer = {0};
 
+static timer_capture_calc_t cw_wheel_fg_calc = {0};
+
 const Uarter uart0_output = {
     .uart_periph = RCU_USART0,
     .dma_periph = RCU_DMA0,
@@ -77,9 +79,9 @@ const Uarter uart1_debug = {
 };
 
 const fan_timer_config_t cw_wheel_pwm = {
-    .timer_clock = RCU_TIMER0,
-    .timer_base = TIMER0,
-    .timer_channel = TIMER_CH_0,
+    .timer_clock = RCU_TIMER1,
+    .timer_base = TIMER1,
+    .timer_channel = TIMER_CH_3,
     .gpio_port = FAN_PWM_PORT,
     .gpio_pin = FAN_PWM_PIN,
 };
@@ -87,17 +89,37 @@ const fan_timer_config_t cw_wheel_pwm = {
 const fan_timer_config_t cw_wheel_fg = {
     .timer_clock = RCU_TIMER0,
     .timer_base = TIMER0,
-    .timer_channel = TIMER_CH_1,
+    .timer_channel = TIMER_CH_3,
     .gpio_port = FG_PORT,
     .gpio_pin = FG_PIN,
+    .timer_IRQ = TIMER0_IRQn,
+    .channel_interrupt_flag = TIMER_INT_FLAG_CH3,
+    .channel_interrupt_enable = TIMER_INT_CH3,
+    .p_st_calc = &cw_wheel_fg_calc,
 };
 
 const ntc_adc_config_t ld_ntc = {
     .adc_clock = RCU_ADC0,
     .adc_base = ADC0,
-    .adc_channel = ADC_CHANNEL_0,
+    .adc_channel = ADC_CHANNEL_8,
     .gpio_port = LD_NTC_PORT,
     .gpio_pin = LD_NTC_PIN,
+};
+
+const ntc_adc_config_t green_led_ntc = {
+    .adc_clock = RCU_ADC0,
+    .adc_base = ADC0,
+    .adc_channel = ADC_CHANNEL_9,
+    .gpio_port = G_LED_NTC_PORT,
+    .gpio_pin = G_LED_NTC_PIN,
+};
+
+const ntc_adc_config_t evn_ntc = {
+    .adc_clock = RCU_ADC0,
+    .adc_base = ADC0,
+    .adc_channel = ADC_CHANNEL_1,
+    .gpio_port = EVN_NTC_PORT,
+    .gpio_pin = EVN_NTC_PIN,
 };
 
 const laser_dac_config_t laser_dac = {
@@ -156,8 +178,13 @@ void application_init()
     semaphore_init();
 
     /* initilize the USART */
-    // uarter_init(&uart0_output);
+    uarter_init(&uart0_output);
     uarter_init(&uart1_debug);
+
+    /* GPIO remap */
+    rcu_periph_clock_enable(RCU_AF);
+    gpio_pin_remap_config(GPIO_SWJ_SWDPENABLE_REMAP, ENABLE);
+    gpio_pin_remap_config(GPIO_TIMER1_PARTIAL_REMAP1, ENABLE);
 
     gpio_table_init(gpio_config_table, ARRAYNUM(gpio_config_table));
     extern_Gpio_interrupt_init();
@@ -168,8 +195,11 @@ void application_init()
     fan_timer_FG_config(&cw_wheel_fg);
 
     ntc_adc_config(&ld_ntc);
+    ntc_adc_config(&green_led_ntc);
+    ntc_adc_config(&evn_ntc);
 
     laser_dac_init(&laser_dac);
+    laser_dac_set_value(&laser_dac, 2047);
 
     debug_printf("OV Lcos Board %s finished\r\n", __func__);
     /* print out the clock frequency of system, AHB, APB1 and APB2 */
@@ -179,9 +209,21 @@ void application_init()
     debug_printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
 }
 
+//TODO: add uart0 printf
+
 void USART0_IRQHandler(void)
 {
     uarter_IRQ(&uart0_output);
+}
+
+void USART1_IRQHandler(void)
+{
+    uarter_IRQ(&uart1_debug);
+}
+
+void TIMER0_IRQHandler(void)
+{
+    timer_input_capture_IRQ(&cw_wheel_fg);
 }
 
 void EXTI5_9_IRQHandler(void)
