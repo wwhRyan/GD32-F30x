@@ -40,6 +40,7 @@ void software_triggle_adc_init(rcu_periph_enum adc_clock, uint32_t adc_base, uin
 
 uint16_t get_adc_channel_sample(uint32_t adc_base, uint8_t channel)
 {
+    adc_regular_data_read(adc_base); //clear last adc data
     /* ADC regular channel config */
     adc_regular_channel_config(adc_base, 0U, channel, ADC_SAMPLETIME_7POINT5);
     /* ADC software trigger enable */

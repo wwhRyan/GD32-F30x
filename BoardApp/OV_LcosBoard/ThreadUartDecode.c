@@ -17,6 +17,7 @@
 
 asAtProtocol at_obj;
 extern const Uarter uart0_output;
+extern const Uarter uart1_debug;
 
 void TaskUartDecode(void *pvParameters)
 {
@@ -45,6 +46,14 @@ void TaskUartDecode(void *pvParameters)
             ICmdLinesInput(GetRxData(&uart0_output));
             IAtCmdDecodeAndRun(&at_obj, str);
             ClearRxData(&uart0_output);
+        }
+
+        if(0 != GetRxlen(&uart1_debug))
+        {
+            debug_printf("%s\r\n", GetRxData(&uart1_debug));
+            ICmdLinesInput(GetRxData(&uart1_debug));
+            IAtCmdDecodeAndRun(&at_obj, str);
+            ClearRxData(&uart1_debug);
         }
 
         vTaskDelay(10);

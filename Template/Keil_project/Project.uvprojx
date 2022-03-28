@@ -902,6 +902,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\BoardInit.c</FilePath>
             </File>
+            <File>
+              <FileName>at.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\at.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\cmd.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1801,6 +1811,16 @@
               <FileName>BoardInit.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\BoardInit.c</FilePath>
+            </File>
+            <File>
+              <FileName>at.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\at.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\cmd.c</FilePath>
             </File>
           </Files>
         </Group>

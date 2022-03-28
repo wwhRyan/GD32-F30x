@@ -18,18 +18,21 @@ void software_triggle_dac_init(rcu_periph_enum dac_clock, uint32_t dac_base, uin
 
     dac_deinit();
     /* configure the dac_base */
-    dac_trigger_source_config(dac_base, DAC_TRIGGER_SOFTWARE);
-    dac_trigger_enable(dac_base);
+    dac_trigger_disable(dac_base);
     dac_wave_mode_config(dac_base, DAC_WAVE_DISABLE);
+    dac_output_buffer_enable(dac_base);
 
-    /* enable dac_base and set data */
-    dac_enable(dac_base);
-    dac_data_set(dac_base, DAC_ALIGN_12B_R, 0);
+    /* enable dac_base */
+    // dac_enable(dac_base);
+
+    /* enable DAC concurrent mode and set data */
+    dac_concurrent_enable();
+    dac_concurrent_data_set(DAC_ALIGN_12B_R, 0, 0);
 }
 
 void set_dac_value(uint32_t dac_base, uint32_t value)
 {
-    dac_data_set(dac_base, DAC_ALIGN_12B_R, value);
+    dac_concurrent_data_set(DAC_ALIGN_12B_R, value, value);
 }
 
 void laser_dac_init(const laser_dac_config_t *laser_dac_config)

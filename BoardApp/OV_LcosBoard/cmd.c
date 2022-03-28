@@ -27,12 +27,12 @@ extern const ntc_adc_config_t ld_ntc;
 
 static void m_fan_set(const char *cmd, ...);
 static void m_fan_get(const char *cmd, ...);
-static void m_adc_set(const char *cmd, ...);
+static void m_dac_set(const char *cmd, ...);
 static void m_adc_get(const char *cmd, ...);
 
 ICmdRegister("fanset", m_fan_set);
 ICmdRegister("fanget", m_fan_get);
-ICmdRegister("adcset", m_adc_set);
+ICmdRegister("dacset", m_dac_set);
 ICmdRegister("adcget", m_adc_get);
 
 static void m_fan_set(const char *cmd, ...)
@@ -113,7 +113,7 @@ static void m_dac_set(const char *cmd, ...)
         return;
     }
 
-    if (data[1] > 100 || data[1] < 0)
+    if (data[1] > 4096 || data[1] < 0)
     {
         printf("%s param data[1] error!\n", __func__);
         return;
@@ -154,5 +154,5 @@ static void m_adc_get(const char *cmd, ...)
         printf("adc green led:%d\n", get_ntc_adc_sample(&green_led_ntc));
 
     if (data[0] == 3)
-        printf("adc ld:%d\n", get_ntc_adc_sample(&evn_ntc));
+        printf("adc EVN:%d\n", get_ntc_adc_sample(&evn_ntc));
 }

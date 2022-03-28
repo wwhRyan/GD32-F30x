@@ -92,7 +92,7 @@ const fan_timer_config_t cw_wheel_fg = {
     .timer_channel = TIMER_CH_3,
     .gpio_port = FG_PORT,
     .gpio_pin = FG_PIN,
-    .timer_IRQ = TIMER0_IRQn,
+    .timer_IRQ = TIMER0_Channel_IRQn,
     .channel_interrupt_flag = TIMER_INT_FLAG_CH3,
     .channel_interrupt_enable = TIMER_INT_CH3,
     .p_st_calc = &cw_wheel_fg_calc,
@@ -209,8 +209,6 @@ void application_init()
     debug_printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
 }
 
-//TODO: add uart0 printf
-
 void USART0_IRQHandler(void)
 {
     uarter_IRQ(&uart0_output);
@@ -221,7 +219,7 @@ void USART1_IRQHandler(void)
     uarter_IRQ(&uart1_debug);
 }
 
-void TIMER0_IRQHandler(void)
+void TIMER0_Channel_IRQHandler(void)
 {
     timer_input_capture_IRQ(&cw_wheel_fg);
 }
