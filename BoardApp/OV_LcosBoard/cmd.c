@@ -119,7 +119,10 @@ static void m_dac_set(const char *cmd, ...)
         return;
     }
     if (data[0] == 1)
-        laser_dac_set_value(&laser_dac, data[1]);
+    {
+        GET_TIME(laser_dac_set_value, &laser_dac, data[1]); //81Us
+        GET_NOP_TIME;
+    }
 }
 
 static void m_adc_get(const char *cmd, ...)
