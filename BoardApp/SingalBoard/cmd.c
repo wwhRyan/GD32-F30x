@@ -20,80 +20,55 @@ extern const fan_timer_config_t fan2_pwm;
 extern const fan_timer_config_t fan1_FG;
 extern const fan_timer_config_t fan2_FG;
 
-extern struct ovp921_t ovp921;
-
-static void m_fan_set(const char *cmd, ...);
-static void m_fan_get(const char *cmd, ...);
-
-ICmdRegister("fanset", m_fan_set);
-ICmdRegister("fanget", m_fan_get);
-
-static void m_fan_set(const char *cmd, ...)
+void fanset(char argc, char *argv)
 {
-    int data[2] = {0};
-    int cmdsize = m_CatchCmdSizeBeforeFlag(cmd, "=");
-
-    if (2 != sscanf(cmd + cmdsize, "%d,%d",
-                    &data[0], &data[1]))
+    int fan_idx;
+    int fan_speed;
+    if (argc == 3)
     {
-        printf("%s cmd error!\n", __func__);
-        return;
+        sscanf((const char *)&(argv[argv[1]]), "%d", &fan_idx);
+        sscanf((const char *)&(argv[argv[2]]), "%d", &fan_speed);
+
+        if (fan_idx > fan_max || fan_idx <= 0)
+        {
+            printf("%s param fan_idx error!\n", __func__);
+            return;
+        }
+
+        if (fan_speed > 100 || fan_speed < 0)
+        {
+            printf("%s param fan_speed error!\n", __func__);
+            return;
+        }
+        if (fan_idx == 1)
+            Set_fan_timer_pwm(&fan1_pwm, fan_speed);
+        else if (fan_idx == 2)
+            Set_fan_timer_pwm(&fan2_pwm, fan_speed);
     }
-
-    printf("%s:%d,%d\n", __func__, data[0], data[1]);
-
-    if (data[0] > fan_max || data[0] <= 0)
+    else
     {
-        printf("%s param data[0] error!\n", __func__);
-        return;
+        printf("%s param error!\n", __func__);
     }
-
-    if (data[1] > 100 || data[1] < 0)
-    {
-        printf("%s param data[1] error!\n", __func__);
-        return;
-    }
-    if (data[0] == 1)
-        Set_fan_timer_pwm(&fan1_pwm, data[1]);
-
-    if (data[0] == 2)
-        Set_fan_timer_pwm(&fan2_pwm, data[1]);
 }
 
-extern __IO uint16_t fre;
-static void m_fan_get(const char *cmd, ...)
+void fanget(char argc, char *argv)
 {
-    int data[2] = {0};
-    int cmdsize = m_CatchCmdSizeBeforeFlag(cmd, "=");
-
-    if (2 != sscanf(cmd + cmdsize, "%d,%d",
-                    &data[0], &data[1]))
+    if (argc == 2)
     {
-        printf("%s cmd error!\n", __func__);
-        return;
+        int fan_idx;
+        sscanf((const char *)&(argv[argv[1]]), "%d", &fan_idx);
+        if (fan_idx > fan_max || fan_idx <= 0)
+        {
+            printf("%s param fan_idx error!\n", __func__);
+            return;
+        }
+        if (fan_idx == 1)
+            printf("%d\n", Get_fan_timer_FG(&fan1_FG));
+        else if (fan_idx == 2)
+            printf("%d\n", Get_fan_timer_FG(&fan2_FG));
     }
-
-    printf("%s:%d,%d\n", __func__, data[0], data[1]);
-
-    if (data[0] > fan_max || data[0] <= 0)
+    else
     {
-        printf("%s param data[0] error!\n", __func__);
-        return;
+        printf("%s param error!\n", __func__);
     }
-
-    if (data[1] > 100 || data[1] < 0)
-    {
-        printf("%s param data[1] error!\n", __func__);
-        return;
-    }
-    if (data[0] == 1)
-        printf("fan fre 1:%d\n", (int)Get_fan_timer_FG(&fan1_FG));
-
-    if (data[0] == 2)
-        printf("fan 2:%d\n", (int)Get_fan_timer_FG(&fan2_FG));
-
-    debug_printf("ovp921 id:%#X\r\n", ovp921.chipid.reg.bits.chip_id);
-    debug_printf("ovp921 mark version:%#X\r\n", ovp921.chipid.reg.bits.mask_version);
-
-    debug_printf("ovp921 id2:%#X\r\n", ovp921.chipid2.reg.bits.chip_id2);
 }

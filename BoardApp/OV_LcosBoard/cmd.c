@@ -12,6 +12,7 @@
 #include "main.h"
 #include "Cmdline.h"
 #include "timer.h"
+#include "ovp921.h"
 
 #define FAN_MAX_NUM 1
 #define ADC_MAX_NUM 3
@@ -25,137 +26,135 @@ extern const ntc_adc_config_t evn_ntc;
 extern const ntc_adc_config_t green_led_ntc;
 extern const ntc_adc_config_t ld_ntc;
 
-static void m_fan_set(const char *cmd, ...);
-static void m_fan_get(const char *cmd, ...);
-static void m_dac_set(const char *cmd, ...);
-static void m_adc_get(const char *cmd, ...);
+extern struct ovp921_t ovp921;
 
-ICmdRegister("fanset", m_fan_set);
-ICmdRegister("fanget", m_fan_get);
-ICmdRegister("dacset", m_dac_set);
-ICmdRegister("adcget", m_adc_get);
-
-static void m_fan_set(const char *cmd, ...)
+void fanset(char argc, char *argv)
 {
-    int data[2] = {0};
-    int cmdsize = m_CatchCmdSizeBeforeFlag(cmd, "=");
-
-    if (2 != sscanf(cmd + cmdsize, "%d,%d",
-                    &data[0], &data[1]))
+    int fan_idx;
+    int fan_speed;
+    if (argc == 2 + 1)
     {
-        printf("%s cmd error!\n", __func__);
-        return;
+        sscanf((const char *)&(argv[argv[1]]), "%d", &fan_idx);
+        sscanf((const char *)&(argv[argv[2]]), "%d", &fan_speed);
+
+        if (fan_idx > FAN_MAX_NUM || fan_idx <= 0)
+        {
+            printf("%s param fan_idx error!\n", __func__);
+            return;
+        }
+
+        if (fan_speed > 100 || fan_speed < 0)
+        {
+            printf("%s param fan_speed error!\n", __func__);
+            return;
+        }
+        if (fan_idx == 1)
+            Set_fan_timer_pwm(&cw_wheel_pwm, fan_speed);
     }
-
-    printf("%s:%d,%d\n", __func__, data[0], data[1]);
-
-    if (data[0] > FAN_MAX_NUM || data[0] <= 0)
+    else
     {
-        printf("%s param data[0] error!\n", __func__);
-        return;
+        printf("%s param error!\n", __func__);
     }
-
-    if (data[1] > 100 || data[1] < 0)
-    {
-        printf("%s param data[1] error!\n", __func__);
-        return;
-    }
-    if (data[0] == 1)
-        Set_fan_timer_pwm(&cw_wheel_pwm, data[1]);
 }
 
-static void m_fan_get(const char *cmd, ...)
+void fanget(char argc, char *argv)
 {
-    int data[2] = {0};
-    int cmdsize = m_CatchCmdSizeBeforeFlag(cmd, "=");
-
-    if (2 != sscanf(cmd + cmdsize, "%d,%d",
-                    &data[0], &data[1]))
+    if (argc == FAN_MAX_NUM + 1)
     {
-        printf("%s cmd error!\n", __func__);
-        return;
+        int fan_idx;
+        sscanf((const char *)&(argv[argv[1]]), "%d", &fan_idx);
+        if (fan_idx > FAN_MAX_NUM || fan_idx <= 0)
+        {
+            printf("%s param fan_idx error!\n", __func__);
+            return;
+        }
+        if (fan_idx == 1)
+            printf("%d\n", Get_fan_timer_FG(&cw_wheel_fg));
     }
-
-    printf("%s:%d,%d\n", __func__, data[0], data[1]);
-
-    if (data[0] > FAN_MAX_NUM || data[0] <= 0)
+    else
     {
-        printf("%s param data[0] error!\n", __func__);
-        return;
+        printf("%s param error!\n", __func__);
     }
-
-    if (data[1] > 100 || data[1] < 0)
-    {
-        printf("%s param data[1] error!\n", __func__);
-        return;
-    }
-    if (data[0] == 1)
-        printf("cw fre:%d\n", (int)Get_fan_timer_FG(&cw_wheel_fg));
 }
 
-static void m_dac_set(const char *cmd, ...)
+void dacset(char argc, char *argv)
 {
-    int data[2] = {0};
-    int cmdsize = m_CatchCmdSizeBeforeFlag(cmd, "=");
-
-    if (2 != sscanf(cmd + cmdsize, "%d,%d",
-                    &data[0], &data[1]))
+    int dac_idx;
+    int dac_value;
+    if (argc == 1 + 1)
     {
-        printf("%s cmd error!\n", __func__);
-        return;
+        sscanf((const char *)&(argv[argv[1]]), "%d", &dac_idx);
+        sscanf((const char *)&(argv[argv[2]]), "%d", &dac_value);
+
+        if (dac_idx > DAC_MAX_NUM || dac_idx <= 0)
+        {
+            printf("%s param dac_idx error!\n", __func__);
+            return;
+        }
+
+        if (dac_value > 100 || dac_value < 0)
+        {
+            printf("%s param dac_value error!\n", __func__);
+            return;
+        }
+        if (dac_idx == 1)
+            laser_dac_set_value(&laser_dac, dac_value);
     }
-
-    printf("%s:%d,%d\n", __func__, data[0], data[1]);
-
-    if (data[0] > DAC_MAX_NUM || data[0] <= 0)
+    else
     {
-        printf("%s param data[0] error!\n", __func__);
-        return;
+        printf("%s param error!\n", __func__);
     }
+}
 
-    if (data[1] > 4096 || data[1] < 0)
+void adcget(char argc, char *argv)
+{
+    int adc_idx;
+    if (argc == 1 + 1)
     {
-        printf("%s param data[1] error!\n", __func__);
-        return;
+        sscanf((const char *)&(argv[argv[1]]), "%d", &adc_idx);
+        if (adc_idx > ADC_MAX_NUM || adc_idx <= 0)
+        {
+            printf("%s param adc_idx error!\n", __func__);
+            return;
+        }
+        if (adc_idx == 1)
+            printf("%d\n", get_ntc_adc_sample(&ld_ntc));
+        else if (adc_idx == 2)
+            printf("%d\n", get_ntc_adc_sample(&green_led_ntc));
+        else if (adc_idx == 3)
+            printf("%d\n", get_ntc_adc_sample(&evn_ntc));
     }
-    if (data[0] == 1)
+    else
     {
-        GET_TIME(laser_dac_set_value, &laser_dac, data[1]); //81Us
+        printf("%s param error!\n", __func__);
+    }
+}
+
+void gettime(char argc, char *argv)
+{
+    int val;
+    if (argc == 2)
+    {
+        sscanf((const char *)&(argv[argv[1]]), "%d", &val);
+        GET_TIME(laser_dac_set_value, &laser_dac, val); //81Us
         GET_NOP_TIME;
     }
+    else
+    {
+        printf("%s param error!\n", __func__);
+    }
 }
 
-static void m_adc_get(const char *cmd, ...)
+void chipid(char argc, char *argv)
 {
-    int data[2] = {0};
-    int cmdsize = m_CatchCmdSizeBeforeFlag(cmd, "=");
-
-    if (2 != sscanf(cmd + cmdsize, "%d,%d",
-                    &data[0], &data[1]))
-    {
-        printf("%s cmd error!\n", __func__);
-        return;
-    }
-
-    printf("%s:%d,%d\n", __func__, data[0], data[1]);
-
-    if (data[0] > ADC_MAX_NUM || data[0] <= 0)
-    {
-        printf("%s param data[0] error!\n", __func__);
-        return;
-    }
-
-    if (data[1] > 100 || data[1] < 0)
-    {
-        printf("%s param data[1] error!\n", __func__);
-        return;
-    }
-    if (data[0] == 1)
-        printf("adc ld:%d\n", get_ntc_adc_sample(&ld_ntc));
-
-    if (data[0] == 2)
-        printf("adc green led:%d\n", get_ntc_adc_sample(&green_led_ntc));
-
-    if (data[0] == 3)
-        printf("adc EVN:%d\n", get_ntc_adc_sample(&evn_ntc));
+    debug_printf("ovp921 id:%#X\r\n", ovp921.chipid.reg.bits.chip_id);
+    debug_printf("ovp921 mark version:%#X\r\n", ovp921.chipid.reg.bits.mask_version);
+    debug_printf("ovp921 id2:%#X\r\n", ovp921.chipid2.reg.bits.chip_id2);
 }
+
+ICmdRegister("fanset", fanset);
+ICmdRegister("fanget", fanget);
+ICmdRegister("dacset", dacset);
+ICmdRegister("adcget", adcget);
+ICmdRegister("chipid", chipid);
+ICmdRegister("gettime", gettime);
