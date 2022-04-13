@@ -14,6 +14,19 @@
 
 void TaskIdle(void *pvParameters)
 {
+    struct x
+    {
+        uint16_t a : 4;
+        uint16_t b : 8;
+        uint16_t c : 4;
+    } test;
+
+    test.a = 0b1111;
+    test.b = 0b00000000;
+    test.c = 0b1111;
+
+    debug_printf("test is %#X\r\n", test);
+
     while (1)
     {
         // debug_printf("TaskIdle\r\n");

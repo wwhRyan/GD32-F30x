@@ -17,6 +17,14 @@ struct ovp921_t ovp921 = {
         .reg.bits.pattern_generator_type = 1,
         .reg.bits.pattern_generator_en = 1,
     },
+    .chipid = {
+        .addr = 0x0000,
+        .reg.raw = 0x00,
+    },
+    .chipid2 = {
+        .addr = 0x004F,
+        .reg.raw = 0x00,
+    },
 };
 
 extern const SoftwareI2C ovp921_i2c;
@@ -25,4 +33,10 @@ void show_test_pattern()
 {
     ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_generator.addr,
                          REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_generator.reg.raw, 1, SCCB_DELAY_TIME);
+
+    ISoftwareI2CRegRead(&ovp921_i2c, OVP921_SCCB_ADDRESS_READ, ovp921.chipid.addr,
+                        REG_ADDR_2BYTE, (uint8_t *)&ovp921.chipid.reg.raw, 1, SCCB_DELAY_TIME);
+
+    ISoftwareI2CRegRead(&ovp921_i2c, OVP921_SCCB_ADDRESS_READ, ovp921.chipid2.addr,
+                        REG_ADDR_2BYTE, (uint8_t *)&ovp921.chipid2.reg.raw, 1, SCCB_DELAY_TIME);
 }

@@ -12,12 +12,15 @@
 #include "main.h"
 #include "Cmdline.h"
 #include "timer.h"
+#include "ovp921.h"
 
 #define fan_max 2
 extern const fan_timer_config_t fan1_pwm;
 extern const fan_timer_config_t fan2_pwm;
 extern const fan_timer_config_t fan1_FG;
 extern const fan_timer_config_t fan2_FG;
+
+extern struct ovp921_t ovp921;
 
 static void m_fan_set(const char *cmd, ...);
 static void m_fan_get(const char *cmd, ...);
@@ -88,4 +91,9 @@ static void m_fan_get(const char *cmd, ...)
 
     if (data[0] == 2)
         printf("fan 2:%d\n", (int)Get_fan_timer_FG(&fan2_FG));
+
+    debug_printf("ovp921 id:%#X\r\n", ovp921.chipid.reg.bits.chip_id);
+    debug_printf("ovp921 mark version:%#X\r\n", ovp921.chipid.reg.bits.mask_version);
+
+    debug_printf("ovp921 id2:%#X\r\n", ovp921.chipid2.reg.bits.chip_id2);
 }
