@@ -12,6 +12,7 @@
 #include "main.h"
 #include "gd32f30x.h"
 #include "BoardInit.h"
+#include "ovp921.h"
 
 extern const Uarter uart0_output;
 
@@ -30,6 +31,7 @@ void TaskSectionCurrent(void *pvParameters)
             ClearRxData(&uart0_output);
         }
 #endif
-        vTaskDelay(10);
+        vTaskDelay(500);
+        show_test_pattern();
     }
 }

@@ -4,38 +4,34 @@
 #define OPTION_WRITE 0
 #define OPTION_READ 1
 
-static bool m_SoftI2cSclHigh(SoftwareI2C *psI2c);
-static bool m_SoftI2cSclLow(SoftwareI2C *psI2c);
-static bool m_SoftI2cSdaHigh(SoftwareI2C *psI2c);
-static bool m_SoftI2cSdaLow(SoftwareI2C *psI2c);
-static void m_SoftI2cDelay(SoftwareI2C *psI2c);
-static FlagStatus m_GetSoftI2cSda(SoftwareI2C *psI2c);
-static bool m_SoftI2cStart(SoftwareI2C *psI2c);
-static bool m_SoftI2cStop(SoftwareI2C *psI2c);
-static bool m_SoftI2cAck(SoftwareI2C *psI2c);
-static bool m_SoftI2cNAck(SoftwareI2C *psI2c);
-static bool m_SoftI2cWaitAck(SoftwareI2C *psI2c);
+static bool m_SoftI2cSclHigh(const SoftwareI2C *psI2c);
+static bool m_SoftI2cSclLow(const SoftwareI2C *psI2c);
+static bool m_SoftI2cSdaHigh(const SoftwareI2C *psI2c);
+static bool m_SoftI2cSdaLow(const SoftwareI2C *psI2c);
+static void m_SoftI2cDelay(const SoftwareI2C *psI2c);
+static FlagStatus m_GetSoftI2cSda(const SoftwareI2C *psI2c);
+static bool m_SoftI2cStart(const SoftwareI2C *psI2c);
+static bool m_SoftI2cStop(const SoftwareI2C *psI2c);
+static bool m_SoftI2cAck(const SoftwareI2C *psI2c);
+static bool m_SoftI2cNAck(const SoftwareI2C *psI2c);
+static bool m_SoftI2cWaitAck(const SoftwareI2C *psI2c);
 
-static bool m_SoftI2cWriteByte(SoftwareI2C *psI2c, uint8_t byte);
-static uint8_t m_SoftI2cReadByte(SoftwareI2C *psI2c);
+static bool m_SoftI2cWriteByte(const SoftwareI2C *psI2c, uint8_t byte);
+static uint8_t m_SoftI2cReadByte(const SoftwareI2C *psI2c);
 
-static bool m_SoftI2cSendAddress(SoftwareI2C *psI2c, uint8_t option,
+static bool m_SoftI2cSendAddress(const SoftwareI2C *psI2c, uint8_t option,
 								 uint16_t dev_addr, uint16_t reg_addr, uint8_t reg_addr_type);
-static bool m_SoftI2cBurst(SoftwareI2C *psI2c, uint8_t option,
+static bool m_SoftI2cBurst(const SoftwareI2C *psI2c, uint8_t option,
 						   uint8_t *pData, uint16_t size, uint32_t timeout);
 
-SoftwareI2C g_3555_SoftwareI2C;
-SoftwareI2C g_A5931_SoftwareI2C;
-SoftwareI2C g_31790_SoftwareI2C;
-SoftwareI2C g_Eeprom_SoftwareI2C;
+// SoftwareI2C g_3555_SoftwareI2C;
+// SoftwareI2C g_A5931_SoftwareI2C;
+// SoftwareI2C g_31790_SoftwareI2C;
+// SoftwareI2C g_Eeprom_SoftwareI2C;
 
-void INewSoftwareI2C(SoftwareI2C *psI2c, uint16_t delay_time, uint32_t sda_port, uint32_t scl_port, uint32_t sda_pin, uint32_t scl_pin)
+void INewSoftwareI2C(const SoftwareI2C *psI2c)
 {
-	psI2c->sda_port = sda_port;
-	psI2c->scl_port = scl_port;
-	psI2c->sda_pin = sda_pin;
-	psI2c->scl_pin = scl_pin;
-	psI2c->delay_time = delay_time;
+	assert(psI2c != NULL);
 
 	gpio_init(psI2c->sda_port, GPIO_MODE_OUT_OD, GPIO_OSPEED_50MHZ, psI2c->sda_pin);
 	gpio_init(psI2c->scl_port, GPIO_MODE_OUT_OD, GPIO_OSPEED_50MHZ, psI2c->scl_pin);
@@ -44,25 +40,25 @@ void INewSoftwareI2C(SoftwareI2C *psI2c, uint16_t delay_time, uint32_t sda_port,
 	gpio_bit_write(psI2c->scl_port, psI2c->scl_pin, SET);
 }
 
-static bool m_SoftI2cSclHigh(SoftwareI2C *psI2c)
+static bool m_SoftI2cSclHigh(const SoftwareI2C *psI2c)
 {
 	gpio_bit_write(psI2c->scl_port, psI2c->scl_pin, SET);
 	return true;
 }
 
-static bool m_SoftI2cSclLow(SoftwareI2C *psI2c)
+static bool m_SoftI2cSclLow(const SoftwareI2C *psI2c)
 {
 	gpio_bit_write(psI2c->scl_port, psI2c->scl_pin, RESET);
 	return true;
 }
 
-static bool m_SoftI2cSdaHigh(SoftwareI2C *psI2c)
+static bool m_SoftI2cSdaHigh(const SoftwareI2C *psI2c)
 {
 	gpio_bit_write(psI2c->sda_port, psI2c->sda_pin, SET);
 	return true;
 }
 
-static bool m_SoftI2cSdaLow(SoftwareI2C *psI2c)
+static bool m_SoftI2cSdaLow(const SoftwareI2C *psI2c)
 {
 	gpio_bit_write(psI2c->sda_port, psI2c->sda_pin, RESET);
 	return true;
@@ -96,17 +92,17 @@ void DelayUs(uint32_t nus)
 	} while (abs(val - mark_time) <= nus * SystemCoreClock / 1000000U);
 }
 
-static void m_SoftI2cDelay(SoftwareI2C *psI2c)
+static void m_SoftI2cDelay(const SoftwareI2C *psI2c)
 {
 	DelayUs(psI2c->delay_time);
 }
 
-static FlagStatus m_GetSoftI2cSda(SoftwareI2C *psI2c)
+static FlagStatus m_GetSoftI2cSda(const SoftwareI2C *psI2c)
 {
 	return gpio_input_bit_get(psI2c->sda_port, psI2c->sda_pin);
 }
 
-static bool m_SoftI2cStart(SoftwareI2C *psI2c)
+static bool m_SoftI2cStart(const SoftwareI2C *psI2c)
 {
 	bool tmpRst = true;
 
@@ -124,7 +120,7 @@ static bool m_SoftI2cStart(SoftwareI2C *psI2c)
 	return tmpRst;
 }
 
-static bool m_SoftI2cStop(SoftwareI2C *psI2c)
+static bool m_SoftI2cStop(const SoftwareI2C *psI2c)
 {
 	bool tmpRst = true;
 
@@ -143,7 +139,7 @@ static bool m_SoftI2cStop(SoftwareI2C *psI2c)
 	return tmpRst;
 }
 
-static bool m_SoftI2cAck(SoftwareI2C *psI2c)
+static bool m_SoftI2cAck(const SoftwareI2C *psI2c)
 {
 	bool tmpRst = true;
 
@@ -162,7 +158,7 @@ static bool m_SoftI2cAck(SoftwareI2C *psI2c)
 	return tmpRst;
 }
 
-static bool m_SoftI2cNAck(SoftwareI2C *psI2c)
+static bool m_SoftI2cNAck(const SoftwareI2C *psI2c)
 {
 	bool tmpRst = true;
 
@@ -181,7 +177,7 @@ static bool m_SoftI2cNAck(SoftwareI2C *psI2c)
 	return tmpRst;
 }
 
-static bool m_SoftI2cWaitAck(SoftwareI2C *psI2c)
+static bool m_SoftI2cWaitAck(const SoftwareI2C *psI2c)
 {
 	uint8_t i = 0;
 
@@ -200,7 +196,7 @@ static bool m_SoftI2cWaitAck(SoftwareI2C *psI2c)
 		if (i >= 250)
 		{
 			m_SoftI2cStop(psI2c);
-			DebugPrintf("slave no ack\r\n");
+			debug_printf("slave no ack\r\n");
 			return false;
 		}
 	}
@@ -223,7 +219,7 @@ static bool m_SoftI2cWaitAck(SoftwareI2C *psI2c)
  * @param timeout transfer timeout
  * @return bool 
  */
-bool ISoftwareI2CRegWrite(SoftwareI2C *psI2c, uint16_t dev_addr, uint16_t reg_addr, uint8_t reg_addr_type, uint8_t *pData, uint16_t size, uint32_t timeout)
+bool ISoftwareI2CRegWrite(const SoftwareI2C *psI2c, uint16_t dev_addr, uint16_t reg_addr, uint8_t reg_addr_type, uint8_t *pData, uint16_t size, uint32_t timeout)
 {
 	bool tempRet = true;
 
@@ -242,7 +238,7 @@ bool ISoftwareI2CRegWrite(SoftwareI2C *psI2c, uint16_t dev_addr, uint16_t reg_ad
 	return tempRet;
 }
 
-bool ISoftwareI2CRegRead(SoftwareI2C *psI2c, uint16_t dev_addr, uint16_t reg_addr, uint8_t reg_addr_type, uint8_t *pData, uint16_t size, uint32_t timeout)
+bool ISoftwareI2CRegRead(const SoftwareI2C *psI2c, uint16_t dev_addr, uint16_t reg_addr, uint8_t reg_addr_type, uint8_t *pData, uint16_t size, uint32_t timeout)
 {
 
 	bool tempRet = true;
@@ -262,7 +258,7 @@ bool ISoftwareI2CRegRead(SoftwareI2C *psI2c, uint16_t dev_addr, uint16_t reg_add
 	return tempRet;
 }
 
-static bool m_SoftI2cWriteByte(SoftwareI2C *psI2c, uint8_t byte)
+static bool m_SoftI2cWriteByte(const SoftwareI2C *psI2c, uint8_t byte)
 {
 	uint8_t i = 8;
 	bool tmpRst = true;
@@ -289,7 +285,7 @@ static bool m_SoftI2cWriteByte(SoftwareI2C *psI2c, uint8_t byte)
 	return tmpRst;
 }
 
-static uint8_t m_SoftI2cReadByte(SoftwareI2C *psI2c)
+static uint8_t m_SoftI2cReadByte(const SoftwareI2C *psI2c)
 {
 	uint8_t i = 8;
 	uint8_t byte = 0;
@@ -312,7 +308,7 @@ static uint8_t m_SoftI2cReadByte(SoftwareI2C *psI2c)
 	return byte;
 }
 
-static bool m_SoftI2cSendAddress(SoftwareI2C *psI2c, uint8_t option,
+static bool m_SoftI2cSendAddress(const SoftwareI2C *psI2c, uint8_t option,
 								 uint16_t dev_addr, uint16_t reg_addr, uint8_t reg_addr_type)
 {
 	bool stat = true;
@@ -351,7 +347,7 @@ static bool m_SoftI2cSendAddress(SoftwareI2C *psI2c, uint8_t option,
 	return stat;
 }
 
-static bool m_SoftI2cBurst(SoftwareI2C *psI2c, uint8_t option,
+static bool m_SoftI2cBurst(const SoftwareI2C *psI2c, uint8_t option,
 						   uint8_t *pData, uint16_t size, uint32_t timeout)
 {
 	bool stat = true;

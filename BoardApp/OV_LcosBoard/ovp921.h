@@ -14,5 +14,8 @@
 
 #include "ovp921_reg.h"
 #include "main.h"
+#include "i2c.h"
+
+void show_test_pattern(void);
 
 #endif

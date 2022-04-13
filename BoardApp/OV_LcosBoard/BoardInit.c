@@ -15,6 +15,7 @@
 #include "BoardInit.h"
 #include "Common.h"
 #include "i2c.h"
+#include "ovp921.h"
 
 /**
  * @brief -We
@@ -130,6 +131,14 @@ const laser_dac_config_t laser_dac = {
     .gpio_pin = DAC1_PIN,
 };
 
+const SoftwareI2C ovp921_i2c = {
+    .sda_port = SCCB_SDA_PORT,
+    .sda_pin = SCCB_SDA_PIN,
+    .scl_port = SCCB_CLK_PORT,
+    .scl_pin = SCCB_CLK_PIN,
+    .delay_time = SCCB_DELAY_TIME,
+};
+
 void extern_Gpio_interrupt_init()
 {
     //External Interrupt init
@@ -203,6 +212,8 @@ void application_init()
 
     laser_dac_init(&laser_dac);
     laser_dac_set_value(&laser_dac, 2047);
+
+    INewSoftwareI2C(&ovp921_i2c);
 
     debug_printf("OV Lcos Board %s finished\r\n", __func__);
     /* print out the clock frequency of system, AHB, APB1 and APB2 */
