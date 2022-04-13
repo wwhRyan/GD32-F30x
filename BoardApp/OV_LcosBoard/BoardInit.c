@@ -14,6 +14,7 @@
 #include "gd32f307c_eval.h"
 #include "BoardInit.h"
 #include "Common.h"
+#include "i2c.h"
 
 /**
  * @brief -We
@@ -158,7 +159,7 @@ gpio_config_t gpio_config_table[] = {
     {DISCHARGE2_PORT, DISCHARGE2_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
     {SYS_12V_ON_PORT, SYS_12V_ON_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET},
     {EE_WP_PORT, EE_WP_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {OVP921_RESET_PORT, OVP921_RESET_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+    {OVP921_RESET_PORT, OVP921_RESET_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET},
     {MCU_B_LED_EN_PORT, MCU_B_LED_EN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
     {MCU_R_LED_EN_PORT, MCU_R_LED_EN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
     {MCU_G_LED_EN_PORT, MCU_G_LED_EN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
@@ -171,6 +172,8 @@ gpio_config_t gpio_config_table[] = {
     {G_LED_PWM_PORT, G_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
     {B_LED_PWM_PORT, B_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
 };
+
+void omnivision_lcos_init(void);
 
 void application_init()
 {
@@ -207,6 +210,8 @@ void application_init()
     debug_printf("CK_AHB is %d\n", rcu_clock_freq_get(CK_AHB));
     debug_printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
     debug_printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
+
+    omnivision_lcos_init();
 }
 
 void USART0_IRQHandler(void)
@@ -238,4 +243,10 @@ void EXTI5_9_IRQHandler(void)
     {
         exti_interrupt_flag_clear(EXTI_7);
     }
+}
+
+void omnivision_lcos_init()
+{
+    delay_1ms(5);
+    gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
 }

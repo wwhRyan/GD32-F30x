@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\output\</OutputDirectory>
-          <OutputName>Athena</OutputName>
+          <OutputName>AthenaOVLcos</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -912,6 +912,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\cmd.c</FilePath>
             </File>
+            <File>
+              <FileName>ovp921.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\ovp921.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -959,7 +964,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\output\</OutputDirectory>
-          <OutputName>Athena</OutputName>
+          <OutputName>AthenaSignalBoard</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -1821,6 +1826,11 @@
               <FileName>cmd.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\cmd.c</FilePath>
+            </File>
+            <File>
+              <FileName>ovp921.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\ovp921.c</FilePath>
             </File>
           </Files>
         </Group>
