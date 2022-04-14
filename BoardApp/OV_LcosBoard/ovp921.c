@@ -12,16 +12,18 @@
 #include "ovp921.h"
 
 struct ovp921_t ovp921 = {
-    .pattern_generator = {
-        .addr = 0x0100,
-        .reg.raw = 0x00,
-    },
+    // chip ID and serial port
     .chipid = {
         .addr = 0x0000,
         .reg.raw = 0x00,
     },
     .chipid2 = {
         .addr = 0x004F,
+        .reg.raw = 0x00,
+    },
+    // pattern generator
+    .pattern_generator = {
+        .addr = 0x0100,
         .reg.raw = 0x00,
     },
     .pattern_gen_red_data = {
