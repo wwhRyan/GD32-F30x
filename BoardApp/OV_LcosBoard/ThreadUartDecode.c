@@ -23,11 +23,11 @@ void TaskUartDecode(void *pvParameters)
 {
     IInitAtLib(&at_obj, kAtNormalMode, NULL, debug_printf);
 
-    char str[0xff] = {0};
-
     while (1)
     {
 #if 0
+        char str[0xff] = {0};
+
         debug_printf("Please Input:\n");
         scanf("%200s", str);
         str[strlen(str)] = '\n'; //add '\n' to end of str
@@ -44,10 +44,11 @@ void TaskUartDecode(void *pvParameters)
         {
             debug_printf("%s\r\n", GetRxData(&uart0_output));
             ICmdLinesInput(GetRxData(&uart0_output));
-            IAtCmdDecodeAndRun(&at_obj, str);
+            // IAtCmdDecodeAndRun(&at_obj, str);
             ClearRxData(&uart0_output);
         }
 
+#if 0
         if(0 != GetRxlen(&uart1_debug))
         {
             debug_printf("%s\r\n", GetRxData(&uart1_debug));
@@ -55,7 +56,7 @@ void TaskUartDecode(void *pvParameters)
             IAtCmdDecodeAndRun(&at_obj, str);
             ClearRxData(&uart1_debug);
         }
-
+#endif
         vTaskDelay(10);
     }
 }

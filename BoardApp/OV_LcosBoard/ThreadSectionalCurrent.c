@@ -32,6 +32,5 @@ void TaskSectionCurrent(void *pvParameters)
         }
 #endif
         vTaskDelay(500);
-        show_test_pattern();
     }
 }

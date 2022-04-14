@@ -16,6 +16,14 @@
 #include "main.h"
 #include "i2c.h"
 
-void show_test_pattern(void);
+void red_pattern(void);
+void blue_pattern(void);
+void green_pattern(void);
+
+void gray_ramp_pattern(void);
+void checkerboard_pattern(void);
+void get_chipid(void);
+
+void off_pattern(void);
 
 #endif

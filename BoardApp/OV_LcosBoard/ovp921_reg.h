@@ -278,6 +278,45 @@ typedef struct reg_pattern_gen_hsync_width_t
     } reg;
 } reg_pattern_gen_hsync_width_t;
 
+typedef struct reg_pattern_gen_red_data_t
+{
+    uint16_t addr;
+    union
+    {
+        uint8_t raw;
+        struct
+        {
+            uint8_t reg_pgen_data_r : 8;
+        } bits;
+    } reg;
+} reg_pattern_gen_red_data_t;
+
+typedef struct reg_pattern_gen_green_data_t
+{
+    uint16_t addr;
+    union
+    {
+        uint8_t raw;
+        struct
+        {
+            uint8_t reg_pgen_data_g : 8;
+        } bits;
+    } reg;
+} reg_pattern_gen_green_data_t;
+
+typedef struct reg_pattern_gen_blue_data_t
+{
+    uint16_t addr;
+    union
+    {
+        uint8_t raw;
+        struct
+        {
+            uint8_t reg_pgen_data_b : 8;
+        } bits;
+    } reg;
+} reg_pattern_gen_blue_data_t;
+
 typedef struct reg_chipid_t
 {
     uint16_t addr;
@@ -310,6 +349,9 @@ struct ovp921_t
     reg_pattern_generator_t pattern_generator;
     reg_chipid_t chipid;
     reg_chipid2_t chipid2;
+    reg_pattern_gen_red_data_t pattern_gen_red_data;
+    reg_pattern_gen_green_data_t pattern_gen_green_data;
+    reg_pattern_gen_blue_data_t pattern_gen_blue_data;
 };
 
 #endif

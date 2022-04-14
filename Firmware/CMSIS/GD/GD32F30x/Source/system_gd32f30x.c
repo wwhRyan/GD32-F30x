@@ -575,13 +575,27 @@ static void system_clock_48m_hxtal(void)
     RCU_CFG0 |= RCU_APB1_CKAHB_DIV2;
 
 #if (defined(GD32F30X_HD) || defined(GD32F30X_XD))
+
+#if 0 //8M
     /* select HXTAL/2 as clock source */
     RCU_CFG0 &= ~(RCU_CFG0_PLLSEL | RCU_CFG0_PREDV0);
     RCU_CFG0 |= (RCU_PLLSRC_HXTAL_IRC48M | RCU_CFG0_PREDV0);
 
-    /* CK_PLL = (CK_HXTAL/2) * 12 = 48 MHz */
+    /* CK_PLL = (CK_HXTAL/2) * 30 = 120 MHz */
     RCU_CFG0 &= ~(RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5);
-    RCU_CFG0 |= RCU_PLL_MUL12;
+    RCU_CFG0 |= RCU_PLL_MUL30;
+
+#elif 1 //12M
+    /* select HXTAL as clock source */
+    RCU_CFG0 &= ~(RCU_CFG0_PLLSEL);
+    RCU_CFG0 |= (RCU_PLLSRC_HXTAL_IRC48M);
+
+    /* CK_PLL = (CK_HXTAL) * 10 = 120 MHz */
+    RCU_CFG0 &= ~(RCU_CFG0_PLLMF | RCU_CFG0_PLLMF_4 | RCU_CFG0_PLLMF_5);
+    RCU_CFG0 |= RCU_PLL_MUL10;
+#else
+#error "unsupported HXTAL value"
+#endif /* HXTAL_VALUE */
 
 #elif defined(GD32F30X_CL)
     /* CK_PLL = (CK_PREDIV0) * 12 = 48 MHz */ 
