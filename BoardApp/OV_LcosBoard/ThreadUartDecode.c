@@ -39,7 +39,7 @@ void TaskUartDecode(void *pvParameters)
         debug_printf("TaskUartDecode\r\n");
         debug_printf("TaskUartDecode min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(NULL));
 #endif
-
+#if 0
         if (0 != GetRxlen(&uart0_output))
         {
             debug_printf("%s\r\n", GetRxData(&uart0_output));
@@ -47,16 +47,15 @@ void TaskUartDecode(void *pvParameters)
             // IAtCmdDecodeAndRun(&at_obj, str);
             ClearRxData(&uart0_output);
         }
+#endif
 
-#if 0
-        if(0 != GetRxlen(&uart1_debug))
+        if (0 != GetRxlen(&uart1_debug))
         {
-            debug_printf("%s\r\n", GetRxData(&uart1_debug));
+            debug_printf("rec->:%s\r\n", GetRxData(&uart1_debug));
             ICmdLinesInput(GetRxData(&uart1_debug));
-            IAtCmdDecodeAndRun(&at_obj, str);
+            // IAtCmdDecodeAndRun(&at_obj, str);
             ClearRxData(&uart1_debug);
         }
-#endif
         vTaskDelay(10);
     }
 }

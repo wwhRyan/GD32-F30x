@@ -922,6 +922,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\ovp921.c</FilePath>
             </File>
+            <File>
+              <FileName>basicApp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\basicApp.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1841,6 +1846,11 @@
               <FileName>ovp921.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\ovp921.c</FilePath>
+            </File>
+            <File>
+              <FileName>basicApp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\basicApp.c</FilePath>
             </File>
           </Files>
         </Group>

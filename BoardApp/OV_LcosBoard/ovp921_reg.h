@@ -21,6 +21,18 @@
 #define OVP921_SCCB_ADDRESS_WRITE (uint8_t)(OVP921_SCCB_ADDRESS << 1)
 #define OVP921_SCCB_ADDRESS_READ (uint8_t)(OVP921_SCCB_ADDRESS << 1 | 0x01)
 
+#define CHIP_ID_ADDR 0x0000
+#define MICROLCD_CONTROL_ADDR 0x000A
+#define INCOMING_VIDEO_PROPERTIES_ADDR 0x0014
+#define MISCELLANEOUS_ADDR 0x0040
+#define SCALAR_ADDR 0x00B3
+#define PLL_CONTROL_ADDR 0x00DF
+#define PATTERN_GENERATOR_ADDR 0x0100
+#define MIPI_RECEIVER_ADDR 0x0126
+#define LIGHT_SOURCE_CONTROL_ADDR 0x0194
+#define MIPI_TRANSMITTER_ADDR 0x0600
+#define SPECIAL_CONTROL_SOURCE_ADDR 0x7FC0
+
 #define SCCB_DELAY_TIME 5 //5ms for i2c wait time
 
 /**
@@ -600,6 +612,22 @@ typedef struct reg_pattern_gen_vertical_cross_hatch_x_off_t
     } reg;
 } reg_pattern_gen_vertical_cross_hatch_x_off_t;
 
+typedef struct reg_led_control_t
+{
+    uint16_t addr;
+    union
+    {
+        uint8_t raw;
+        struct
+        {
+            uint8_t blue_LED_en : 1;
+            uint8_t green_LED_en : 1;
+            uint8_t red_LED_en : 1;
+            uint8_t : 5;
+        } bits;
+    } reg;
+} reg_led_control_t;
+
 /*
                       ____  ___   ___      __ 
   ____  _   __ ____  / __ \|__ \ <  /     / /_
@@ -616,9 +644,32 @@ struct ovp921_t
     reg_chipid2_t chipid2;
     // pattern generator
     reg_pattern_generator_t pattern_generator;
+    reg_pattern_gen_grayramp_step_low_t pattern_gen_grayramp_step_low;
+    reg_pattern_gen_grayramp_step_high_t pattern_gen_grayramp_step_high;
     reg_pattern_gen_red_data_t pattern_gen_red_data;
     reg_pattern_gen_green_data_t pattern_gen_green_data;
     reg_pattern_gen_blue_data_t pattern_gen_blue_data;
+    reg_pattern_gen_vsync_width_t pattern_gen_vsync_width;
+    reg_pattern_gen_vsync_front_porch_t pattern_gen_vsync_front_porch;
+    reg_pattern_gen_vsync_back_porch_t pattern_gen_vsync_back_porch;
+    reg_pattern_gen_hsync_width_t pattern_gen_hsync_width;
+    reg_pattern_gen_hsync_front_porch_t pattern_gen_hsync_front_porch;
+    reg_pattern_gen_hsync_back_porch_t pattern_gen_hsync_back_porch;
+    reg_pattern_gen_horizontal_cross_hatch_y_offset_t pattern_gen_horizontal_cross_hatch_y_offset;
+    reg_pattern_gen_horizontal_cross_hatch_y_on_t pattern_gen_horizontal_cross_hatch_y_on;
+    reg_pattern_gen_horizontal_cross_hatch_y_off_t pattern_gen_horizontal_cross_hatch_y_off;
+    reg_pattern_gen_horizontal_cross_hatch_x_offset_t pattern_gen_horizontal_cross_hatch_x_offset;
+    reg_pattern_gen_horizontal_cross_hatch_x_on_t pattern_gen_horizontal_cross_hatch_x_on;
+    reg_pattern_gen_horizontal_cross_hatch_x_off_t pattern_gen_horizontal_cross_hatch_x_off;
+    reg_pattern_gen_vertical_cross_hatch_y_offset_t pattern_gen_vertical_cross_hatch_y_offset;
+    reg_pattern_gen_vertical_cross_hatch_y_on_t pattern_gen_vertical_cross_hatch_y_on;
+    reg_pattern_gen_vertical_cross_hatch_y_off_t pattern_gen_vertical_cross_hatch_y_off;
+    reg_pattern_gen_vertical_cross_hatch_x_offset_t pattern_gen_vertical_cross_hatch_x_offset;
+    reg_pattern_gen_vertical_cross_hatch_x_on_t pattern_gen_vertical_cross_hatch_x_on;
+    reg_pattern_gen_vertical_cross_hatch_x_off_t pattern_gen_vertical_cross_hatch_x_off;
+
+    // light source control
+    reg_led_control_t led_control;
 };
 
 #endif

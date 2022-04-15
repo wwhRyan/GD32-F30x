@@ -11,32 +11,99 @@
 
 #include "ovp921.h"
 
+/**
+ * @brief good thing is we no need to remember the register address and member address
+ * @note bad thind is we have to enter lots of text.
+ * @note if the register number is thousands, we have to transfer ovp921 struct to const, 
+ *      and make the union become pointer. addr become const value.
+ * 
+ */
 struct ovp921_t ovp921 = {
     // chip ID and serial port
     .chipid = {
-        .addr = 0x0000,
-        .reg.raw = 0x00,
+        .addr = CHIP_ID_ADDR,
     },
     .chipid2 = {
-        .addr = 0x004F,
-        .reg.raw = 0x00,
+        .addr = MISCELLANEOUS_ADDR + 0x0f,
     },
+
     // pattern generator
     .pattern_generator = {
-        .addr = 0x0100,
-        .reg.raw = 0x00,
+        .addr = PATTERN_GENERATOR_ADDR,
+    },
+    .pattern_gen_grayramp_step_low = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x01,
+    },
+    .pattern_gen_grayramp_step_high = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x02,
     },
     .pattern_gen_red_data = {
-        .addr = 0x0103,
-        .reg.raw = 0x00,
+        .addr = PATTERN_GENERATOR_ADDR + 0x03,
     },
     .pattern_gen_green_data = {
-        .addr = 0x0104,
-        .reg.raw = 0x00,
+        .addr = PATTERN_GENERATOR_ADDR + 0x04,
     },
     .pattern_gen_blue_data = {
-        .addr = 0x0105,
-        .reg.raw = 0x00,
+        .addr = PATTERN_GENERATOR_ADDR + 0x05,
+    },
+    .pattern_gen_vsync_width = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x06,
+    },
+    .pattern_gen_vsync_front_porch = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x07,
+    },
+    .pattern_gen_vsync_back_porch = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x08,
+    },
+    .pattern_gen_hsync_width = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x09,
+    },
+    .pattern_gen_hsync_front_porch = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x0a,
+    },
+    .pattern_gen_hsync_back_porch = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x0b,
+    },
+    .pattern_gen_horizontal_cross_hatch_y_offset = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x0c,
+    },
+    .pattern_gen_horizontal_cross_hatch_y_on = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x0d,
+    },
+    .pattern_gen_horizontal_cross_hatch_y_off = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x0e,
+    },
+    .pattern_gen_horizontal_cross_hatch_x_offset = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x0f,
+    },
+    .pattern_gen_horizontal_cross_hatch_x_on = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x10,
+    },
+    .pattern_gen_horizontal_cross_hatch_x_off = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x11,
+    },
+    .pattern_gen_vertical_cross_hatch_y_offset = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x12,
+    },
+    .pattern_gen_vertical_cross_hatch_y_on = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x13,
+    },
+    .pattern_gen_vertical_cross_hatch_y_off = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x14,
+    },
+    .pattern_gen_vertical_cross_hatch_x_offset = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x15,
+    },
+    .pattern_gen_vertical_cross_hatch_x_on = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x16,
+    },
+    .pattern_gen_vertical_cross_hatch_x_off = {
+        .addr = PATTERN_GENERATOR_ADDR + 0x17,
+    },
+
+    // light source control
+    .led_control = {
+        .addr = LIGHT_SOURCE_CONTROL_ADDR,
     },
 };
 
@@ -106,4 +173,18 @@ void off_pattern()
     ovp921.pattern_generator.reg.bits.pattern_generator_en = 0;
     ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_generator.addr,
                          REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_generator.reg.raw, 1, SCCB_DELAY_TIME);
+}
+
+uint8_t get_reg(uint16_t reg_addr)
+{
+    uint8_t reg_val = 0;
+    ISoftwareI2CRegRead(&ovp921_i2c, OVP921_SCCB_ADDRESS_READ, reg_addr,
+                        REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);
+    return reg_val;
+}
+
+void set_reg(uint16_t reg_addr, uint8_t reg_val)
+{
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, reg_addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);
 }
