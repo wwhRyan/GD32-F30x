@@ -287,6 +287,9 @@ typedef struct reg_video_XYdim_manuall_t
     } reg;
 } reg_video_XYdim_manuall_t;
 
+/**
+ * @brief conflicting with datasheet
+ */
 typedef struct reg_pattern_generator_t
 {
     uint16_t addr;
@@ -296,8 +299,9 @@ typedef struct reg_pattern_generator_t
         struct
         {
             uint8_t pattern_generator_en : 1;
+            uint8_t : 1;
             uint8_t pattern_generator_type : 2;
-            uint8_t : 5;
+            uint8_t : 4;
         } bits;
     } reg;
 } reg_pattern_generator_t;

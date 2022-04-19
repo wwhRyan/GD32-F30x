@@ -33,7 +33,7 @@ void fanset(char argc, char *argv)
 {
     int fan_idx;
     int fan_speed;
-    if (argc == 2 + 1)
+    if (argc == 1 + 2)
     {
         sscanf((const char *)&(argv[argv[1]]), "%d", &fan_idx);
         sscanf((const char *)&(argv[argv[2]]), "%d", &fan_speed);
@@ -60,7 +60,7 @@ void fanset(char argc, char *argv)
 
 void fanget(char argc, char *argv)
 {
-    if (argc == FAN_MAX_NUM + 1)
+    if (argc == 1 + 1)
     {
         int fan_idx;
         sscanf((const char *)&(argv[argv[1]]), "%d", &fan_idx);
@@ -82,7 +82,7 @@ void dacset(char argc, char *argv)
 {
     int dac_idx;
     int dac_value;
-    if (argc == 1 + 1)
+    if (argc == 1 + 2)
     {
         sscanf((const char *)&(argv[argv[1]]), "%d", &dac_idx);
         sscanf((const char *)&(argv[argv[2]]), "%d", &dac_value);
@@ -99,7 +99,7 @@ void dacset(char argc, char *argv)
             return;
         }
         if (dac_idx == 1)
-            laser_dac_set_value(&laser_dac, dac_value);
+            laser_dac_set_value(&laser_dac, dac_value * 4095 / 100);
     }
     else
     {
@@ -259,17 +259,18 @@ void write(char argc, char *argv)
 {
     uint32_t addr;
     uint32_t val;
-    if (argc == 2 + 1)
+    if (argc >= 2 + 1)
     {
         sscanf((const char *)&(argv[argv[1]]), "%x", &addr);
-        sscanf((const char *)&(argv[argv[2]]), "%x", &val);
-        set_reg((uint16_t)addr, (uint8_t)val);
-        cmd_printf("write addr:%04x val:%02x\r\n", addr, val);
-
-        addr = 0x00;
-        val = 0x00;
-        sscanf((const char *)&(argv[argv[1]]), "%x", &addr);
-        cmd_printf("read addr:%04x val:%02x\r\n", addr, get_reg((uint16_t)addr));
+        for (size_t i = 0; i < argc - 2; i++)
+        {
+            sscanf((const char *)&(argv[argv[i + 2]]), "%x", &val);
+            set_reg((uint16_t)addr, (uint8_t)val);
+            cmd_printf("write addr:%04x val:%02x ", addr, val);
+            cmd_printf("read addr:%04x val:%02x\r\n", addr, get_reg((uint16_t)addr));
+            addr++;
+            val = 0x00;
+        }
     }
     else
     {
@@ -284,6 +285,27 @@ void read(char argc, char *argv)
     {
         sscanf((const char *)&(argv[argv[1]]), "%x", &addr);
         cmd_printf("read addr:%04x val:%02x\r\n", addr, get_reg((uint16_t)addr));
+    }
+    else if (argc == 1 + 2)
+    {
+        int num;
+        sscanf((const char *)&(argv[argv[1]]), "%x", &addr);
+        sscanf((const char *)&(argv[argv[2]]), "%d", &num);
+
+        if (num > 256)
+        {
+            cmd_printf("%s num > 256!\n", __func__);
+            return;
+        }
+        else
+        {
+            for (int i = 0; i < num; i++)
+            {
+                cmd_printf("addr:%04x val:%02x \n", addr, get_reg((uint16_t)addr));
+                addr += 1;
+            }
+            cmd_printf("\r\n");
+        }
     }
     else
     {

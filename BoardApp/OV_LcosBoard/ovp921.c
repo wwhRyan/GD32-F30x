@@ -153,6 +153,46 @@ void gray_ramp_pattern()
 
 void checkerboard_pattern()
 {
+    ovp921.pattern_gen_horizontal_cross_hatch_y_offset.reg.raw = 0x00;
+    ovp921.pattern_gen_horizontal_cross_hatch_y_on.reg.raw = 0x80;
+    ovp921.pattern_gen_horizontal_cross_hatch_y_off.reg.raw = 0x80;
+    ovp921.pattern_gen_horizontal_cross_hatch_x_offset.reg.raw = 0x00;
+    ovp921.pattern_gen_horizontal_cross_hatch_x_on.reg.raw = 0x80;
+    ovp921.pattern_gen_horizontal_cross_hatch_x_off.reg.raw = 0x80;
+    ovp921.pattern_gen_vertical_cross_hatch_y_offset.reg.raw = 0x80;
+    ovp921.pattern_gen_vertical_cross_hatch_y_on.reg.raw = 0x80;
+    ovp921.pattern_gen_vertical_cross_hatch_y_off.reg.raw = 0x80;
+    ovp921.pattern_gen_vertical_cross_hatch_x_offset.reg.raw = 0x80;
+    ovp921.pattern_gen_vertical_cross_hatch_x_on.reg.raw = 0x80;
+    ovp921.pattern_gen_vertical_cross_hatch_x_off.reg.raw = 0x80;
+
+    show_solid_color_pattern(0xFF, 0xff, 0xff);
+
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_horizontal_cross_hatch_y_offset.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_horizontal_cross_hatch_y_offset.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_horizontal_cross_hatch_y_on.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_horizontal_cross_hatch_y_on.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_horizontal_cross_hatch_y_off.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_horizontal_cross_hatch_y_off.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_horizontal_cross_hatch_x_offset.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_horizontal_cross_hatch_x_offset.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_horizontal_cross_hatch_x_on.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_horizontal_cross_hatch_x_on.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_horizontal_cross_hatch_x_off.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_horizontal_cross_hatch_x_off.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_vertical_cross_hatch_y_offset.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_vertical_cross_hatch_y_offset.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_vertical_cross_hatch_y_on.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_vertical_cross_hatch_y_on.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_vertical_cross_hatch_y_off.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_vertical_cross_hatch_y_off.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_vertical_cross_hatch_x_offset.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_vertical_cross_hatch_x_offset.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_vertical_cross_hatch_x_on.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_vertical_cross_hatch_x_on.reg.raw, 1, SCCB_DELAY_TIME);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_gen_vertical_cross_hatch_x_off.addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_gen_vertical_cross_hatch_x_off.reg.raw, 1, SCCB_DELAY_TIME);
+
     ovp921.pattern_generator.reg.bits.pattern_generator_type = 2;
     ovp921.pattern_generator.reg.bits.pattern_generator_en = 1;
     ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_generator.addr,

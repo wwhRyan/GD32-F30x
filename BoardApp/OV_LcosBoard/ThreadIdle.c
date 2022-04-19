@@ -11,6 +11,8 @@
 
 #include "main.h"
 #include "gd32f30x.h"
+#include "ovp921.h"
+#include "basicApp.h"
 
 void TaskIdle(void *pvParameters)
 {
@@ -26,6 +28,14 @@ void TaskIdle(void *pvParameters)
     test.c = 0xf;
 
     debug_printf("test is %#X\r\n", test);
+
+    for (int i = 0; i < 20; i++)
+    {
+        debug_printf("%ds\r\n", i);
+        vTaskDelay(1000);
+    }
+    laser_on();
+    debug_printf("laser on\r\n");
 
     while (1)
     {
