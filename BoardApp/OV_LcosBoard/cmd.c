@@ -211,6 +211,18 @@ void testpattern(char argc, char *argv)
     }
 }
 
+int get_color_idx(char *color)
+{
+    if (!strcmp("r", color) || !strcmp("R", color))
+        return (int)RED;
+    else if (!strcmp("g", color) || !strcmp("G", color))
+        return (int)GREEN;
+    else if (!strcmp("b", color) || !strcmp("B", color))
+        return (int)BLUE;
+    else
+        return -1;
+}
+
 void laser(char argc, char *argv)
 {
     if (argc == 1 + 1)
@@ -221,6 +233,7 @@ void laser(char argc, char *argv)
             cmd_printf("options: \r\n");
             cmd_printf("\t on \t: turn on laser\r\n");
             cmd_printf("\t off \t: turn off laser\r\n");
+            cmd_printf("\t R 0.7 \t: set laser Red current\r\n");
         }
         else if (!strcmp("on", &argv[argv[1]]))
         {
@@ -237,22 +250,25 @@ void laser(char argc, char *argv)
             cmd_printf("%s param error!\n", __func__);
         }
     }
+    else if (argc == 1 + 2)
+    {
+        float current;
+        int idx = get_color_idx(&argv[argv[1]]);
+        if (idx < 0)
+        {
+            cmd_printf("%s color can`t resolve!\n", __func__);
+            return;
+        }
+        sscanf((const char *)&(argv[argv[2]]), "%f", &current);
+        if (true == laser_set(idx, current))
+            cmd_printf("laser idx %d current set to %f\r\n", idx, current);
+        else
+            cmd_printf("laser idx %d current set failed!\r\n", idx);
+    }
     else
     {
         cmd_printf("%s param num error!\n", __func__);
     }
-}
-
-void laseron(char argc, char *argv)
-{
-    laser_on();
-    cmd_printf("laser on\r\n");
-}
-
-void laseroff(char argc, char *argv)
-{
-    laser_off();
-    cmd_printf("laser off\r\n");
 }
 
 void write(char argc, char *argv)
@@ -322,6 +338,4 @@ ICmdRegister("adcget", adcget);
 ICmdRegister("chipid", chipid);
 ICmdRegister("gettime", gettime);
 ICmdRegister("laser", laser);
-ICmdRegister("laseron", laseron);
-ICmdRegister("laseroff", laseroff);
 ICmdRegister("testpattern", testpattern);

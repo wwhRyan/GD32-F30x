@@ -143,7 +143,7 @@ void extern_Gpio_interrupt_init()
 {
     //External Interrupt init
     rcu_periph_clock_enable(RCU_AF);
-    gpio_init(R_LED_PWM_PORT, GPIO_MODE_AIN, GPIO_OSPEED_10MHZ,
+    gpio_init(R_LED_PWM_PORT, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_10MHZ,
               R_LED_PWM_PIN | G_LED_PWM_PIN | B_LED_PWM_PIN);
     /* enable and set gpio EXTI interrupt to the lowest priority */
     nvic_irq_enable(EXTI5_9_IRQn, 0, 0);
@@ -210,8 +210,8 @@ void application_init()
     ntc_adc_config(&green_led_ntc);
     ntc_adc_config(&evn_ntc);
 
-    laser_dac_init(&laser_dac);
-    laser_dac_set_value(&laser_dac, 2047);
+    // laser_dac_init(&laser_dac);
+    // laser_dac_set_value(&laser_dac, 2047);
 
     INewSoftwareI2C(&ovp921_i2c);
 

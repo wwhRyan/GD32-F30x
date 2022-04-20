@@ -30,8 +30,10 @@ typedef struct __SoftwareI2C{
 void DelayUs(uint32_t nus);
 
 void INewSoftwareI2C(const SoftwareI2C *psI2c);
-bool ISoftwareI2CRegWrite(const SoftwareI2C* psI2c, uint16_t dev_addr, uint16_t reg_addr, uint8_t reg_addr_type, uint8_t *pData, uint16_t size, uint32_t timeout);
-bool ISoftwareI2CRegRead(const SoftwareI2C* psI2c, uint16_t dev_addr, uint16_t reg_addr, uint8_t reg_addr_type, uint8_t *pData, uint16_t size, uint32_t timeout);
+bool ISoftwareI2CRegWrite(const SoftwareI2C* psI2c, uint16_t dev_addr, uint16_t reg_addr, 
+                uint8_t reg_addr_type, uint8_t *pData, uint16_t size, uint32_t timeout);
+bool ISoftwareI2CRegRead(const SoftwareI2C* psI2c, uint16_t dev_addr, uint16_t reg_addr, 
+                uint8_t reg_addr_type, uint8_t *pData, uint16_t size, uint32_t timeout);
 
 #endif // __I2C_H
 

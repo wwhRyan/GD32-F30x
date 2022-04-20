@@ -17,7 +17,14 @@
 #include "BoardInit.h"
 #include "Common.h"
 
+typedef enum color_current_t{
+    RED,
+    GREEN,
+    BLUE,
+}laser_color_t;
+
 void laser_on(void);
 void laser_off(void);
+bool laser_set(int idx, float current);
 
 #endif

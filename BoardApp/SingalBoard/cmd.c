@@ -12,7 +12,6 @@
 #include "main.h"
 #include "Cmdline.h"
 #include "timer.h"
-#include "ovp921.h"
 
 #define fan_max 2
 extern const fan_timer_config_t fan1_pwm;
