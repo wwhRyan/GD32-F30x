@@ -166,6 +166,12 @@ void testpattern(char argc, char *argv)
             cmd_printf("\t red \t: show red\r\n");
             cmd_printf("\t green \t: show green\r\n");
             cmd_printf("\t blue \t: show blue\r\n");
+            cmd_printf("\t white \t: show white\r\n");
+            cmd_printf("\t black \t: show black\r\n");
+            cmd_printf("\t yellow \t: show yellow\r\n");
+            cmd_printf("\t cyan \t: show cyan\r\n");
+            cmd_printf("\t magenta \t: show magenta\r\n");
+            cmd_printf("\t gray \t: show gray\r\n");
             cmd_printf("\t ramp \t: show ramp\r\n");
             cmd_printf("\t checkerboard \t: show checkerboard\r\n");
             cmd_printf("\t off \t: show off\r\n");
@@ -177,18 +183,48 @@ void testpattern(char argc, char *argv)
         }
         else if (!strcmp("red", &argv[argv[1]]))
         {
-            red_pattern();
+            show_solid_color_pattern(0xFF, 0x00, 0x00);
             cmd_printf("show red\r\n");
         }
         else if (!strcmp("blue", &argv[argv[1]]))
         {
-            blue_pattern();
+            show_solid_color_pattern(0x00, 0x00, 0xFF);
             cmd_printf("show blue\r\n");
         }
         else if (!strcmp("green", &argv[argv[1]]))
         {
-            green_pattern();
+            show_solid_color_pattern(0x00, 0xFF, 0x00);
             cmd_printf("show green\r\n");
+        }
+        else if (!strcmp("white", &argv[argv[1]]))
+        {
+            show_solid_color_pattern(0xFF, 0xFF, 0xFF);
+            cmd_printf("show white\r\n");
+        }
+        else if (!strcmp("black", &argv[argv[1]]))
+        {
+            show_solid_color_pattern(0x00, 0x00, 0x00);
+            cmd_printf("show black\r\n");
+        }
+        else if (!strcmp("yellow", &argv[argv[1]]))
+        {
+            show_solid_color_pattern(0xFF, 0xFF, 0x00);
+            cmd_printf("show yellow\r\n");
+        }
+        else if (!strcmp("cyan", &argv[argv[1]]))
+        {
+            show_solid_color_pattern(0x00, 0xFF, 0xFF);
+            cmd_printf("show cyan\r\n");
+        }
+        else if (!strcmp("magenta", &argv[argv[1]]))
+        {
+            show_solid_color_pattern(0xFF, 0x00, 0xFF);
+            cmd_printf("show magenta\r\n");
+        }
+        else if (!strcmp("gray", &argv[argv[1]]))
+        {
+            show_solid_color_pattern(0x80, 0x80, 0x80);
+            cmd_printf("show gray\r\n");
         }
         else if (!strcmp("checkerboard", &argv[argv[1]]))
         {

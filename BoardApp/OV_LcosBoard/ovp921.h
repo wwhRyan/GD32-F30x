@@ -16,9 +16,7 @@
 #include "main.h"
 #include "i2c.h"
 
-void red_pattern(void);
-void blue_pattern(void);
-void green_pattern(void);
+void show_solid_color_pattern(uint8_t red, uint8_t green, uint8_t blue);
 
 void gray_ramp_pattern(void);
 void checkerboard_pattern(void);

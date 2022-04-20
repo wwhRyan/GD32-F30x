@@ -109,7 +109,7 @@ struct ovp921_t ovp921 = {
 
 extern const SoftwareI2C ovp921_i2c;
 
-static void show_solid_color_pattern(uint8_t red, uint8_t green, uint8_t blue)
+void show_solid_color_pattern(uint8_t red, uint8_t green, uint8_t blue)
 {
     ovp921.pattern_gen_red_data.reg.bits.reg_pgen_data_r = red;
     ovp921.pattern_gen_green_data.reg.bits.reg_pgen_data_g = green;
@@ -128,23 +128,10 @@ static void show_solid_color_pattern(uint8_t red, uint8_t green, uint8_t blue)
                          REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_generator.reg.raw, 1, SCCB_DELAY_TIME);
 }
 
-void red_pattern()
-{
-    show_solid_color_pattern(0xFF, 0x00, 0x00);
-}
-
-void blue_pattern()
-{
-    show_solid_color_pattern(0x00, 0x00, 0xff);
-}
-
-void green_pattern()
-{
-    show_solid_color_pattern(0x00, 0xff, 0x00);
-}
-
 void gray_ramp_pattern()
 {
+    show_solid_color_pattern(0xFF, 0xFF, 0xFF);
+
     ovp921.pattern_generator.reg.bits.pattern_generator_type = 1;
     ovp921.pattern_generator.reg.bits.pattern_generator_en = 1;
     ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_generator.addr,
