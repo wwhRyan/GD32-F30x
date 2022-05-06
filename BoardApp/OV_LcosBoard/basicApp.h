@@ -26,5 +26,12 @@ typedef enum color_current_t{
 void laser_on(void);
 void laser_off(void);
 bool laser_set(int idx, float current);
+float laser_get(int idx);
+
+uint8_t get_idu_value(float current);
+float get_current_value(uint8_t idu);
+
+bool eeprom_write(uint8_t addr, uint8_t data);
+uint8_t eeprom_read(uint8_t addr);
 
 #endif

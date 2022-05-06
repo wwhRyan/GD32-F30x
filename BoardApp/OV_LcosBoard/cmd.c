@@ -295,6 +295,9 @@ void laser(char argc, char *argv)
             cmd_printf("%s color can`t resolve!\n", __func__);
             return;
         }
+
+        printf("old current: %f\n", laser_get(idx));
+
         sscanf((const char *)&(argv[argv[2]]), "%f", &current);
         if (true == laser_set(idx, current))
             cmd_printf("laser idx %d current set to %f\r\n", idx, current);
