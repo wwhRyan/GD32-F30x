@@ -29,18 +29,17 @@ void TaskIdle(void *pvParameters)
 
     debug_printf("test is %#X\r\n", test);
 
+    for (int i = 0; i < 10; i++)
+    {
+        debug_printf("%ds\r\n", i);
+        vTaskDelay(1000);
+    }
     laser_set(RED, 1.0);
     laser_set(GREEN, 0.8);
     laser_set(BLUE, 0.623);
     debug_printf("laser_set RED is %f\r\n", 1.0);
     debug_printf("laser_set GREEN is %f\r\n", 0.8);
     debug_printf("laser_set BLUE is %f\r\n", 0.623);
-
-    for (int i = 0; i < 15; i++)
-    {
-        debug_printf("%ds\r\n", i);
-        vTaskDelay(1000);
-    }
     laser_on();
     debug_printf("laser on\r\n");
 

@@ -31,6 +31,9 @@ void laser_off(void)
  * 
  * @param idx R\G\B\Y 0\1\2\3
  * @param current A
+ * @note i2c addr 0x66
+ * @note i2c speed 100K
+ * @note min 127, max 21
  */
 bool laser_set(int idx, float current)
 {

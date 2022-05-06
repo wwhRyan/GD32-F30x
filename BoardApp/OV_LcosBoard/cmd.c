@@ -54,7 +54,7 @@ void fanset(char argc, char *argv)
     }
     else
     {
-        cmd_printf("%s param error!\n", __func__);
+        cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
@@ -74,7 +74,7 @@ void fanget(char argc, char *argv)
     }
     else
     {
-        cmd_printf("%s param error!\n", __func__);
+        cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
@@ -103,7 +103,7 @@ void dacset(char argc, char *argv)
     }
     else
     {
-        cmd_printf("%s param error!\n", __func__);
+        cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
@@ -127,14 +127,14 @@ void adcget(char argc, char *argv)
     }
     else
     {
-        cmd_printf("%s param error!\n", __func__);
+        cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
 void gettime(char argc, char *argv)
 {
     int val;
-    if (argc == 2)
+    if (argc == 1 + 1)
     {
         sscanf((const char *)&(argv[argv[1]]), "%d", &val);
         cmd_printf("set laser val = %d\n", val);
@@ -143,7 +143,7 @@ void gettime(char argc, char *argv)
     }
     else
     {
-        cmd_printf("%s param error!\n", __func__);
+        cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
@@ -243,7 +243,7 @@ void testpattern(char argc, char *argv)
     }
     else
     {
-        cmd_printf("%s param error!\n", __func__);
+        cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
@@ -303,7 +303,7 @@ void laser(char argc, char *argv)
     }
     else
     {
-        cmd_printf("%s param num error!\n", __func__);
+        cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
@@ -326,7 +326,7 @@ void write(char argc, char *argv)
     }
     else
     {
-        cmd_printf("%s param error!\n", __func__);
+        cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
@@ -353,7 +353,7 @@ void read(char argc, char *argv)
         {
             for (int i = 0; i < num; i++)
             {
-                cmd_printf("addr:%04x val:%02x \n", addr, get_reg((uint16_t)addr));
+                cmd_printf("addr:%04x val:%02x \r\n", addr, get_reg((uint16_t)addr));
                 addr += 1;
             }
             cmd_printf("\r\n");
@@ -361,7 +361,47 @@ void read(char argc, char *argv)
     }
     else
     {
-        cmd_printf("%s param error!\n", __func__);
+        cmd_printf("%s Please input right param!\n", __func__);
+    }
+}
+
+void reset(char argc, char *argv)
+{
+    if (argc == 1 + 1)
+    {
+        if (!strcmp("-h", &argv[argv[1]]))
+        {
+            cmd_printf("useage: %s [options]\r\n", __func__);
+            cmd_printf("options: \r\n");
+            cmd_printf("\t ov \t: ovp921 reset\r\n");
+            cmd_printf("\t sys \t: sys 12V reset\r\n");
+        }
+        else if (!strcmp("ov", &argv[argv[1]]))
+        {
+            gpio_bit_set(OVP921_RESET_PORT, OVP921_RESET_PIN);
+            vTaskDelay(1000);
+            gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
+            cmd_printf("reset ovp921 reset pin.\r\n");
+        }
+        else if (!strcmp("sys", &argv[argv[1]]))
+        {
+            gpio_bit_set(OVP921_RESET_PORT, OVP921_RESET_PIN);
+            gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
+            vTaskDelay(1000);
+            gpio_bit_set(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
+            cmd_printf("reset sys 12V reset pin.\r\n");
+            vTaskDelay(1000);
+            gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
+            cmd_printf("reset ovp921 reset pin.\r\n");
+        }
+        else
+        {
+            cmd_printf("%s param error!\n", __func__);
+        }
+    }
+    else
+    {
+        cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
@@ -375,3 +415,4 @@ ICmdRegister("chipid", chipid);
 ICmdRegister("gettime", gettime);
 ICmdRegister("laser", laser);
 ICmdRegister("testpattern", testpattern);
+ICmdRegister("reset", reset);
