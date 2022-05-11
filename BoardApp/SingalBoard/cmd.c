@@ -40,9 +40,15 @@ void fanset(char argc, char *argv)
             return;
         }
         if (fan_idx == 1)
+        {
             Set_fan_timer_pwm(&fan1_pwm, fan_speed);
+            printf("%s fan1_pwm set %d\n", __func__, fan_speed);
+        }
         else if (fan_idx == 2)
+        {
             Set_fan_timer_pwm(&fan2_pwm, fan_speed);
+            printf("%s fan2_pwm set %d\n", __func__, fan_speed);
+        }
     }
     else
     {
@@ -62,12 +68,15 @@ void fanget(char argc, char *argv)
             return;
         }
         if (fan_idx == 1)
-            printf("%d\n", Get_fan_timer_FG(&fan1_FG));
+            printf("fan 1 speed %d RPM\n", Get_fan_timer_FG(&fan1_FG) * 60 / 2);
         else if (fan_idx == 2)
-            printf("%d\n", Get_fan_timer_FG(&fan2_FG));
+            printf("fan 2 speed %d RPM\n", Get_fan_timer_FG(&fan2_FG) * 60 / 2);
     }
     else
     {
         printf("%s param error!\n", __func__);
     }
 }
+
+ICmdRegister("fanset", fanset);
+ICmdRegister("fanget", fanget);

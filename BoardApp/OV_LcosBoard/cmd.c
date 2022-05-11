@@ -28,6 +28,7 @@ extern const ntc_adc_config_t green_led_ntc;
 extern const ntc_adc_config_t ld_ntc;
 
 extern struct ovp921_t ovp921;
+extern const Uarter uart1_debug;
 
 void fanset(char argc, char *argv)
 {
@@ -78,6 +79,18 @@ void fanget(char argc, char *argv)
     }
 }
 
+void bypassfanset(char argc, char *argv)
+{
+    output_printf("%s\n", GetRxData(&uart1_debug));
+    cmd_printf("To SignalBoard: %s\n", GetRxData(&uart1_debug));
+}
+
+void bypassfanget(char argc, char *argv)
+{
+    output_printf("%s\n", GetRxData(&uart1_debug));
+    cmd_printf("To SignalBoard: %s\n", GetRxData(&uart1_debug));
+}
+
 void dacset(char argc, char *argv)
 {
     int dac_idx;
@@ -110,6 +123,7 @@ void dacset(char argc, char *argv)
 void adcget(char argc, char *argv)
 {
     int adc_idx;
+    int value;
     if (argc == 1 + 1)
     {
         sscanf((const char *)&(argv[argv[1]]), "%d", &adc_idx);
@@ -119,11 +133,23 @@ void adcget(char argc, char *argv)
             return;
         }
         if (adc_idx == 1)
-            cmd_printf("%d\n", get_ntc_adc_sample(&ld_ntc));
+        {
+            value = get_ntc_adc_sample(&ld_ntc);
+            cmd_printf("%d\n", value);
+            cmd_printf("%f\n", get_temperature(value));
+        }
         else if (adc_idx == 2)
-            cmd_printf("%d\n", get_ntc_adc_sample(&green_led_ntc));
+        {
+            value = get_ntc_adc_sample(&green_led_ntc);
+            cmd_printf("%d\n", value);
+            cmd_printf("%f\n", get_temperature(value));
+        }
         else if (adc_idx == 3)
-            cmd_printf("%d\n", get_ntc_adc_sample(&evn_ntc));
+        {
+            value = get_ntc_adc_sample(&evn_ntc);
+            cmd_printf("%d\n", value);
+            cmd_printf("%f\n", get_temperature(value));
+        }
     }
     else
     {
@@ -408,10 +434,25 @@ void reset(char argc, char *argv)
     }
 }
 
+void lcos(char argc, char *argv)
+{
+    /*
+    if (argc == 1 + 1)
+    {
+        if (!strcmp("-h", &argv[argv[1]]))
+        {
+            cmd_printf("useage: %s get lcos temprature\r\n", __func__);
+        }
+    }*/
+    set_reg(0x0049, 0xFF);
+    vTaskDelay(1000);
+    cmd_printf("lcos temprature: %d\r\n", get_reg(0x0049) / 2);
+}
+
 ICmdRegister("write", write);
 ICmdRegister("read", read);
-ICmdRegister("fanset", fanset);
-ICmdRegister("fanget", fanget);
+ICmdRegister("fanset", bypassfanset);
+ICmdRegister("fanget", bypassfanget);
 ICmdRegister("dacset", dacset);
 ICmdRegister("adcget", adcget);
 ICmdRegister("chipid", chipid);
@@ -419,3 +460,4 @@ ICmdRegister("gettime", gettime);
 ICmdRegister("laser", laser);
 ICmdRegister("testpattern", testpattern);
 ICmdRegister("reset", reset);
+ICmdRegister("lcos", lcos);

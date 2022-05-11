@@ -73,4 +73,6 @@ char *GetRxData(const Uarter *pUarter);
 int GetRxlen(const Uarter *pUarter);
 void ClearRxData(const Uarter *pUarter);
 
+void uarter_send(const Uarter *pUarter, const char *pData, uint32_t len);
+
 #endif //__UART_H__

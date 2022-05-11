@@ -22,16 +22,16 @@ void TaskUartDecode(void *pvParameters)
 {
     IInitAtLib(&at_obj, kAtNormalMode, NULL, debug_printf);
 
-    char str[0xff] = {0};
+    //char str[0xff] = {0};
 
     while (1)
     {
 
         if (0 != GetRxlen(&uart1_debug))
         {
-            debug_printf("%s\r\n", GetRxData(&uart1_debug));
+            // debug_printf("%s\r\n", GetRxData(&uart1_debug));
             ICmdLinesInput(GetRxData(&uart1_debug));
-            IAtCmdDecodeAndRun(&at_obj, str);
+            // IAtCmdDecodeAndRun(&at_obj, str);
             ClearRxData(&uart1_debug);
         }
 

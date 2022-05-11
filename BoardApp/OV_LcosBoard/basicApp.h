@@ -17,11 +17,20 @@
 #include "BoardInit.h"
 #include "Common.h"
 
-typedef enum color_current_t{
+typedef enum color_current_t
+{
     RED,
     GREEN,
     BLUE,
-}laser_color_t;
+} laser_color_t;
+
+typedef struct ntc_t
+{
+    uint16_t B;
+    uint16_t normal_R;
+    uint16_t divided_voltage_R;
+    bool is_pull_up; // true: divided_voltage_R pull up, false: divided_voltage_R pull down
+} ntc_t;
 
 void laser_on(void);
 void laser_off(void);
@@ -30,6 +39,7 @@ float laser_get(int idx);
 
 uint8_t get_idu_value(float current);
 float get_current_value(uint8_t idu);
+float get_temperature(int adc_value);
 
 bool eeprom_write(uint8_t addr, uint8_t data);
 uint8_t eeprom_read(uint8_t addr);

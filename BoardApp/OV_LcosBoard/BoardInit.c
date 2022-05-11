@@ -261,3 +261,15 @@ void omnivision_lcos_init()
     delay_1ms(5);
     gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
 }
+
+void output_printf(const char *fmt, ...)
+{
+    char buf[256] = {0};
+
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    uarter_send(&uart0_output, buf, strlen(buf));
+}

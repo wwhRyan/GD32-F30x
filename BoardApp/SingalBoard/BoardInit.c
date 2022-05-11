@@ -153,12 +153,13 @@ void application_init()
     fan_timer_FG_config(&fan1_FG);
     fan_timer_FG_config(&fan2_FG);
 
-    debug_printf("Signal Board %s finished\r\n", __func__);
+    // vTaskDelay(3000);
+    debug_printf("Signal Board Init %s finished\r\n", __func__);
     /* print out the clock frequency of system, AHB, APB1 and APB2 */
-    debug_printf("CK_SYS is %d\n", rcu_clock_freq_get(CK_SYS));
-    debug_printf("CK_AHB is %d\n", rcu_clock_freq_get(CK_AHB));
-    debug_printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
-    debug_printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
+    // debug_printf("CK_SYS is %d\n", rcu_clock_freq_get(CK_SYS));
+    // debug_printf("CK_AHB is %d\n", rcu_clock_freq_get(CK_AHB));
+    // debug_printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
+    // debug_printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
 }
 
 void USART1_IRQHandler(void)

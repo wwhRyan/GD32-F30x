@@ -51,7 +51,7 @@ int fputc(int ch, FILE *f)
 
 int fgetc(FILE *f)
 {
-    while (RESET == usart_flag_get(EVAL_COM0, USART_FLAG_RBNE))
+    while (RESET == usart_flag_get(EVAL_COM1, USART_FLAG_RBNE))
         ;
-    return (int)usart_data_receive(EVAL_COM0);
+    return (int)usart_data_receive(EVAL_COM1);
 }

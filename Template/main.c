@@ -41,12 +41,14 @@ int main(void)
     xTaskCreate(TaskUartDecode, "TaskUartDecode", TASK_UART_DECODE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskUartDecodeHandle);
     xTaskCreate(TaskSectionCurrent, "TaskSectionCurrent", TASK_SECTION_CURENT_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskCurrentHandle);
 
+#if 0
     TimerHandle_t xTimer;
 
     xTimer = xTimerCreate("Timer", pdMS_TO_TICKS(20000), pdTRUE, NULL, TimerCallFunc);
     assert(xTimer != NULL);
 
     xTimerStart(xTimer, 0);
+#endif
 
     vTaskStartScheduler();
 
@@ -54,9 +56,12 @@ int main(void)
         ;
 }
 
+#if 0
 void TimerCallFunc(TimerHandle_t xTimer)
 {
     debug_printf("TaskIdle min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskIdleHandle));
     debug_printf("TaskUartDecode min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskUartDecodeHandle));
     debug_printf("TaskCurrent min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskCurrentHandle));
 }
+
+#endif

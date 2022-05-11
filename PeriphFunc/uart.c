@@ -150,3 +150,16 @@ void ClearRxData(const Uarter *pUarter)
     if (pUarter->p_rx_buffer->tail >= BUFF_CACHE_SIZE)
         pUarter->p_rx_buffer->tail = 0;
 }
+
+void uarter_send(const Uarter *pUarter, const char *pData, uint32_t len)
+{
+    assert(pUarter != NULL);
+    char *p = (char *)pData;
+
+    while (len--)
+    {
+        while (RESET == usart_flag_get(pUarter->uart_base, USART_FLAG_TBE))
+            ;
+        usart_data_transmit(pUarter->uart_base, *p++);
+    }
+}

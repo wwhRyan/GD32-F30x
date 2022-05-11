@@ -11,12 +11,44 @@
 
 #include "basicApp.h"
 #include "i2c.h"
+#include <math.h>
 
 extern const SoftwareI2C ovp921_i2c;
 
 #define EEPROM_ADDRESS 0xA0 //8'h 0xA0
 #define EEPROM_WRITE (EEPROM_ADDRESS | 0x00)
 #define EEPROM_READ (EEPROM_ADDRESS | 0x01)
+
+const ntc_t NCP18WB473F10RB = {
+    .B = 4108,
+    .normal_R = 47000,
+    .divided_voltage_R = 10000,
+    .is_pull_up = true,
+};
+
+/**
+ * @brief Get the ntc temperature
+ * 
+ * @param ntc object
+ * @param Voltage 0~3.3V
+ */
+float get_ntc_temperature(const ntc_t *ntc, float Voltage)
+{
+    float ntc_R;
+    if (ntc->is_pull_up == false)
+        ntc_R = (3.3 / (double)Voltage) * ntc->divided_voltage_R - ntc->divided_voltage_R;
+    else
+        ntc_R = (3.3 / (3.3 - (double)Voltage)) * ntc->divided_voltage_R - ntc->divided_voltage_R;
+
+    // printf("ntc_R = %f\r\n", ntc_R);
+
+    return (298.15 * ntc->B) / (298.15 * log(ntc_R / ntc->normal_R) + ntc->B) - 273.15;
+}
+
+float get_temperature(int adc_value)
+{
+    return get_ntc_temperature(&NCP18WB473F10RB, (double)adc_value / 4095 * 3.3);
+}
 
 void laser_on(void)
 {

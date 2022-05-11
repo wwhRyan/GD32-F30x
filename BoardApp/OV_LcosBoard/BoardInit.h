@@ -30,6 +30,8 @@ void TaskIdle(void *pvParameters);
 void TaskUartDecode(void *pvParameters);
 void TaskSectionCurrent(void *pvParameters);
 
+void output_printf(const char *fmt, ...);
+
 /*<! Red laser NTC !>*/
 #define LD_NTC_PORT GPIOB
 #define LD_NTC_PIN GPIO_PIN_0
