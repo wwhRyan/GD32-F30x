@@ -146,3 +146,116 @@ uint8_t eeprom_read(uint8_t addr)
     eeprom_lock(LOCK);
     return data;
 }
+
+inline void R_to_G()
+{
+    gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
+    gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
+    gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
+    DelayUs(40);
+    gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
+    gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
+}
+
+inline void G_to_B()
+{
+    gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
+    gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
+    gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
+    DelayUs(40);
+    gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
+    gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
+}
+
+inline void G_to_R()
+{
+    gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
+    gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
+    gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
+    DelayUs(40);
+    gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
+    gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
+}
+
+inline void B_to_G()
+{
+    gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
+    gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
+    gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
+    DelayUs(40);
+    gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
+    gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
+}
+
+//RGBG
+color_t color_index[color_num] = {
+    GREEN,
+    GREEN,
+    GREEN,
+};
+
+void spoke(color_t last_color, color_t next_color)
+{
+    switch (last_color)
+    {
+    case RED:
+        if (next_color == GREEN)
+            R_to_G();
+        color_index[GREEN] = BLUE;
+        break;
+
+    case GREEN:
+        if (next_color == BLUE)
+            G_to_B();
+        if (next_color == RED)
+            G_to_R();
+        break;
+
+    case BLUE:
+        if (next_color == GREEN)
+            B_to_G();
+        color_index[GREEN] = RED;
+        break;
+
+    default:
+        break;
+    }
+}
+
+void color_on(color_t color)
+{
+    gpio_bit_reset(I_SPOKER_PORT, I_SPOKER_PIN);
+}
+
+void error_detect()
+{
+    gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
+}
+
+void color_EN_EXIT_IRQ(color_t color)
+{
+    static uint8_t cnt[color_num] = {0};
+    cnt[color]++;
+
+    uint8_t x = (color + 1) % color_num;
+    uint8_t y = (color + 2) % color_num;
+    if (cnt[x] == 0 && cnt[y] == 0)
+    {
+        if (cnt[color] == 2)
+        {
+            spoke(color, color_index[color]);
+            cnt[color] = 0;
+        }
+        else if (cnt[color] == 1)
+        {
+            color_on(color);
+        }
+    }
+    else
+    {
+        cnt[x] = 0;
+        cnt[y] = 0;
+        cnt[color] = 1;
+        error_detect();
+    }
+}

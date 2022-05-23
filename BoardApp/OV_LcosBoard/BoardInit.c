@@ -16,6 +16,7 @@
 #include "Common.h"
 #include "i2c.h"
 #include "ovp921.h"
+#include "basicApp.h"
 
 /**
  * @brief -We
@@ -152,9 +153,9 @@ void extern_Gpio_interrupt_init()
     gpio_exti_source_select(GPIO_PORT_SOURCE_GPIOA, GPIO_PIN_SOURCE_6);
     gpio_exti_source_select(GPIO_PORT_SOURCE_GPIOA, GPIO_PIN_SOURCE_7);
     /* configure gpio EXTI line */
-    exti_init(EXTI_5, EXTI_INTERRUPT, EXTI_TRIG_RISING);
-    exti_init(EXTI_6, EXTI_INTERRUPT, EXTI_TRIG_RISING);
-    exti_init(EXTI_7, EXTI_INTERRUPT, EXTI_TRIG_RISING);
+    exti_init(EXTI_5, EXTI_INTERRUPT, EXTI_TRIG_BOTH);
+    exti_init(EXTI_6, EXTI_INTERRUPT, EXTI_TRIG_BOTH);
+    exti_init(EXTI_7, EXTI_INTERRUPT, EXTI_TRIG_BOTH);
     exti_interrupt_flag_clear(EXTI_5);
     exti_interrupt_flag_clear(EXTI_6);
     exti_interrupt_flag_clear(EXTI_7);
@@ -244,22 +245,19 @@ void EXTI5_9_IRQHandler(void)
 {
     if (RESET != exti_interrupt_flag_get(EXTI_5))
     {
+        color_EN_EXIT_IRQ(RED);
         exti_interrupt_flag_clear(EXTI_5);
     }
     if (RESET != exti_interrupt_flag_get(EXTI_6))
     {
+        color_EN_EXIT_IRQ(GREEN);
         exti_interrupt_flag_clear(EXTI_6);
     }
     if (RESET != exti_interrupt_flag_get(EXTI_7))
     {
+        color_EN_EXIT_IRQ(BLUE);
         exti_interrupt_flag_clear(EXTI_7);
     }
-}
-
-void omnivision_lcos_init()
-{
-    delay_1ms(5);
-    gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
 }
 
 void output_printf(const char *fmt, ...)

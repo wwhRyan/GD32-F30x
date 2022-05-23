@@ -215,3 +215,10 @@ void set_reg(uint16_t reg_addr, uint8_t reg_val)
     ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, reg_addr,
                          REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);
 }
+
+void omnivision_lcos_init()
+{
+    delay_1ms(5);
+    gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
+}
+

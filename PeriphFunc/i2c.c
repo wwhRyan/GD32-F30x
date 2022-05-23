@@ -24,10 +24,6 @@ static bool m_SoftI2cSendAddress(const SoftwareI2C *psI2c, uint8_t option,
 static bool m_SoftI2cBurst(const SoftwareI2C *psI2c, uint8_t option,
 						   uint8_t *pData, uint16_t size, uint32_t timeout);
 
-// SoftwareI2C g_3555_SoftwareI2C;
-// SoftwareI2C g_A5931_SoftwareI2C;
-// SoftwareI2C g_31790_SoftwareI2C;
-// SoftwareI2C g_Eeprom_SoftwareI2C;
 
 void INewSoftwareI2C(const SoftwareI2C *psI2c)
 {
@@ -84,12 +80,35 @@ void DelayUs(uint32_t nus)
 
 void DelayUs(uint32_t nus)
 {
-	uint32_t val;
-	uint32_t mark_time = SysTick->VAL;
-	do
+	uint32_t ticks;
+	uint32_t told, tnow, tcnt = 0;
+	uint32_t reload = SysTick->LOAD;			//LOAD Value
+	ticks = (SystemCoreClock / 1000000U) * nus; // The number of beats needed
+	told = SysTick->VAL;						// Counter value at the time of first entry
+	while (1)
 	{
-		val = SysTick->VAL;
-	} while (abs(val - mark_time) <= nus * SystemCoreClock / 1000000U);
+
+		tnow = SysTick->VAL;
+		if (tnow != told)
+		{
+
+			if (tnow < told)
+				tcnt += told - tnow; // Notice here SYSTICK It's a decreasing counter .
+			else
+				tcnt += reload - tnow + told;
+			told = tnow;
+			if (tcnt >= ticks)
+				break; // For more than / Equal to the time to delay , The exit .
+		}
+	}
+}
+
+void DelayMs(uint32_t nms)
+{
+	while (nms--)
+	{
+		DelayUs(1000);
+	}
 }
 
 static void m_SoftI2cDelay(const SoftwareI2C *psI2c)
