@@ -13,6 +13,22 @@
 #include "main.h"
 #include "systick.h"
 
+void extern_gpio_interrupt_init(const exti_gpio_t *p_exti_gpio)
+{
+    //External Interrupt init
+    rcu_periph_clock_enable(RCU_AF);
+    rcu_periph_clock_enable(p_exti_gpio->gpio_clk);
+    gpio_init(p_exti_gpio->gpio_port, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ,
+              p_exti_gpio->gpio_pin);
+    /* enable and set gpio EXTI interrupt to the lowest priority */
+    nvic_irq_enable(p_exti_gpio->gpio_IRQ, 0, 0);
+    /* connect gpio EXTI line to gpio pin */
+    gpio_exti_source_select(p_exti_gpio->port_source, p_exti_gpio->pin_source);
+    /* configure gpio EXTI line */
+    exti_init(p_exti_gpio->exti_line, EXTI_INTERRUPT, EXTI_TRIG_BOTH);
+    exti_interrupt_flag_clear(p_exti_gpio->exti_line);
+}
+
 void gpio_table_init(gpio_config_t *table, uint32_t num)
 {
     rcu_periph_clock_enable(RCU_GPIOA);

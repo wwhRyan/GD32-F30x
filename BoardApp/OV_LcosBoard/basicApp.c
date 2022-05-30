@@ -14,6 +14,7 @@
 #include <math.h>
 
 extern const SoftwareI2C ovp921_i2c;
+extern const dac_t laser_dac;
 
 #define EEPROM_ADDRESS 0xA0 //8'h 0xA0
 #define EEPROM_WRITE (EEPROM_ADDRESS | 0x00)
@@ -60,6 +61,12 @@ void laser_off(void)
 {
     gpio_bit_reset(LD_EN_H_PORT, LD_EN_H_PIN);
     gpio_bit_set(LD_EN_L_PORT, LD_EN_L_PIN);
+}
+
+//DAC_VALUE=(1.24/24+1.24/36-0.015*电流值）*(4095*36/3.3)
+void laser_dac_set(float current)
+{
+    laser_dac_set_value(&laser_dac, (uint32_t)((1.24 / 24 + 1.24 / 30 - 0.015 * (double)current) * (4095 * 30 / 3.3)));
 }
 
 uint8_t get_idu_value(float current)
@@ -147,22 +154,33 @@ uint8_t eeprom_read(uint8_t addr)
     return data;
 }
 
+// DISCHARGE2 voltage big --> little
+// DISCHARGE current big --> little
+
+#define R_CURRENT (2.5 + 0.3)
+#define G_CURRENT (4.6 + 0.5)
+#define B_CURRENT (4.6 + 0.5)
+
 inline void R_to_G()
 {
     gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
-    gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
+    laser_dac_set(G_CURRENT);
+
+    // gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
-    DelayUs(40);
-    gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
+    DelayUs(100); //100 -> 72us; 40 -> 28us
+    // gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
 
 inline void G_to_B()
 {
     gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
+    laser_dac_set(B_CURRENT);
+
     gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
-    DelayUs(40);
+    DelayUs(100);
     gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
@@ -170,20 +188,24 @@ inline void G_to_B()
 inline void G_to_R()
 {
     gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
+    laser_dac_set(R_CURRENT);
+
     gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
-    gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
-    DelayUs(40);
+    // gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
+    DelayUs(100);
     gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
-    gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
+    // gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
 
 inline void B_to_G()
 {
     gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
-    gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
+    laser_dac_set(G_CURRENT);
+
+    // gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
-    DelayUs(40);
-    gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
+    DelayUs(100);
+    // gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
 
@@ -230,6 +252,7 @@ void color_on(color_t color)
 void error_detect()
 {
     gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
+    laser_dac_set(0.00);
 }
 
 void color_EN_EXIT_IRQ(color_t color)

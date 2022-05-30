@@ -1,12 +1,12 @@
 /**
  * @file ThreadUartDecode.c
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-02-14
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #include "main.h"
@@ -52,9 +52,9 @@ void TaskUartDecode(void *pvParameters)
         {
             debug_printf("rec->:%s\r\n", GetRxData(&uart1_debug));
             ICmdLinesInput(GetRxData(&uart1_debug));
-            // IAtCmdDecodeAndRun(&at_obj, str);
+            IAtCmdDecodeAndRun(&at_obj, GetRxData(&uart1_debug));
             ClearRxData(&uart1_debug);
         }
-        vTaskDelay(10);
+        vTaskDelay(5);
     }
 }

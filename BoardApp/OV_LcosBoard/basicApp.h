@@ -37,6 +37,7 @@ void laser_on(void);
 void laser_off(void);
 bool laser_set(int idx, float current);
 float laser_get(int idx);
+void laser_dac_set(float current);
 
 uint8_t get_idu_value(float current);
 float get_current_value(uint8_t idu);

@@ -84,8 +84,8 @@ void output_printf(const char *fmt, ...);
 #define MCU_B_LED_EN_PIN GPIO_PIN_15
 
 /*<! hardware version detect !>*/
-#define HW_PORT GPIOA
-#define HW_PIN GPIO_PIN_0
+// #define HW_PORT GPIOA
+// #define HW_PIN GPIO_PIN_0
 
 #define OVP2200_1_5V_EN_PORT GPIOC
 #define OVP2200_1_5V_EN_PIN GPIO_PIN_14
@@ -108,7 +108,7 @@ void output_printf(const char *fmt, ...);
 
 /*<! ovp921 red light on signal !>*/
 #define R_LED_PWM_PORT GPIOA
-#define R_LED_PWM_PIN GPIO_PIN_5
+#define R_LED_PWM_PIN GPIO_PIN_0
 
 /*<! ovp921 green light on signal !>*/
 #define G_LED_PWM_PORT GPIOA

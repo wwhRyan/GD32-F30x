@@ -125,7 +125,7 @@ const ntc_adc_config_t evn_ntc = {
     .gpio_pin = EVN_NTC_PIN,
 };
 
-const laser_dac_config_t laser_dac = {
+const dac_t laser_dac = {
     .dac_clock = RCU_DAC,
     .dac_base = DAC,
     .gpio_port = DAC1_PORT,
@@ -140,26 +140,35 @@ const SoftwareI2C ovp921_i2c = {
     .delay_time = SCCB_DELAY_TIME,
 };
 
-void extern_Gpio_interrupt_init()
-{
-    //External Interrupt init
-    rcu_periph_clock_enable(RCU_AF);
-    gpio_init(R_LED_PWM_PORT, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_10MHZ,
-              R_LED_PWM_PIN | G_LED_PWM_PIN | B_LED_PWM_PIN);
-    /* enable and set gpio EXTI interrupt to the lowest priority */
-    nvic_irq_enable(EXTI5_9_IRQn, 0, 0);
-    /* connect gpio EXTI line to gpio pin */
-    gpio_exti_source_select(GPIO_PORT_SOURCE_GPIOA, GPIO_PIN_SOURCE_5);
-    gpio_exti_source_select(GPIO_PORT_SOURCE_GPIOA, GPIO_PIN_SOURCE_6);
-    gpio_exti_source_select(GPIO_PORT_SOURCE_GPIOA, GPIO_PIN_SOURCE_7);
-    /* configure gpio EXTI line */
-    exti_init(EXTI_5, EXTI_INTERRUPT, EXTI_TRIG_BOTH);
-    exti_init(EXTI_6, EXTI_INTERRUPT, EXTI_TRIG_BOTH);
-    exti_init(EXTI_7, EXTI_INTERRUPT, EXTI_TRIG_BOTH);
-    exti_interrupt_flag_clear(EXTI_5);
-    exti_interrupt_flag_clear(EXTI_6);
-    exti_interrupt_flag_clear(EXTI_7);
-}
+const exti_gpio_t R_pwm_led = {
+    .gpio_port = R_LED_PWM_PORT,
+    .gpio_pin = R_LED_PWM_PIN,
+    .gpio_clk = RCU_GPIOA,
+    .exti_line = EXTI_0,
+    .port_source = GPIO_PORT_SOURCE_GPIOA,
+    .pin_source = GPIO_PIN_SOURCE_0,
+    .gpio_IRQ = EXTI0_IRQn,
+};
+
+const exti_gpio_t G_pwm_led = {
+    .gpio_port = G_LED_PWM_PORT,
+    .gpio_pin = G_LED_PWM_PIN,
+    .gpio_clk = RCU_GPIOA,
+    .exti_line = EXTI_6,
+    .port_source = GPIO_PORT_SOURCE_GPIOA,
+    .pin_source = GPIO_PIN_SOURCE_6,
+    .gpio_IRQ = EXTI5_9_IRQn,
+};
+
+const exti_gpio_t B_pwm_led = {
+    .gpio_port = B_LED_PWM_PORT,
+    .gpio_pin = B_LED_PWM_PIN,
+    .gpio_clk = RCU_GPIOA,
+    .exti_line = EXTI_7,
+    .port_source = GPIO_PORT_SOURCE_GPIOA,
+    .pin_source = GPIO_PIN_SOURCE_7,
+    .gpio_IRQ = EXTI5_9_IRQn,
+};
 
 gpio_config_t gpio_config_table[] = {
     //output
@@ -177,10 +186,10 @@ gpio_config_t gpio_config_table[] = {
     {I_SPOKER_PORT, I_SPOKER_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
 
     //input
-    {HW_PORT, HW_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
-    {R_LED_PWM_PORT, R_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
-    {G_LED_PWM_PORT, G_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
-    {B_LED_PWM_PORT, B_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
+    // {HW_PORT, HW_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
+    // {R_LED_PWM_PORT, R_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
+    // {G_LED_PWM_PORT, G_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
+    // {B_LED_PWM_PORT, B_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
 };
 
 void omnivision_lcos_init(void);
@@ -200,7 +209,9 @@ void application_init()
     gpio_pin_remap_config(GPIO_TIMER1_PARTIAL_REMAP1, ENABLE);
 
     gpio_table_init(gpio_config_table, ARRAYNUM(gpio_config_table));
-    extern_Gpio_interrupt_init();
+    extern_gpio_interrupt_init(&R_pwm_led);
+    extern_gpio_interrupt_init(&G_pwm_led);
+    extern_gpio_interrupt_init(&B_pwm_led);
 
     fan_timer_pwm_config(&cw_wheel_pwm);
     Set_fan_timer_pwm(&cw_wheel_pwm, 90);
@@ -211,8 +222,9 @@ void application_init()
     ntc_adc_config(&green_led_ntc);
     ntc_adc_config(&evn_ntc);
 
-    // laser_dac_init(&laser_dac);
+    laser_dac_init(&laser_dac);
     // laser_dac_set_value(&laser_dac, 2047);
+    laser_dac_set(2.00);
 
     INewSoftwareI2C(&ovp921_i2c);
 
@@ -241,13 +253,18 @@ void TIMER0_Channel_IRQHandler(void)
     timer_input_capture_IRQ(&cw_wheel_fg);
 }
 
-void EXTI5_9_IRQHandler(void)
+void EXTI0_IRQHandler(void)
 {
-    if (RESET != exti_interrupt_flag_get(EXTI_5))
+    if (RESET != exti_interrupt_flag_get(EXTI_0))
     {
         color_EN_EXIT_IRQ(RED);
-        exti_interrupt_flag_clear(EXTI_5);
+        exti_interrupt_flag_clear(EXTI_0);
     }
+}
+
+void EXTI5_9_IRQHandler(void)
+{
+
     if (RESET != exti_interrupt_flag_get(EXTI_6))
     {
         color_EN_EXIT_IRQ(GREEN);

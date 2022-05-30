@@ -35,7 +35,7 @@ void set_dac_value(uint32_t dac_base, uint32_t value)
     dac_concurrent_data_set(DAC_ALIGN_12B_R, value, value);
 }
 
-void laser_dac_init(const laser_dac_config_t *laser_dac_config)
+void laser_dac_init(const dac_t *laser_dac_config)
 {
     software_triggle_dac_init(laser_dac_config->dac_clock, laser_dac_config->dac_base,
                               laser_dac_config->gpio_port, laser_dac_config->gpio_pin);
@@ -44,10 +44,10 @@ void laser_dac_init(const laser_dac_config_t *laser_dac_config)
 /**
  * @brief 
  * 
- * @param laser_dac_config laser_dac_config_t *
+ * @param laser_dac_config dac_t *
  * @param value 0~4095
  */
-void laser_dac_set_value(const laser_dac_config_t *laser_dac_config, uint32_t value)
+void laser_dac_set_value(const dac_t *laser_dac_config, uint32_t value)
 {
     set_dac_value(laser_dac_config->dac_base, value);
 }

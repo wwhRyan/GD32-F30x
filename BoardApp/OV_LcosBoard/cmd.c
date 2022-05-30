@@ -21,7 +21,7 @@
 
 extern const fan_timer_config_t cw_wheel_pwm;
 extern const fan_timer_config_t cw_wheel_fg;
-extern const laser_dac_config_t laser_dac;
+extern const dac_t laser_dac;
 
 extern const ntc_adc_config_t evn_ntc;
 extern const ntc_adc_config_t green_led_ntc;
