@@ -45,6 +45,7 @@ float get_temperature(int adc_value);
 
 bool eeprom_write(uint8_t addr, uint8_t data);
 uint8_t eeprom_read(uint8_t addr);
+void reload_idu_current(void);
 
 void color_EN_EXIT_IRQ(color_t color);
 

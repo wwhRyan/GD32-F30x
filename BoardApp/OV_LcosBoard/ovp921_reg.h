@@ -1,12 +1,12 @@
 /**
  * @file ovp921_reg.h
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-04-12
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #ifndef OVP921_REG_H
@@ -33,7 +33,7 @@
 #define MIPI_TRANSMITTER_ADDR 0x0600
 #define SPECIAL_CONTROL_SOURCE_ADDR 0x7FC0
 
-#define SCCB_DELAY_TIME 5 //5ms for i2c wait time
+#define SCCB_DELAY_TIME 5 // 5ms for i2c wait time
 
 /**
  * @brief GD32 using arm cm4, it is little endian
@@ -44,12 +44,12 @@
  */
 
 /*
-         __     _           _      __                     _         __                       __ 
+         __     _           _      __                     _         __                       __
   _____ / /_   (_)____     (_)____/ /  _____ ___   _____ (_)____ _ / /  ____   ____   _____ / /_
  / ___// __ \ / // __ \   / // __  /  / ___// _ \ / ___// // __ `// /  / __ \ / __ \ / ___// __/
-/ /__ / / / // // /_/ /  / // /_/ /  (__  )/  __// /   / // /_/ // /  / /_/ // /_/ // /   / /_  
-\___//_/ /_//_// .___/  /_/ \__,_/  /____/ \___//_/   /_/ \__,_//_/  / .___/ \____//_/    \__/  
-              /_/                                                   /_/                         
+/ /__ / / / // // /_/ /  / // /_/ /  (__  )/  __// /   / // /_/ // /  / /_/ // /_/ // /   / /_
+\___//_/ /_//_// .___/  /_/ \__,_/  /____/ \___//_/   /_/ \__,_//_/  / .___/ \____//_/    \__/
+              /_/                                                   /_/
 */
 typedef struct reg_chipid_t
 {
@@ -65,6 +65,47 @@ typedef struct reg_chipid_t
     } reg;
 } reg_chipid_t;
 
+typedef struct reg_microlcd_serial_port_address_low_t
+{
+    uint16_t addr;
+    union
+    {
+        uint8_t raw;
+        struct
+        {
+            uint8_t dp_addr : 8;
+        } bits;
+    } reg;
+} reg_microlcd_serial_port_address_low_t;
+
+typedef struct reg_microlcd_serial_port_address_high_t
+{
+    uint16_t addr;
+    union
+    {
+        uint8_t raw;
+        struct
+        {
+            uint8_t dp_addr : 4;
+            uint8_t : 3;
+            uint8_t read_request : 1;
+        } bits;
+    } reg;
+} reg_microlcd_serial_port_address_high_t;
+
+typedef struct reg_microlcd_serial_port_data_t
+{
+    uint16_t addr;
+    union
+    {
+        uint8_t raw;
+        struct
+        {
+            uint8_t dp_data : 8;
+        } bits;
+    } reg;
+} reg_microlcd_serial_port_data_t;
+
 typedef struct reg_chipid2_t
 {
     uint16_t addr;
@@ -79,12 +120,12 @@ typedef struct reg_chipid2_t
 } reg_chipid2_t;
 
 /*
-                       __            
+                       __
    _____ _____ ____ _ / /____ _ _____
   / ___// ___// __ `// // __ `// ___/
- (__  )/ /__ / /_/ // // /_/ // /    
-/____/ \___/ \__,_//_/ \__,_//_/     
-                                     
+ (__  )/ /__ / /_/ // // /_/ // /
+/____/ \___/ \__,_//_/ \__,_//_/
+
 */
 
 typedef struct reg_scalar_Xdim_low_t
@@ -162,12 +203,12 @@ typedef struct reg_keystone_offset_t
 } reg_keystone_offset_t;
 
 /*
-    _                                 _                         _      __                                                       __   _            
+    _                                 _                         _      __                                                       __   _
    (_)____   _____ ____   ____ ___   (_)____   ____ _   _   __ (_)____/ /___   ____     ____   _____ ____   ____   ___   _____ / /_ (_)___   _____
   / // __ \ / ___// __ \ / __ `__ \ / // __ \ / __ `/  | | / // // __  // _ \ / __ \   / __ \ / ___// __ \ / __ \ / _ \ / ___// __// // _ \ / ___/
- / // / / // /__ / /_/ // / / / / // // / / // /_/ /   | |/ // // /_/ //  __// /_/ /  / /_/ // /   / /_/ // /_/ //  __// /   / /_ / //  __/(__  ) 
-/_//_/ /_/ \___/ \____//_/ /_/ /_//_//_/ /_/ \__, /    |___//_/ \__,_/ \___/ \____/  / .___//_/    \____// .___/ \___//_/    \__//_/ \___//____/  
-                                            /____/                                  /_/                 /_/                                       
+ / // / / // /__ / /_/ // / / / / // // / / // /_/ /   | |/ // // /_/ //  __// /_/ /  / /_/ // /   / /_/ // /_/ //  __// /   / /_ / //  __/(__  )
+/_//_/ /_/ \___/ \____//_/ /_/ /_//_//_/ /_/ \__, /    |___//_/ \__,_/ \___/ \____/  / .___//_/    \____// .___/ \___//_/    \__//_/ \___//____/
+                                            /____/                                  /_/                 /_/
 */
 
 typedef struct reg_video_input_bus_byte_swap_t
@@ -307,12 +348,12 @@ typedef struct reg_pattern_generator_t
 } reg_pattern_generator_t;
 
 /*
-                   __   __                                                               __              
+                   __   __                                                               __
     ____   ____ _ / /_ / /_ ___   _____ ____     ____ _ ___   ____   ___   _____ ____ _ / /_ ____   _____
    / __ \ / __ `// __// __// _ \ / ___// __ \   / __ `// _ \ / __ \ / _ \ / ___// __ `// __// __ \ / ___/
-  / /_/ // /_/ // /_ / /_ /  __// /   / / / /  / /_/ //  __// / / //  __// /   / /_/ // /_ / /_/ // /    
- / .___/ \__,_/ \__/ \__/ \___//_/   /_/ /_/   \__, / \___//_/ /_/ \___//_/    \__,_/ \__/ \____//_/     
-/_/                                           /____/                                                     
+  / /_/ // /_/ // /_ / /_ /  __// /   / / / /  / /_/ //  __// / / //  __// /   / /_/ // /_ / /_/ // /
+ / .___/ \__,_/ \__/ \__/ \___//_/   /_/ /_/   \__, / \___//_/ /_/ \___//_/    \__,_/ \__/ \____//_/
+/_/                                           /____/
 */
 
 typedef struct reg_pattern_gen_vsync_width_t
@@ -633,18 +674,22 @@ typedef struct reg_led_control_t
 } reg_led_control_t;
 
 /*
-                      ____  ___   ___      __ 
+                      ____  ___   ___      __
   ____  _   __ ____  / __ \|__ \ <  /     / /_
  / __ \| | / // __ \/ /_/ /__/ / / /     / __/
-/ /_/ /| |/ // /_/ /\__, // __/ / /     / /_  
-\____/ |___// .___//____//____//_/______\__/  
-           /_/                   /_____/      
+/ /_/ /| |/ // /_/ /\__, // __/ / /     / /_
+\____/ |___// .___//____//____//_/______\__/
+           /_/                   /_____/
 */
 
 struct ovp921_t
 {
     // chip ID and serial port
     reg_chipid_t chipid;
+    reg_microlcd_serial_port_address_low_t microlcd_serial_port_address_low;
+    reg_microlcd_serial_port_address_high_t microlcd_serial_port_address_high;
+    reg_microlcd_serial_port_data_t microlcd_serial_port_data;
+    
     reg_chipid2_t chipid2;
     // pattern generator
     reg_pattern_generator_t pattern_generator;

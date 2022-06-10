@@ -1,12 +1,12 @@
 /**
  * @file basicApp.c
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-04-14
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #include "basicApp.h"
@@ -16,7 +16,7 @@
 extern const SoftwareI2C ovp921_i2c;
 extern const dac_t laser_dac;
 
-#define EEPROM_ADDRESS 0xA0 //8'h 0xA0
+#define EEPROM_ADDRESS 0xA0 // 8'h 0xA0
 #define EEPROM_WRITE (EEPROM_ADDRESS | 0x00)
 #define EEPROM_READ (EEPROM_ADDRESS | 0x01)
 
@@ -29,7 +29,7 @@ const ntc_t NCP18WB473F10RB = {
 
 /**
  * @brief Get the ntc temperature
- * 
+ *
  * @param ntc object
  * @param Voltage 0~3.3V
  */
@@ -63,7 +63,7 @@ void laser_off(void)
     gpio_bit_set(LD_EN_L_PORT, LD_EN_L_PIN);
 }
 
-//DAC_VALUE=(1.24/24+1.24/36-0.015*电流值）*(4095*36/3.3)
+// DAC_VALUE=(1.24/24+1.24/36-0.015*电流值）*(4095*36/3.3)
 void laser_dac_set(float current)
 {
     laser_dac_set_value(&laser_dac, (uint32_t)((1.24 / 24 + 1.24 / 30 - 0.015 * (double)current) * (4095 * 30 / 3.3)));
@@ -83,7 +83,7 @@ float get_current_value(uint8_t idu)
 #define LOCK true
 /**
  * @brief eeprom lock function
- * 
+ *
  * @param lock true: lock, false: unlock
  */
 void eeprom_lock(bool lock)
@@ -101,8 +101,8 @@ void eeprom_lock(bool lock)
 }
 
 /**
- * @brief 
- * 
+ * @brief
+ *
  * @param idx R\G\B\Y 0\1\2\3
  * @param current A
  * @note i2c addr 0x66
@@ -154,6 +154,46 @@ uint8_t eeprom_read(uint8_t addr)
     return data;
 }
 
+void reload_idu_current(void)
+{
+    uint8_t red_idu_value = eeprom_read((int)RED);
+    uint8_t green_idu_value = eeprom_read((int)GREEN);
+    uint8_t blue_idu_value = eeprom_read((int)BLUE);
+
+    if (red_idu_value <= 127 && red_idu_value >= 21)
+    {
+        laser_set(RED, get_current_value(red_idu_value));
+        debug_printf("RED: %f A\r\n", get_current_value(red_idu_value));
+    }
+    else
+    {
+        laser_set(RED, 1.0);
+        debug_printf("laser_set RED is %f A\r\n", 1.0);
+    }
+
+    if (green_idu_value <= 127 && green_idu_value >= 21)
+    {
+        laser_set(GREEN, get_current_value(green_idu_value));
+        debug_printf("GREEN: %f A\r\n", get_current_value(green_idu_value));
+    }
+    else
+    {
+        laser_set(GREEN, 0.8);
+        debug_printf("laser_set GREEN is %f A\r\n", 0.8);
+    }
+
+    if (blue_idu_value <= 127 && blue_idu_value >= 21)
+    {
+        laser_set(BLUE, get_current_value(blue_idu_value));
+        debug_printf("BLUE: %f A\r\n", get_current_value(blue_idu_value));
+    }
+    else
+    {
+        laser_set(BLUE, 0.623);
+        debug_printf("laser_set BLUE is %f A\r\n", 0.623);
+    }
+}
+
 // DISCHARGE2 voltage big --> little
 // DISCHARGE current big --> little
 
@@ -168,7 +208,7 @@ inline void R_to_G()
 
     // gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
-    DelayUs(100); //100 -> 72us; 40 -> 28us
+    DelayUs(100); // 100 -> 72us; 40 -> 28us
     // gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
@@ -209,7 +249,7 @@ inline void B_to_G()
     gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
 
-//RGBG
+// RGBG
 color_t color_index[color_num] = {
     GREEN,
     GREEN,

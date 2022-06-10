@@ -1,12 +1,12 @@
 /**
  * @file ovp921.c
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-04-12
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #include "ovp921.h"
@@ -14,14 +14,23 @@
 /**
  * @brief good thing is we no need to remember the register address and member address
  * @note bad thind is we have to enter lots of text.
- * @note if the register number is thousands, we have to transfer ovp921 struct to const, 
+ * @note if the register number is thousands, we have to transfer ovp921 struct to const,
  *      and make the union become pointer. addr become const value.
- * 
+ *
  */
 struct ovp921_t ovp921 = {
     // chip ID and serial port
     .chipid = {
         .addr = CHIP_ID_ADDR,
+    },
+    .microlcd_serial_port_address_low = {
+        .addr = CHIP_ID_ADDR + 1,
+    },
+    .microlcd_serial_port_address_high = {
+        .addr = CHIP_ID_ADDR + 2,
+    },
+    .microlcd_serial_port_data = {
+        .addr = CHIP_ID_ADDR + 3,
     },
     .chipid2 = {
         .addr = MISCELLANEOUS_ADDR + 0x0f,
@@ -222,3 +231,44 @@ void omnivision_lcos_init()
     gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
 }
 
+void vertical_flip(bool enable)
+{
+    ovp921.microlcd_serial_port_address_low.reg.bits.dp_addr = 0x06;
+    // ovp921.microlcd_serial_port_address_high.reg.bits.read_request = 1;
+    // set_reg(ovp921.microlcd_serial_port_address_low.addr, ovp921.microlcd_serial_port_address_low.reg.raw);
+    // set_reg(ovp921.microlcd_serial_port_address_high.addr, ovp921.microlcd_serial_port_address_high.reg.raw);
+
+    // while ((0x80 & get_reg(ovp921.microlcd_serial_port_address_high.addr)) != 0x00)
+    // {
+    //     vTaskDelay(1);
+    // }
+
+    // dp_data = get_reg(ovp921.microlcd_serial_port_data.addr);
+
+    ovp921.microlcd_serial_port_address_high.reg.raw = 0x00;
+
+    if (enable)
+    {
+        set_reg(ovp921.microlcd_serial_port_address_low.addr, ovp921.microlcd_serial_port_address_low.reg.raw);
+        set_reg(ovp921.microlcd_serial_port_address_high.addr, ovp921.microlcd_serial_port_address_high.reg.raw);
+        set_reg(ovp921.microlcd_serial_port_data.addr, 0x40);
+    }
+    else
+    {
+        set_reg(ovp921.microlcd_serial_port_address_low.addr, ovp921.microlcd_serial_port_address_low.reg.raw);
+        set_reg(ovp921.microlcd_serial_port_address_high.addr, ovp921.microlcd_serial_port_address_high.reg.raw);
+        set_reg(ovp921.microlcd_serial_port_data.addr, 0x00);
+    }
+}
+
+bool get_ovp921_status()
+{
+    if (get_reg(0x004C) == 0x17)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}

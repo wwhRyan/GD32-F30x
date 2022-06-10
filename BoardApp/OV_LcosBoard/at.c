@@ -42,26 +42,95 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
-        if (kKeyStatus == my_kvs[0].key)
+        if (kKeyOn == my_kvs[0].value)
         {
-            if (kKeyOn == my_kvs[0].value)
-            {
-                debug_printf("system on\n");
-                IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-            }
-            else if (kKeyOff == my_kvs[0].value)
-            {
-                debug_printf("system off\n");
-                IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-            }
-            else
-            {
-                debug_printf("system value error\n");
-            }
+            debug_printf("system on\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyOff == my_kvs[0].value)
+        {
+            debug_printf("system off\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
         else
         {
-            debug_printf("system key error\n");
+            debug_printf("system value error\n");
+        }
+    }
+    else
+    {
+        if (kKeyStatus == my_kvs[0].key)
+        {
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+    }
+}
+
+IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
+{
+    asAtKvUnit_Enum my_kvs[1];
+    ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
+    debug_printf("\n-----------------\nkvs num : %d\n", pAt_Kv_List->size);
+    for (int i = 0; i < pAt_Kv_List->size; i++)
+    {
+        debug_printf("at_str : key = %s, value = %s\n", pAt_Kv_List->pList[i].key.pData, pAt_Kv_List->pList[i].value.pData);
+        debug_printf("at_type : key_id = %d, value = %d\n", my_kvs[i].key, my_kvs[i].value);
+    }
+    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+
+    if (kAtControlType == IGetAtCmdType(&at_obj))
+    {
+        if (kKeyOn == my_kvs[0].value)
+        {
+            debug_printf("system on\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyOff == my_kvs[0].value)
+        {
+            debug_printf("system off\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else
+        {
+            debug_printf("system value error\n");
+        }
+    }
+    else
+    {
+        if (kKeyStatus == my_kvs[0].key)
+        {
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+    }
+}
+
+IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
+{
+    asAtKvUnit_Enum my_kvs[1];
+    ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
+    debug_printf("\n-----------------\nkvs num : %d\n", pAt_Kv_List->size);
+    for (int i = 0; i < pAt_Kv_List->size; i++)
+    {
+        debug_printf("at_str : key = %s, value = %s\n", pAt_Kv_List->pList[i].key.pData, pAt_Kv_List->pList[i].value.pData);
+        debug_printf("at_type : key_id = %d, value = %d\n", my_kvs[i].key, my_kvs[i].value);
+    }
+    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+
+    if (kAtControlType == IGetAtCmdType(&at_obj))
+    {
+        if (kKeyOn == my_kvs[0].value)
+        {
+            debug_printf("system on\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyOff == my_kvs[0].value)
+        {
+            debug_printf("system off\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else
+        {
+            debug_printf("system value error\n");
         }
     }
     else
