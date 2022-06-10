@@ -176,9 +176,9 @@ void gettime(char argc, char *argv)
 void chipid(char argc, char *argv)
 {
     get_chipid();
-    cmd_printf("ovp921 id:%04X\r\n", ovp921.chipid.reg.bits.chip_id);
-    cmd_printf("ovp921 mark version:%04X\r\n", ovp921.chipid.reg.bits.mask_version);
-    cmd_printf("ovp921 id2:%04X\r\n", ovp921.chipid2.reg.bits.chip_id2);
+    cmd_printf("ovp921 id:%04X\r\n", ovp921.chipid.chip_id);
+    cmd_printf("ovp921 mark version:%04X\r\n", ovp921.chipid.mask_version);
+    cmd_printf("ovp921 id2:%04X\r\n", ovp921.chipid2.chip_id2);
 }
 
 void testpattern(char argc, char *argv)

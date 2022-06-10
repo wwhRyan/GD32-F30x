@@ -1,12 +1,12 @@
 /**
  * @file ovp921.h
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-04-12
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #ifndef OVP921_H
@@ -26,5 +26,6 @@ void off_pattern(void);
 uint8_t get_reg(uint16_t reg_addr);
 void set_reg(uint16_t reg_addr, uint8_t reg_val);
 void omnivision_lcos_init(void);
+bool get_ovp921_status(void);
 
 #endif
