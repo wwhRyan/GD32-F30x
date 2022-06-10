@@ -10,6 +10,8 @@
  */
 #include "main.h"
 #include "AtProtocol.h"
+#include "basicApp.h"
+#include "ovp921.h"
 
 extern asAtProtocol at_obj;
 
@@ -44,12 +46,38 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
     {
         if (kKeyOn == my_kvs[0].value)
         {
+
+            gpio_bit_set(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
+            if (get_ovp921_status() != true)
+            {
+                gpio_bit_set(OVP921_RESET_PORT, OVP921_RESET_PIN);
+                vTaskDelay(1000);
+                gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
+            }
             debug_printf("system on\n");
+            for (int i = 0; i < 10; i++)
+            {
+                debug_printf("%ds\r\n", i);
+                if (get_ovp921_status() == true)
+                {
+                    laser_on();
+                    debug_printf("laser on\r\n");
+                    break;
+                }
+                else
+                {
+                    laser_off();
+                    debug_printf("laser off\r\n");
+                }
+                vTaskDelay(1000);
+            }
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
         else if (kKeyOff == my_kvs[0].value)
         {
             debug_printf("system off\n");
+            laser_off();
+            gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
         else
@@ -61,7 +89,14 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
     {
         if (kKeyStatus == my_kvs[0].key)
         {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            if (gpio_output_bit_get(SYS_12V_ON_PORT, SYS_12V_ON_PIN))
+            {
+                IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+            }
+            else
+            {
+                IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
+            }
         }
     }
 }
@@ -82,11 +117,13 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
     {
         if (kKeyOn == my_kvs[0].value)
         {
+            laser_on();
             debug_printf("system on\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
         else if (kKeyOff == my_kvs[0].value)
         {
+            laser_off();
             debug_printf("system off\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
@@ -99,7 +136,14 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
     {
         if (kKeyStatus == my_kvs[0].key)
         {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            if (gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN))
+            {
+                IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+            }
+            else
+            {
+                IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
+            }
         }
     }
 }
@@ -118,26 +162,14 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
-        if (kKeyOn == my_kvs[0].value)
-        {
-            debug_printf("system on\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-        else if (kKeyOff == my_kvs[0].value)
-        {
-            debug_printf("system off\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-        else
-        {
-            debug_printf("system value error\n");
-        }
+        debug_printf("system value error\n");
     }
     else
     {
-        if (kKeyStatus == my_kvs[0].key)
+        if (kKeyMcuSoftware == my_kvs[0].value)
         {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            debug_printf("system on\n");
+            IAddFeedbackStrTo(pAt_feedback_str, MCU_VERSION "\n");
         }
     }
 }
@@ -156,24 +188,11 @@ IAtOperationRegister(kCmdLightSourceTime, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
-        if (kKeyOn == my_kvs[0].value)
-        {
-            debug_printf("system on\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-        else if (kKeyOff == my_kvs[0].value)
-        {
-            debug_printf("system off\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-        else
-        {
-            debug_printf("system value error\n");
-        }
+        debug_printf("system value error\n");
     }
     else
     {
-        if (kKeyStatus == my_kvs[0].key)
+        if (kKeyMinute == my_kvs[0].key)
         {
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
@@ -194,14 +213,30 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
-        if (kKeyOn == my_kvs[0].value)
+        if (kKeyCeilingFront == my_kvs[0].value)
         {
-            debug_printf("system on\n");
+
+            horizontal_flip(true);
+            vertical_flip(false);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
-        else if (kKeyOff == my_kvs[0].value)
+        else if (kKeyCeilingRear == my_kvs[0].value)
         {
-            debug_printf("system off\n");
+            horizontal_flip(false);
+            vertical_flip(false);
+
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyTableFront == my_kvs[0].value)
+        {
+            horizontal_flip(true);
+            vertical_flip(true);
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyTableRear == my_kvs[0].value)
+        {
+            horizontal_flip(false);
+            vertical_flip(true);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
         else
@@ -346,16 +381,68 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
-        if (kKeyOn == my_kvs[0].value)
+        if (kKeyRed == my_kvs[0].value)
         {
-            debug_printf("system on\n");
+            show_solid_color_pattern(255, 0, 0);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
+        else if (kKeyGreen == my_kvs[0].value)
+        {
+            show_solid_color_pattern(0, 255, 0);
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyBlue == my_kvs[0].value)
+        {
+            show_solid_color_pattern(0, 0, 255);
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyGrey == my_kvs[0].value)
+        {
+            show_solid_color_pattern(127, 127, 127);
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyMegenta == my_kvs[0].value)
+        {
+            show_solid_color_pattern(255, 0, 255);
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyCyan == my_kvs[0].value)
+        {
+            show_solid_color_pattern(0, 255, 255);
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyYellow == my_kvs[0].value)
+        {
+            show_solid_color_pattern(255, 255, 0);
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyBlack == my_kvs[0].value)
+        {
+            show_solid_color_pattern(0, 0, 0);
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyWhite == my_kvs[0].value)
+        {
+            show_solid_color_pattern(255, 255, 255);
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyCheckErboard == my_kvs[0].value)
+        {
+            checkerboard_pattern();
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+        else if (kKeyHorizontalRamp == my_kvs[0].value)
+        {
+            gray_ramp_pattern();
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+        }
+
         else if (kKeyOff == my_kvs[0].value)
         {
-            debug_printf("system off\n");
+            off_pattern();
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
+
         else
         {
             debug_printf("system value error\n");

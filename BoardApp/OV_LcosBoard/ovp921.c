@@ -35,7 +35,16 @@ struct ovp921_t ovp921 = {
     .chipid2 = {
         .addr = MISCELLANEOUS_ADDR + 0x0f,
     },
-
+    // microlcd control and status
+    .microlcd_control = {
+        .addr = MICROLCD_CONTROL_ADDR,
+    },
+    .ulcd_xydim_h = {
+        .addr = MICROLCD_CONTROL_ADDR + 1,
+    },
+    .horizontal_mode = {
+        .addr = 0x000E,
+    },
     // pattern generator
     .pattern_generator = {
         .addr = PATTERN_GENERATOR_ADDR,
@@ -118,8 +127,18 @@ struct ovp921_t ovp921 = {
 
 extern const SoftwareI2C ovp921_i2c;
 
+void change_anf(uint8_t num)
+{
+    if (get_reg(0x0046) != num)
+    {
+        set_reg(0x0046, 0xA0 | num);
+    }
+    vTaskDelay(5);
+}
+
 void show_solid_color_pattern(uint8_t red, uint8_t green, uint8_t blue)
 {
+    change_anf(2);
     ovp921.pattern_gen_red_data.reg_pgen_data_r = red;
     ovp921.pattern_gen_green_data.reg_pgen_data_g = green;
     ovp921.pattern_gen_blue_data.reg_pgen_data_b = blue;
@@ -139,6 +158,10 @@ void show_solid_color_pattern(uint8_t red, uint8_t green, uint8_t blue)
 
 void gray_ramp_pattern()
 {
+    change_anf(2);
+    ovp921.pattern_generator.byte = get_reg(ovp921.pattern_generator.addr);
+    if (ovp921.pattern_generator.pattern_generator_type == 1 && ovp921.pattern_generator.pattern_generator_en == 1)
+        return;
     show_solid_color_pattern(0xFF, 0xFF, 0xFF);
 
     ovp921.pattern_generator.pattern_generator_type = 1;
@@ -149,6 +172,10 @@ void gray_ramp_pattern()
 
 void checkerboard_pattern()
 {
+    change_anf(2);
+    ovp921.pattern_generator.byte = get_reg(ovp921.pattern_generator.addr);
+    if (ovp921.pattern_generator.pattern_generator_type == 2 && ovp921.pattern_generator.pattern_generator_en == 1)
+        return;
     ovp921.pattern_gen_horizontal_cross_hatch_y_offset.byte = 0x00;
     ovp921.pattern_gen_horizontal_cross_hatch_y_on.byte = 0x80;
     ovp921.pattern_gen_horizontal_cross_hatch_y_off.byte = 0x80;
@@ -209,6 +236,7 @@ void off_pattern()
     ovp921.pattern_generator.pattern_generator_en = 0;
     ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, ovp921.pattern_generator.addr,
                          REG_ADDR_2BYTE, (uint8_t *)&ovp921.pattern_generator.byte, 1, SCCB_DELAY_TIME);
+    change_anf(1);
 }
 
 uint8_t get_reg(uint16_t reg_addr)
@@ -234,7 +262,7 @@ void omnivision_lcos_init()
 void vertical_flip(bool enable)
 {
     // read vertical flip status
-#if 0
+#if 1
     ovp921.microlcd_serial_port_address_low.dp_addr = 0x06;
     ovp921.microlcd_serial_port_address_high.read_request = 1;
     set_reg(ovp921.microlcd_serial_port_address_low.addr, ovp921.microlcd_serial_port_address_low.byte);
@@ -255,14 +283,20 @@ void vertical_flip(bool enable)
     {
         set_reg(ovp921.microlcd_serial_port_address_low.addr, ovp921.microlcd_serial_port_address_low.byte);
         set_reg(ovp921.microlcd_serial_port_address_high.addr, ovp921.microlcd_serial_port_address_high.byte);
-        set_reg(ovp921.microlcd_serial_port_data.addr, 0x40);
+        set_reg(ovp921.microlcd_serial_port_data.addr, dp_data | 0x40);
     }
     else
     {
         set_reg(ovp921.microlcd_serial_port_address_low.addr, ovp921.microlcd_serial_port_address_low.byte);
         set_reg(ovp921.microlcd_serial_port_address_high.addr, ovp921.microlcd_serial_port_address_high.byte);
-        set_reg(ovp921.microlcd_serial_port_data.addr, 0x00);
+        set_reg(ovp921.microlcd_serial_port_data.addr, dp_data & (uint8_t)(~0x40));
     }
+}
+
+void horizontal_flip(bool enable)
+{
+    ovp921.horizontal_mode.horizontal_filp = enable;
+    set_reg(ovp921.horizontal_mode.addr, (uint8_t)ovp921.horizontal_mode.byte);
 }
 
 bool get_ovp921_status()

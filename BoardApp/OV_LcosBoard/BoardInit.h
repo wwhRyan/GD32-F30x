@@ -1,16 +1,19 @@
 /**
  * @file ExecThread.h
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-02-14
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #ifndef EXECTHREAD_H
 #define EXECTHREAD_H
+
+#define MCU_VERSION "V1.0"
+
 #include "uart.h"
 #include "timer.h"
 #include "adc_mcu.h"
@@ -21,7 +24,7 @@
 #error "Please define ATHENA_OV_LCOS"
 #endif
 
-//configMINIMAL_STACK_SIZE
+// configMINIMAL_STACK_SIZE
 #define TASK_IDLE_STACK_SIZE 1024
 #define TASK_UART_DECODE_STACK_SIZE 1024
 #define TASK_SECTION_CURENT_STACK_SIZE configMINIMAL_STACK_SIZE
