@@ -1,12 +1,12 @@
 /**
  * @file main.c
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-02-15
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #include "gd32f30x.h"
@@ -38,7 +38,7 @@ int main(void)
     application_init();
 
     xTaskCreate(TaskIdle, "TaskIdle", TASK_IDLE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskIdleHandle);
-    xTaskCreate(TaskUartDecode, "TaskUartDecode", TASK_UART_DECODE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskUartDecodeHandle);
+    xTaskCreate(TaskUartDecode, "TaskUartDecode", TASK_UART_DECODE_STACK_SIZE, NULL, configMAX_PRIORITIES - 1, &TaskUartDecodeHandle);
     xTaskCreate(TaskSectionCurrent, "TaskSectionCurrent", TASK_SECTION_CURENT_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskCurrentHandle);
 
 #if 0

@@ -209,9 +209,9 @@ void application_init()
     gpio_pin_remap_config(GPIO_TIMER1_PARTIAL_REMAP1, ENABLE);
 
     gpio_table_init(gpio_config_table, ARRAYNUM(gpio_config_table));
-    extern_gpio_interrupt_init(&R_pwm_led);
-    extern_gpio_interrupt_init(&G_pwm_led);
-    extern_gpio_interrupt_init(&B_pwm_led);
+    // extern_gpio_interrupt_init(&R_pwm_led);
+    // extern_gpio_interrupt_init(&G_pwm_led);
+    // extern_gpio_interrupt_init(&B_pwm_led);
 
     fan_timer_pwm_config(&cw_wheel_pwm);
     Set_fan_timer_pwm(&cw_wheel_pwm, 90);

@@ -41,8 +41,6 @@ float get_ntc_temperature(const ntc_t *ntc, float Voltage)
     else
         ntc_R = (3.3 / (3.3 - (double)Voltage)) * ntc->divided_voltage_R - ntc->divided_voltage_R;
 
-    // printf("ntc_R = %f\r\n", ntc_R);
-
     return (298.15 * ntc->B) / (298.15 * log(ntc_R / ntc->normal_R) + ntc->B) - 273.15;
 }
 

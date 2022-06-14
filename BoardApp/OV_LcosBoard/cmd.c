@@ -1,12 +1,12 @@
 /**
  * @file cmd.c
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-02-15
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #include "main.h"
@@ -14,6 +14,8 @@
 #include "timer.h"
 #include "ovp921.h"
 #include "basicApp.h"
+
+#ifdef DEBUG
 
 #define FAN_MAX_NUM 1
 #define ADC_MAX_NUM 3
@@ -164,7 +166,7 @@ void gettime(char argc, char *argv)
     {
         sscanf((const char *)&(argv[argv[1]]), "%d", &val);
         cmd_printf("set laser val = %d\n", val);
-        GET_TIME(laser_dac_set_value, &laser_dac, val); //81Us
+        GET_TIME(laser_dac_set_value, &laser_dac, val); // 81Us
         GET_NOP_TIME;
     }
     else
@@ -461,3 +463,5 @@ ICmdRegister("laser", laser);
 ICmdRegister("testpattern", testpattern);
 ICmdRegister("reset", reset);
 ICmdRegister("lcos", lcos);
+
+#endif
