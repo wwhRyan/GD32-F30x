@@ -132,7 +132,7 @@ gpio_config_t gpio_config_table[] = {
 void application_init()
 {
     /* initilize the LEDs, USART and key */
-    semaphore_init();
+    system_ipc_init();
 
     /* initilize the USART */
     uarter_init(&uart1_debug);

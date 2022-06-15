@@ -22,12 +22,12 @@ void TaskIdle(void *pvParameters)
         // debug_printf("TaskIdle\r\n");
         // debug_printf("TaskIdle min free stack size %d\r\n",(int)uxTaskGetStackHighWaterMark(NULL));
         vTaskDelay(500);
-        if (get_ovp921_status() == true && !gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN))
+        if (get_ovp921_status() == true && get_sig(sys_sig, at_lightsource) && !gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN))
         {
             laser_on();
             debug_printf("laser on\r\n");
         }
-        else if (get_ovp921_status() == false && gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN))
+        else if ((get_ovp921_status() == false || !get_sig(sys_sig, at_lightsource)) && gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN))
         {
             laser_off();
             debug_printf("laser off\r\n");

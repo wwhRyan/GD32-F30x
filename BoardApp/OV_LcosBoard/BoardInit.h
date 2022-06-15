@@ -19,6 +19,8 @@
 #include "adc_mcu.h"
 #include "dac.h"
 #include "port.h"
+#include "event_groups.h"
+#include "semphr.h"
 
 #ifndef ATHENA_OV_LCOS
 #error "Please define ATHENA_OV_LCOS"
@@ -34,6 +36,17 @@ void TaskUartDecode(void *pvParameters);
 void TaskSectionCurrent(void *pvParameters);
 
 void output_printf(const char *fmt, ...);
+void system_ipc_init(void);
+
+extern EventGroupHandle_t sys_sig;
+extern SemaphoreHandle_t uart_Semaphore;
+extern SemaphoreHandle_t i2c_Semaphore;
+
+typedef enum sys_sig_t
+{
+    at_lightsource,
+
+} sys_sig_t;
 
 /*<! Red laser NTC !>*/
 #define LD_NTC_PORT GPIOB

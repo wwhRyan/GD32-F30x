@@ -1,31 +1,24 @@
 /**
  * @file utils.c
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-02-15
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #include "utils.h"
 #include "semphr.h"
 #include "gd32f307c_eval.h"
-
-SemaphoreHandle_t uart_Semaphore = NULL;
-
-void semaphore_init(void)
-{
-    uart_Semaphore = xSemaphoreCreateMutex();
-    assert(uart_Semaphore != NULL);
-}
+#include "Boardinit.h"
 
 /**
  * @brief debug_printf is Thread safety printf function
- * 
- * @param fmt 
- * @param ... 
+ *
+ * @param fmt
+ * @param ...
  */
 void debug_printf(const char *fmt, ...)
 {
@@ -54,4 +47,28 @@ int fgetc(FILE *f)
     while (RESET == usart_flag_get(EVAL_COM1, USART_FLAG_RBNE))
         ;
     return (int)usart_data_receive(EVAL_COM1);
+}
+
+bool get_sig(EventGroupHandle_t pEventGroup, int BitInx)
+{
+    int EventGroup = xEventGroupGetBits(pEventGroup);
+
+    if (EventGroup & (0x00000001 << BitInx))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+void set_sig(EventGroupHandle_t pEventGroup, int BitInx)
+{
+    xEventGroupSetBits(pEventGroup, (0x00000001 << BitInx));
+}
+
+void clear_sig(EventGroupHandle_t pEventGroup, int BitInx)
+{
+    xEventGroupClearBits(pEventGroup, (0x00000001 << BitInx));
 }

@@ -978,6 +978,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\basicApp.c</FilePath>
             </File>
+            <File>
+              <FileName>ovp921_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\ovp921_flash.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -1902,6 +1907,11 @@
               <FileName>basicApp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\basicApp.c</FilePath>
+            </File>
+            <File>
+              <FileName>ovp921_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\ovp921_flash.c</FilePath>
             </File>
           </Files>
         </Group>

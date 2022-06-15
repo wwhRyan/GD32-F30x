@@ -1,12 +1,12 @@
 /**
  * @file utils.h
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-02-15
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 #ifndef _UTILS_H_
 #define _UTILS_H_
@@ -38,7 +38,7 @@
 #ifdef DEBUG
 /**
  * @brief 假设没有中断的影响，时间精度是1Us
- * 
+ *
  */
 #define GET_TIME(func, ...)                                                  \
     do                                                                       \
@@ -68,6 +68,8 @@
 #endif
 
 void debug_printf(const char *fmt, ...);
-void semaphore_init(void);
+bool get_sig(EventGroupHandle_t pEventGroup, int BitInx);
+void set_sig(EventGroupHandle_t pEventGroup, int BitInx);
+void clear_sig(EventGroupHandle_t pEventGroup, int BitInx);
 
 #endif

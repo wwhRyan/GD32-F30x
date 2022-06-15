@@ -1,12 +1,12 @@
 /**
  * @file BoardInit.c
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-03-22
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #include "main.h"
@@ -24,7 +24,7 @@
  * C2564W: extended constant initialiser used
  */
 
-#pragma diag_suppress 1296 //Suppress warning message: extended constant initialiser used
+#pragma diag_suppress 1296 // Suppress warning message: extended constant initialiser used
 
 static UartBuffer uart0_rx_buffer = {0};
 static UartBuffer uart1_rx_buffer = {0};
@@ -171,7 +171,7 @@ const exti_gpio_t B_pwm_led = {
 };
 
 gpio_config_t gpio_config_table[] = {
-    //output
+    // output
     {LD_EN_H_PORT, LD_EN_H_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
     {LD_EN_L_PORT, LD_EN_L_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
     {DISCHARGE_PORT, DISCHARGE_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
@@ -185,19 +185,38 @@ gpio_config_t gpio_config_table[] = {
     {OVP2200_1_5V_EN_PORT, OVP2200_1_5V_EN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
     {I_SPOKER_PORT, I_SPOKER_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
 
-    //input
+    // input
     // {HW_PORT, HW_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
     // {R_LED_PWM_PORT, R_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
     // {G_LED_PWM_PORT, G_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
     // {B_LED_PWM_PORT, B_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
 };
 
+SemaphoreHandle_t uart_Semaphore = NULL;
+SemaphoreHandle_t i2c_Semaphore = NULL;
+
+// Declare a variable to hold the created event group.
+EventGroupHandle_t sys_sig;
+
+void system_ipc_init(void)
+{
+    uart_Semaphore = xSemaphoreCreateMutex();
+    E_assert(uart_Semaphore != NULL);
+    i2c_Semaphore = xSemaphoreCreateMutex();
+    E_assert(i2c_Semaphore != NULL);
+
+    // Attempt to create the event group.
+    sys_sig = xEventGroupCreate();
+    E_assert(sys_sig != NULL);
+    set_sig(sys_sig, at_lightsource);
+}
+
 void omnivision_lcos_init(void);
 
 void application_init()
 {
     /* initilize the LEDs, USART and key */
-    semaphore_init();
+    system_ipc_init();
 
     /* initilize the USART */
     uarter_init(&uart0_output);

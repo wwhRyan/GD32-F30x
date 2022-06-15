@@ -29,35 +29,23 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
         {
 
             gpio_bit_set(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
-            if (get_ovp921_status() != true)
+            if (get_ovp921_status() != true)    // if ovp921 is not working, then reset it
             {
                 gpio_bit_set(OVP921_RESET_PORT, OVP921_RESET_PIN);
                 vTaskDelay(1000);
                 gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
             }
             debug_printf("system on\n");
-            for (int i = 0; i < 10; i++)
-            {
-                debug_printf("%ds\r\n", i);
-                if (get_ovp921_status() == true)
-                {
-                    laser_on();
-                    debug_printf("laser on\r\n");
-                    break;
-                }
-                else
-                {
-                    laser_off();
-                    debug_printf("laser off\r\n");
-                }
-                vTaskDelay(1000);
-            }
+            set_sig(sys_sig, at_lightsource);
+            debug_printf("at_lightsource on\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
         else if (kKeyOff == my_kvs[0].value)
         {
             debug_printf("system off\n");
             laser_off();
+            clear_sig(sys_sig, at_lightsource);
+            debug_printf("at_lightsource off\n");
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
@@ -89,14 +77,14 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
     {
         if (kKeyOn == my_kvs[0].value)
         {
-            laser_on();
-            debug_printf("system on\n");
+            set_sig(sys_sig, at_lightsource);
+            debug_printf("at_lightsource on\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
         else if (kKeyOff == my_kvs[0].value)
         {
-            laser_off();
-            debug_printf("system off\n");
+            clear_sig(sys_sig, at_lightsource);
+            debug_printf("at_lightsource off\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
     }
