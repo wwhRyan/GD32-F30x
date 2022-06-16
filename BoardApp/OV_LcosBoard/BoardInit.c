@@ -249,12 +249,12 @@ void application_init()
 
     INewSoftwareI2C(&ovp921_i2c);
 
-    debug_printf("OV Lcos Board %s finished\r\n", __func__);
+    printf("OV Lcos Board %s finished\r\n", __func__);
     /* print out the clock frequency of system, AHB, APB1 and APB2 */
-    debug_printf("CK_SYS is %d\n", rcu_clock_freq_get(CK_SYS));
-    debug_printf("CK_AHB is %d\n", rcu_clock_freq_get(CK_AHB));
-    debug_printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
-    debug_printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
+    printf("CK_SYS is %d\n", rcu_clock_freq_get(CK_SYS));
+    printf("CK_AHB is %d\n", rcu_clock_freq_get(CK_AHB));
+    printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
+    printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
 
     omnivision_lcos_init();
 }

@@ -215,7 +215,7 @@ static bool m_SoftI2cWaitAck(const SoftwareI2C *psI2c)
 		if (i >= 250)
 		{
 			m_SoftI2cStop(psI2c);
-			debug_printf("slave no ack\r\n");
+			printf("slave no ack\r\n");
 			return false;
 		}
 	}

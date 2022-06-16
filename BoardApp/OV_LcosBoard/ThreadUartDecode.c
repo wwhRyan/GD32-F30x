@@ -25,22 +25,22 @@ void TaskUartDecode(void *pvParameters)
 {
     reload_idu_current();
 
-    for (int i = 0; i < 10; i++)
-    {
-        debug_printf("%ds\r\n", i);
-        vTaskDelay(1000);
-        if (get_ovp921_status() == true)
-        {
-            laser_on();
-            debug_printf("laser on\r\n");
-            break;
-        }
-        else
-        {
-            laser_off();
-            debug_printf("laser off\r\n");
-        }
-    }
+    // for (int i = 0; i < 10; i++)
+    // {
+    //     debug_printf("%ds\r\n", i);
+    //     vTaskDelay(1000);
+    //     if (get_ovp921_status() == true)
+    //     {
+    //         laser_on();
+    //         debug_printf("laser on\r\n");
+    //         break;
+    //     }
+    //     else
+    //     {
+    //         laser_off();
+    //         debug_printf("laser off\r\n");
+    //     }
+    // }
     IInitAtLib(&at_obj, kAtNormalMode, NULL, debug_printf);
 
     while (1)
