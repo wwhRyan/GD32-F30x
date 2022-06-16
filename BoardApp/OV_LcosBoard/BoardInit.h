@@ -45,7 +45,8 @@ extern SemaphoreHandle_t i2c_Semaphore;
 typedef enum sys_sig_t
 {
     at_lightsource,
-
+    ovp921_status,
+    light_status,
 } sys_sig_t;
 
 /*<! Red laser NTC !>*/

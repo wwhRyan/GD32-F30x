@@ -244,19 +244,20 @@ void off_pattern()
 
 uint8_t get_reg(uint16_t reg_addr)
 {
-    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0);
     uint8_t reg_val = 0;
-    reg_val = get_reg(reg_addr);
+    ISoftwareI2CRegRead(&ovp921_i2c, OVP921_SCCB_ADDRESS_READ, reg_addr,
+                        REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);
     xSemaphoreGive(i2c_Semaphore);
     return reg_val;
 }
 
 void set_reg(uint16_t reg_addr, uint8_t reg_val)
 {
-    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0);
 
-    set_reg(reg_addr,
-            reg_val);
+    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, reg_addr,
+                         REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);
     xSemaphoreGive(i2c_Semaphore);
 }
 

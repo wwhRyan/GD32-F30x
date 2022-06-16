@@ -209,6 +209,8 @@ void system_ipc_init(void)
     sys_sig = xEventGroupCreate();
     E_assert(sys_sig != NULL);
     set_sig(sys_sig, at_lightsource);
+    clear_sig(sys_sig, ovp921_status);
+    clear_sig(sys_sig, at_lightsource);
 }
 
 void omnivision_lcos_init(void);
