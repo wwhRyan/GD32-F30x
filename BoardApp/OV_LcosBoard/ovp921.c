@@ -138,7 +138,9 @@ void change_anf(uint8_t num)
     {
         set_reg(0x0046, 0xA0 | num);
     }
-    vTaskDelay(5);
+    else
+        return;
+    vTaskDelay(100); // wait for the register to be updated in first change.
 }
 
 void show_solid_color_pattern(uint8_t red, uint8_t green, uint8_t blue)
@@ -159,6 +161,8 @@ void show_solid_color_pattern(uint8_t red, uint8_t green, uint8_t blue)
     ovp921.pattern_generator.pattern_generator_en = 1;
     set_reg(ovp921.pattern_generator.addr,
             ovp921.pattern_generator.byte);
+    vTaskDelay(1);
+    set_reg(0x4E, 0xAA);
 }
 
 void gray_ramp_pattern()
@@ -173,6 +177,8 @@ void gray_ramp_pattern()
     ovp921.pattern_generator.pattern_generator_en = 1;
     set_reg(ovp921.pattern_generator.addr,
             ovp921.pattern_generator.byte);
+    vTaskDelay(1);
+    set_reg(0x4E, 0xAA);
 }
 
 void checkerboard_pattern()
@@ -225,6 +231,8 @@ void checkerboard_pattern()
     ovp921.pattern_generator.pattern_generator_en = 1;
     set_reg(ovp921.pattern_generator.addr,
             ovp921.pattern_generator.byte);
+    vTaskDelay(1);
+    set_reg(0x4E, 0xAA);
 }
 
 void get_chipid()
@@ -244,8 +252,9 @@ void off_pattern()
 
 uint8_t get_reg(uint16_t reg_addr)
 {
-    xSemaphoreTake(i2c_Semaphore, (TickType_t)0);
     uint8_t reg_val = 0;
+
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
     ISoftwareI2CRegRead(&ovp921_i2c, OVP921_SCCB_ADDRESS_READ, reg_addr,
                         REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);
     xSemaphoreGive(i2c_Semaphore);
@@ -254,7 +263,7 @@ uint8_t get_reg(uint16_t reg_addr)
 
 void set_reg(uint16_t reg_addr, uint8_t reg_val)
 {
-    xSemaphoreTake(i2c_Semaphore, (TickType_t)0);
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
 
     ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, reg_addr,
                          REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);

@@ -36,7 +36,8 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
                 gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
             }
             debug_printf("system on\n");
-            set_sig(sys_sig, at_lightsource,true);
+            set_sig(sys_sig, at_lightsource, true);
+            set_sig(sys_sig, at_system, true);
             debug_printf("at_lightsource on\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
@@ -45,6 +46,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             debug_printf("system off\n");
             laser_off();
             clear_sig(sys_sig, at_lightsource);
+            clear_sig(sys_sig, at_system);
             debug_printf("at_lightsource off\n");
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
@@ -77,7 +79,7 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
     {
         if (kKeyOn == my_kvs[0].value)
         {
-            set_sig(sys_sig, at_lightsource,true);
+            set_sig(sys_sig, at_lightsource, true);
             debug_printf("at_lightsource on\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
@@ -141,7 +143,7 @@ IAtOperationRegister(kCmdLightSourceTime, pAt_Kv_List, pAt_feedback_str)
     {
         if (kKeyMinute == my_kvs[0].key)
         {
-            IAddFeedbackStrTo(pAt_feedback_str, "Minute:%d\n", eeprom.light_source_time);
+            IAddFeedbackStrTo(pAt_feedback_str, "Minute:%d\n", eeprom.light_source_time / 60);
         }
     }
 }

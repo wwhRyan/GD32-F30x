@@ -68,15 +68,16 @@ bool eeprom_write(uint8_t addr, uint8_t data);
 uint8_t eeprom_read(uint8_t addr);
 void init_eeprom(void);
 
-#define EEPROM_SET(var, unit, byte_size)                                                                         \
-    do                                                                                                           \
-    {                                                                                                            \
-        eeprom_lock(UNLOCK);                                                                                     \
-                                                                                                                 \
-        eeprom.unit = var;                                                                                       \
-        ISoftwareI2CRegWrite(&ovp921_i2c, EEPROM_WRITE, offsetof(eeprom_t, unit),                                \
+#define EEPROM_SET(var, unit, byte_size)                                                                          \
+    do                                                                                                            \
+    {                                                                                                             \
+        eeprom_lock(UNLOCK);                                                                                      \
+        xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);                                                        \
+        eeprom.unit = var;                                                                                        \
+        ISoftwareI2CRegWrite(&ovp921_i2c, EEPROM_WRITE, offsetof(eeprom_t, unit),                                 \
                              REG_ADDR_1BYTE, ((uint8_t *)&eeprom) + offsetof(eeprom_t, unit), byte_size, 0xFFFF); \
-        eeprom_lock(LOCK);                                                                                       \
+        xSemaphoreGive(i2c_Semaphore);                                                                            \
+        eeprom_lock(LOCK);                                                                                        \
     } while (0)
 
 void reload_idu_current(void);

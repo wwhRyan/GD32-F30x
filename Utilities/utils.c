@@ -23,7 +23,7 @@
 void debug_printf(const char *fmt, ...)
 {
     va_list args;
-    if (xSemaphoreTake(uart_Semaphore, (TickType_t)5) == pdFALSE)
+    if (xSemaphoreTake(uart_Semaphore, (TickType_t)0xFFFF) == pdFALSE)
         return;
     va_start(args, fmt);
     vprintf(fmt, args);

@@ -120,7 +120,9 @@ bool laser_set(int idx, float current)
     }
     else
     {
+        xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
         ISoftwareI2CRegWrite(&ovp921_i2c, 0x66, (uint8_t)idx, REG_ADDR_1BYTE, &digital_value, 1, 5);
+        xSemaphoreGive(i2c_Semaphore);
         vTaskDelay(1);
     }
     return true;
@@ -138,7 +140,9 @@ bool eeprom_write(uint8_t addr, uint8_t data)
 {
     bool ret = false;
     eeprom_lock(UNLOCK);
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
     ret = ISoftwareI2CRegWrite(&ovp921_i2c, EEPROM_WRITE, addr, REG_ADDR_1BYTE, &data, 1, 0xFFFF);
+    xSemaphoreGive(i2c_Semaphore);
     eeprom_lock(LOCK);
     return ret;
 }
@@ -147,11 +151,16 @@ uint8_t eeprom_read(uint8_t addr)
 {
     uint8_t data;
     eeprom_lock(UNLOCK);
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
     ISoftwareI2CRegRead(&ovp921_i2c, EEPROM_READ, addr, REG_ADDR_1BYTE, &data, 1, 0xFFFF);
+    xSemaphoreGive(i2c_Semaphore);
     eeprom_lock(LOCK);
     return data;
 }
 
+/**
+ * @brief Call before rtos task
+ */
 void init_eeprom()
 {
 
