@@ -39,11 +39,12 @@ OF SUCH DAMAGE.
 #define SYS_TICK_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 /* configure systick */
 void systick_config(void);
-/* delay a time in milliseconds */
-void delay_1ms(uint32_t count);
+/* get one second, loop check */
+bool is_one_second(void);
 /* delay decrement */
 void delay_decrement(void);
 

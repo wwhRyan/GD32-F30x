@@ -63,9 +63,12 @@ bool get_sig(EventGroupHandle_t pEventGroup, int BitInx)
     }
 }
 
-void set_sig(EventGroupHandle_t pEventGroup, int BitInx)
+void set_sig(EventGroupHandle_t pEventGroup, int BitInx, bool status)
 {
-    xEventGroupSetBits(pEventGroup, (0x00000001 << BitInx));
+    if (status)
+        xEventGroupSetBits(pEventGroup, (0x00000001 << BitInx));
+    else
+        xEventGroupClearBits(pEventGroup, (0x00000001 << BitInx));
 }
 
 void clear_sig(EventGroupHandle_t pEventGroup, int BitInx)

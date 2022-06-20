@@ -208,7 +208,7 @@ void system_ipc_init(void)
     // Attempt to create the event group.
     sys_sig = xEventGroupCreate();
     E_assert(sys_sig != NULL);
-    set_sig(sys_sig, at_lightsource);
+    set_sig(sys_sig, at_lightsource, true);
     clear_sig(sys_sig, ovp921_status);
     clear_sig(sys_sig, at_lightsource);
 }
@@ -219,6 +219,7 @@ void application_init()
 {
     /* initilize the LEDs, USART and key */
     system_ipc_init();
+    // rcu_periph_clock_enable(RCU_CRC);
 
     /* initilize the USART */
     uarter_init(&uart0_output);
@@ -230,9 +231,9 @@ void application_init()
     gpio_pin_remap_config(GPIO_TIMER1_PARTIAL_REMAP1, ENABLE);
 
     gpio_table_init(gpio_config_table, ARRAYNUM(gpio_config_table));
-    // extern_gpio_interrupt_init(&R_pwm_led);
-    // extern_gpio_interrupt_init(&G_pwm_led);
-    // extern_gpio_interrupt_init(&B_pwm_led);
+    extern_gpio_interrupt_init(&R_pwm_led);
+    extern_gpio_interrupt_init(&G_pwm_led);
+    extern_gpio_interrupt_init(&B_pwm_led);
 
     fan_timer_pwm_config(&cw_wheel_pwm);
     Set_fan_timer_pwm(&cw_wheel_pwm, 90);
@@ -256,6 +257,7 @@ void application_init()
     printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
     printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
 
+    init_eeprom();
     omnivision_lcos_init();
 }
 

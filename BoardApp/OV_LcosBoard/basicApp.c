@@ -77,8 +77,6 @@ float get_current_value(uint8_t idu)
     return 9920.0 / (125.0 * idu + 24.0);
 }
 
-#define UNLOCK false
-#define LOCK true
 /**
  * @brief eeprom lock function
  *
@@ -124,7 +122,6 @@ bool laser_set(int idx, float current)
     {
         ISoftwareI2CRegWrite(&ovp921_i2c, 0x66, (uint8_t)idx, REG_ADDR_1BYTE, &digital_value, 1, 5);
         vTaskDelay(1);
-        eeprom_write((uint8_t)idx, digital_value);
     }
     return true;
 }
@@ -133,6 +130,9 @@ float laser_get(int idx)
 {
     return get_current_value(eeprom_read((uint8_t)idx));
 }
+
+eeprom_t eeprom;
+const uint32_t eeprom_magic_number = 0x12344321;
 
 bool eeprom_write(uint8_t addr, uint8_t data)
 {
@@ -152,11 +152,42 @@ uint8_t eeprom_read(uint8_t addr)
     return data;
 }
 
+void init_eeprom()
+{
+
+    ISoftwareI2CRegRead(&ovp921_i2c, EEPROM_WRITE, 0x00,
+                        REG_ADDR_1BYTE, ((uint8_t *)&eeprom), sizeof(eeprom_t), 0xFFFF);
+
+    if (eeprom.magic_num != eeprom_magic_number)
+    {
+        eeprom_lock(UNLOCK);
+
+        printf("reset eeprom!\n");
+        eeprom.magic_num = eeprom_magic_number;
+        eeprom.red = 1.00;
+        eeprom.green = 0.80;
+        eeprom.blue = 0.623;
+        eeprom.light_source_time = 0;
+
+        for (size_t i = 0; i < sizeof(eeprom_t); i++)
+        {
+            ISoftwareI2CRegWrite(&ovp921_i2c, EEPROM_WRITE, i,
+                                 REG_ADDR_1BYTE, ((uint8_t *)&eeprom) + i, 1, 0xFFFF);
+            DelayMs(10);
+        }
+        eeprom_lock(LOCK);
+    }
+    else
+    {
+        printf("Ok eeprom.\n");
+    }
+}
+
 void reload_idu_current(void)
 {
-    uint8_t red_idu_value = eeprom_read((int)RED);
-    uint8_t green_idu_value = eeprom_read((int)GREEN);
-    uint8_t blue_idu_value = eeprom_read((int)BLUE);
+    uint8_t red_idu_value = eeprom.red;
+    uint8_t green_idu_value = eeprom.green;
+    uint8_t blue_idu_value = eeprom.blue;
 
     if (red_idu_value <= 127 && red_idu_value >= 21)
     {

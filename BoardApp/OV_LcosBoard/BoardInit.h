@@ -12,7 +12,7 @@
 #ifndef EXECTHREAD_H
 #define EXECTHREAD_H
 
-#define MCU_VERSION "V1.1"
+#define MCU_VERSION "V1.0"
 
 #include "uart.h"
 #include "timer.h"
