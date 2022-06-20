@@ -1,12 +1,12 @@
 /**
  * @file adc_mcu.h
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-03-22
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #ifndef __ADC_MCU_H__
@@ -15,6 +15,7 @@
 #include "gd32f30x.h"
 #include "main.h"
 #include "systick.h"
+#include "i2c.h"
 
 typedef struct ntc_adc_config_t
 {

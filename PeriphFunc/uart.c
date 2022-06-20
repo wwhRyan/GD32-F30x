@@ -110,7 +110,7 @@ void uarter_init(const Uarter *pUarter)
 //TODO: fix the bug if data is larger than the buffer size 255.
 void uarter_IRQ(const Uarter *pUarter)
 {
-    assert(pUarter != NULL);
+    E_assert(pUarter != NULL);
     if (RESET != usart_interrupt_flag_get(pUarter->uart_base, pUarter->uart_interrupt_flag))
     {
         dma_channel_disable(pUarter->dma_base, pUarter->dma_rx_channel);
@@ -131,19 +131,19 @@ void uarter_IRQ(const Uarter *pUarter)
 
 char *GetRxData(const Uarter *pUarter)
 {
-    assert(pUarter != NULL);
+    E_assert(pUarter != NULL);
     return (char *)pUarter->p_rx_buffer->buffer[pUarter->p_rx_buffer->tail];
 }
 
 int GetRxlen(const Uarter *pUarter)
 {
-    assert(pUarter != NULL);
+    E_assert(pUarter != NULL);
     return (int)pUarter->p_rx_buffer->count[pUarter->p_rx_buffer->tail];
 }
 
 void ClearRxData(const Uarter *pUarter)
 {
-    assert(pUarter != NULL);
+    E_assert(pUarter != NULL);
     pUarter->p_rx_buffer->count[pUarter->p_rx_buffer->tail] = 0;
     memset(pUarter->p_rx_buffer->buffer[pUarter->p_rx_buffer->tail], 0, DMA_BUFFER_SIZE);
     pUarter->p_rx_buffer->tail++;
@@ -153,7 +153,7 @@ void ClearRxData(const Uarter *pUarter)
 
 void uarter_send(const Uarter *pUarter, const char *pData, uint32_t len)
 {
-    assert(pUarter != NULL);
+    E_assert(pUarter != NULL);
     char *p = (char *)pData;
 
     while (len--)

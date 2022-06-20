@@ -263,7 +263,7 @@ void set_reg(uint16_t reg_addr, uint8_t reg_val)
 
 void omnivision_lcos_init()
 {
-    delay_1ms(5);
+    DelayMs(10);
     gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
 }
 

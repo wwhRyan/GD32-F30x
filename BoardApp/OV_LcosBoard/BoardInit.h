@@ -12,7 +12,7 @@
 #ifndef EXECTHREAD_H
 #define EXECTHREAD_H
 
-#define MCU_VERSION "V1.0"
+#define MCU_VERSION "V1.1"
 
 #include "uart.h"
 #include "timer.h"
@@ -21,6 +21,7 @@
 #include "port.h"
 #include "event_groups.h"
 #include "semphr.h"
+#include "basicApp.h"
 
 #ifndef ATHENA_OV_LCOS
 #error "Please define ATHENA_OV_LCOS"

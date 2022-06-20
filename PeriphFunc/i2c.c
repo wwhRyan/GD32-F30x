@@ -27,7 +27,7 @@ static bool m_SoftI2cBurst(const SoftwareI2C *psI2c, uint8_t option,
 
 void INewSoftwareI2C(const SoftwareI2C *psI2c)
 {
-	assert(psI2c != NULL);
+	E_assert(psI2c != NULL);
 
 	gpio_init(psI2c->sda_port, GPIO_MODE_OUT_OD, GPIO_OSPEED_50MHZ, psI2c->sda_pin);
 	gpio_init(psI2c->scl_port, GPIO_MODE_OUT_OD, GPIO_OSPEED_50MHZ, psI2c->scl_pin);

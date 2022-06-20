@@ -14,23 +14,6 @@
 #include "main.h"
 #include "gd32f30x.h"
 
-#ifdef DEBUG
-#define assert(condition)                                   \
-    do                                                      \
-    {                                                       \
-        if (condition)                                      \
-            ;                                               \
-        else                                                \
-        {                                                   \
-            printf("\nERROR:%s, %d\n", __FILE__, __LINE__); \
-            for (;;)                                        \
-                ;                                           \
-        }                                                   \
-    } while (0)
-#else
-#define assert(condition)
-#endif
-
 #define GET_SysTick (uint32_t)(SysTick->VAL)
 // #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)   //获取文件名 linux下
 // #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__) //获取文件名 windows下

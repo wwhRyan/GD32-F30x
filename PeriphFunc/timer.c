@@ -146,14 +146,14 @@ void timer_counter_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint
 
 void fan_timer_pwm_config(const fan_timer_config_t *fan_timer_config)
 {
-    assert(fan_timer_config != NULL);
+    E_assert(fan_timer_config != NULL);
     timer_pwm_config(fan_timer_config->timer_clock, fan_timer_config->timer_base,
                      fan_timer_config->timer_channel, fan_timer_config->gpio_port, fan_timer_config->gpio_pin);
 }
 
 void fan_timer_FG_config(const fan_timer_config_t *fan_timer_config)
 {
-    assert(fan_timer_config != NULL);
+    E_assert(fan_timer_config != NULL);
     timer_counter_config(fan_timer_config->timer_clock, fan_timer_config->timer_base,
                          fan_timer_config->timer_channel, fan_timer_config->gpio_port, fan_timer_config->gpio_pin,
                          fan_timer_config->timer_IRQ, fan_timer_config->channel_interrupt_flag, fan_timer_config->channel_interrupt_enable);
@@ -161,20 +161,20 @@ void fan_timer_FG_config(const fan_timer_config_t *fan_timer_config)
 
 void Set_fan_timer_pwm(const fan_timer_config_t *fan_timer_config, uint16_t percent)
 {
-    assert(fan_timer_config != NULL);
+    E_assert(fan_timer_config != NULL);
     set_timer_counter(fan_timer_config->timer_base, fan_timer_config->timer_channel, percent);
 }
 
 uint32_t Get_fan_timer_FG(const fan_timer_config_t *fan_timer_config)
 {
-    assert(fan_timer_config != NULL);
+    E_assert(fan_timer_config != NULL);
     return fan_timer_config->p_st_calc->fre;
 }
 
 void timer_input_capture_IRQ(const fan_timer_config_t *fan_timer_config)
 {
-    assert(fan_timer_config != NULL);
-    assert(fan_timer_config->p_st_calc != NULL);
+    E_assert(fan_timer_config != NULL);
+    E_assert(fan_timer_config->p_st_calc != NULL);
     if (SET == timer_interrupt_flag_get(fan_timer_config->timer_base, fan_timer_config->channel_interrupt_flag))
     {
         /* clear channel 0 interrupt bit */
