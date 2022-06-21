@@ -21,8 +21,6 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
 
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
         if (kKeyOn == my_kvs[0].value)
@@ -73,8 +71,6 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
 
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
         if (kKeyOn == my_kvs[0].value)
@@ -110,20 +106,35 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
+    char version_str[32] = {0};
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
         debug_printf("system value error\n");
     }
     else
     {
-        if (kKeyMcuSoftware == my_kvs[0].value)
+        if (kKeyMcu == my_kvs[0].value)
         {
-            debug_printf("system on\n");
-            IAddFeedbackStrTo(pAt_feedback_str, MCU_VERSION "\n");
-            update_anf_ovp2200_921_pgen_v4_05();
+            debug_printf("kKeyMcu\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList->key.pData, MCU_VERSION);
+        }
+        else if (kKeyAnf1 == my_kvs[0].value)
+        {
+            debug_printf("kKeyAnf1\n");
+            get_anf_version(version_str, 1);
+            IAddFeedbackStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList->key.pData, version_str);
+        }
+        else if (kKeyAnf2 == my_kvs[0].value)
+        {
+            debug_printf("kKeyAnf2\n");
+            get_anf_version(version_str, 2);
+            IAddFeedbackStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList->key.pData, version_str);
+        }
+        else if (kKeyOvp921 == my_kvs[0].value)
+        {
+            debug_printf("kKeyOvp921\n");
+            get_firmware_version(version_str);
+            IAddFeedbackStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList->key.pData, version_str);
         }
     }
 }
@@ -132,8 +143,6 @@ IAtOperationRegister(kCmdLightSourceTime, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
@@ -152,8 +161,6 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
@@ -222,70 +229,10 @@ IAtOperationRegister(kCmdVerticalKeystone, pAt_Kv_List, pAt_feedback_str)
     }
 }
 
-IAtOperationRegister(kCmdHorizonKeystone, pAt_Kv_List, pAt_feedback_str)
-{
-    asAtKvUnit_Enum my_kvs[1];
-    ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
-    if (kAtControlType == IGetAtCmdType(&at_obj))
-    {
-        if (kKeyOn == my_kvs[0].value)
-        {
-            debug_printf("system on\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-        else if (kKeyOff == my_kvs[0].value)
-        {
-            debug_printf("system off\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-    }
-    else
-    {
-        if (kKeyStatus == my_kvs[0].key)
-        {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-    }
-}
-
-IAtOperationRegister(kCmdKeystone2D, pAt_Kv_List, pAt_feedback_str)
-{
-    asAtKvUnit_Enum my_kvs[1];
-    ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
-    if (kAtControlType == IGetAtCmdType(&at_obj))
-    {
-        if (kKeyOn == my_kvs[0].value)
-        {
-            debug_printf("system on\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-        else if (kKeyOff == my_kvs[0].value)
-        {
-            debug_printf("system off\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-    }
-    else
-    {
-        if (kKeyStatus == my_kvs[0].key)
-        {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-    }
-}
-
 IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
@@ -365,8 +312,6 @@ IAtOperationRegister(kCmdTemperature, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
 
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
     }
@@ -383,8 +328,6 @@ IAtOperationRegister(kCmdCwSpeed, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
@@ -413,37 +356,6 @@ IAtOperationRegister(kCmdReset, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
 
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
-    if (kAtControlType == IGetAtCmdType(&at_obj))
-    {
-        if (kKeyOn == my_kvs[0].value)
-        {
-            debug_printf("system on\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-        else if (kKeyOff == my_kvs[0].value)
-        {
-            debug_printf("system off\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-    }
-    else
-    {
-        if (kKeyStatus == my_kvs[0].key)
-        {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-    }
-}
-
-IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
-{
-    asAtKvUnit_Enum my_kvs[1];
-    ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
         if (kKeyOn == my_kvs[0].value)
@@ -470,8 +382,6 @@ IAtOperationRegister(kCmdError, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
@@ -500,8 +410,6 @@ IAtOperationRegister(kCmdLogInfo, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
 
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
         if (kKeyOn == my_kvs[0].value)
@@ -528,8 +436,6 @@ IAtOperationRegister(kCmdSetCurrent, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
@@ -558,8 +464,6 @@ IAtOperationRegister(kCmdGetCurrent, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
 
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
         if (kKeyOn == my_kvs[0].value)
@@ -586,8 +490,6 @@ IAtOperationRegister(kCmdSn, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
