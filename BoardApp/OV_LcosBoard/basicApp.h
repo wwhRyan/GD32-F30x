@@ -55,7 +55,6 @@ typedef struct eeprom_t
 void laser_on(void);
 void laser_off(void);
 bool laser_set(int idx, float current);
-float laser_get(int idx);
 void laser_dac_set(float current);
 
 uint8_t get_idu_value(float current);
@@ -68,16 +67,19 @@ bool eeprom_write(uint8_t addr, uint8_t data);
 uint8_t eeprom_read(uint8_t addr);
 void init_eeprom(void);
 
-#define EEPROM_SET(var, unit, byte_size)                                                                          \
-    do                                                                                                            \
-    {                                                                                                             \
-        eeprom_lock(UNLOCK);                                                                                      \
-        xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);                                                        \
-        eeprom.unit = var;                                                                                        \
-        ISoftwareI2CRegWrite(&ovp921_i2c, EEPROM_WRITE, offsetof(eeprom_t, unit),                                 \
-                             REG_ADDR_1BYTE, ((uint8_t *)&eeprom) + offsetof(eeprom_t, unit), byte_size, 0xFFFF); \
-        xSemaphoreGive(i2c_Semaphore);                                                                            \
-        eeprom_lock(LOCK);                                                                                        \
+#define EEPROM_SET(var, unit, byte_size)                                                                              \
+    do                                                                                                                \
+    {                                                                                                                 \
+        if (eeprom.unit != var)                                                                                       \
+        {                                                                                                             \
+            eeprom_lock(UNLOCK);                                                                                      \
+            xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);                                                        \
+            eeprom.unit = var;                                                                                        \
+            ISoftwareI2CRegWrite(&ovp921_i2c, EEPROM_WRITE, offsetof(eeprom_t, unit),                                 \
+                                 REG_ADDR_1BYTE, ((uint8_t *)&eeprom) + offsetof(eeprom_t, unit), byte_size, 0xFFFF); \
+            xSemaphoreGive(i2c_Semaphore);                                                                            \
+            eeprom_lock(LOCK);                                                                                        \
+        }                                                                                                             \
     } while (0)
 
 void reload_idu_current(void);

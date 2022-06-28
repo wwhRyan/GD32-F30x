@@ -21,6 +21,7 @@
 #define ADC_MAX_NUM 3
 #define DAC_MAX_NUM 1
 
+extern const SoftwareI2C ovp921_i2c;
 extern const fan_timer_config_t cw_wheel_pwm;
 extern const fan_timer_config_t cw_wheel_fg;
 extern const dac_t laser_dac;
@@ -301,12 +302,12 @@ void laser(char argc, char *argv)
         }
         else if (!strcmp("on", &argv[argv[1]]))
         {
-            laser_on();
+            set_sig(sys_sig, at_lightsource, true);
             cmd_printf("laser on\r\n");
         }
         else if (!strcmp("off", &argv[argv[1]]))
         {
-            laser_off();
+            clear_sig(sys_sig, at_lightsource);
             cmd_printf("laser off\r\n");
         }
         else
@@ -324,11 +325,25 @@ void laser(char argc, char *argv)
             return;
         }
 
-        printf("old current: %f\n", laser_get(idx));
+        printf("old current: %f\n", *(&eeprom.red + idx));
 
         sscanf((const char *)&(argv[argv[2]]), "%f", &current);
         if (true == laser_set(idx, current))
+        {
             cmd_printf("laser idx %d current set to %f\r\n", idx, current);
+            switch (idx)
+            {
+            case RED:
+                EEPROM_SET(current, red, sizeof(float));
+                break;
+            case GREEN:
+                EEPROM_SET(current, green, sizeof(float));
+                break;
+            case BLUE:
+                EEPROM_SET(current, blue, sizeof(float));
+                break;
+            }
+        }
         else
             cmd_printf("laser idx %d current set failed!\r\n", idx);
     }

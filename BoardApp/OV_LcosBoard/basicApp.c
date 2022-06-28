@@ -128,11 +128,6 @@ bool laser_set(int idx, float current)
     return true;
 }
 
-float laser_get(int idx)
-{
-    return get_current_value(eeprom_read((uint8_t)idx));
-}
-
 eeprom_t eeprom;
 const uint32_t eeprom_magic_number = 0x12344321;
 
