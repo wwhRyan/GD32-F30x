@@ -25,7 +25,6 @@ typedef struct dac_t
 } dac_t;
 
 void software_triggle_dac_init(rcu_periph_enum dac_clock, uint32_t dac_base, uint32_t port, uint16_t pin);
-void set_dac_value(uint32_t dac_base, uint32_t value);
 
 void laser_dac_init(const dac_t *laser_dac_config);
 void laser_dac_set_value(const dac_t *laser_dac_config, uint32_t value);

@@ -17,7 +17,7 @@ void software_triggle_adc_init(rcu_periph_enum adc_clock, uint32_t adc_base, uin
 
     rcu_periph_clock_enable(adc_clock);
     /* ADC prescaler select */
-    rcu_adc_clock_config(RCU_CKADC_CKAPB2_DIV4);
+    rcu_adc_clock_config(RCU_CKADC_CKAPB2_DIV6);
 
     /* ADC mode config */
     adc_mode_config(ADC_MODE_FREE);
@@ -42,13 +42,14 @@ uint16_t get_adc_channel_sample(uint32_t adc_base, uint8_t channel)
 {
     adc_regular_data_read(adc_base); // clear last adc data
     /* ADC regular channel config */
-    adc_regular_channel_config(adc_base, 0U, channel, ADC_SAMPLETIME_7POINT5);
+    adc_regular_channel_config(adc_base, 0U, channel, ADC_SAMPLETIME_239POINT5);
     /* ADC software trigger enable */
     adc_software_trigger_enable(adc_base, ADC_REGULAR_CHANNEL);
 
     /* wait the end of conversion flag */
     while (!adc_flag_get(adc_base, ADC_FLAG_EOC))
-        ;
+        vTaskDelay(1);
+    ;
     /* clear the end of conversion flag */
     adc_flag_clear(adc_base, ADC_FLAG_EOC);
     /* return regular channel sample value */

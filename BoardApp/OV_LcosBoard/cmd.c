@@ -16,9 +16,11 @@
 #include "basicApp.h"
 
 #ifdef DEBUG
+#undef cmd_printf
+#define cmd_printf debug_printf
 
 #define FAN_MAX_NUM 1
-#define ADC_MAX_NUM 3
+#define ADC_MAX_NUM 4
 #define DAC_MAX_NUM 1
 
 extern const SoftwareI2C ovp921_i2c;
@@ -28,7 +30,8 @@ extern const dac_t laser_dac;
 
 extern const ntc_adc_config_t evn_ntc;
 extern const ntc_adc_config_t green_led_ntc;
-extern const ntc_adc_config_t ld_ntc;
+extern const ntc_adc_config_t red_ld_ntc;
+extern const ntc_adc_config_t lcos_panel_ntc;
 
 extern struct ovp921_t ovp921;
 extern const Uarter uart1_debug;
@@ -115,7 +118,10 @@ void dacset(char argc, char *argv)
             return;
         }
         if (dac_idx == 1)
+        {
             laser_dac_set_value(&laser_dac, dac_value * 4095 / 100);
+            cmd_printf("laser_dac_set_value %d\r\n", dac_value);
+        }
     }
     else
     {
@@ -137,21 +143,27 @@ void adcget(char argc, char *argv)
         }
         if (adc_idx == 1)
         {
-            value = get_ntc_adc_sample(&ld_ntc);
-            cmd_printf("%d\n", value);
-            cmd_printf("%f\n", get_temperature(value));
+            value = get_ntc_adc_sample(&red_ld_ntc);
+            cmd_printf("value %d\n", value);
+            cmd_printf("temperature %f\n", get_temperature(value));
         }
         else if (adc_idx == 2)
         {
             value = get_ntc_adc_sample(&green_led_ntc);
-            cmd_printf("%d\n", value);
-            cmd_printf("%f\n", get_temperature(value));
+            cmd_printf("value %d\n", value);
+            cmd_printf("temperature %f\n", get_temperature(value));
         }
         else if (adc_idx == 3)
         {
             value = get_ntc_adc_sample(&evn_ntc);
-            cmd_printf("%d\n", value);
-            cmd_printf("%f\n", get_temperature(value));
+            cmd_printf("value %d\n", value);
+            cmd_printf("temperature %f\n", get_temperature(value));
+        }
+        else if (adc_idx == 4)
+        {
+            value = get_ntc_adc_sample(&lcos_panel_ntc);
+            cmd_printf("value %d\n", value);
+            cmd_printf("temperature %f\n", get_temperature(value));
         }
     }
     else

@@ -200,35 +200,6 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
     }
 }
 
-IAtOperationRegister(kCmdVerticalKeystone, pAt_Kv_List, pAt_feedback_str)
-{
-    asAtKvUnit_Enum my_kvs[1];
-    ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-
-    if (kAtControlType == IGetAtCmdType(&at_obj))
-    {
-        if (kKeyOn == my_kvs[0].value)
-        {
-            debug_printf("system on\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-        else if (kKeyOff == my_kvs[0].value)
-        {
-            debug_printf("system off\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-    }
-    else
-    {
-        if (kKeyStatus == my_kvs[0].key)
-        {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-    }
-}
-
 IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
@@ -256,7 +227,7 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
             show_solid_color_pattern(127, 127, 127);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
-        else if (kKeyMegenta == my_kvs[0].value)
+        else if (kKeyMagenta == my_kvs[0].value)
         {
             show_solid_color_pattern(255, 0, 255);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
@@ -281,7 +252,7 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
             show_solid_color_pattern(255, 255, 255);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
-        else if (kKeyCheckErboard == my_kvs[0].value)
+        else if (kKeyCheckerboard == my_kvs[0].value)
         {
             checkerboard_pattern();
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
@@ -432,34 +403,7 @@ IAtOperationRegister(kCmdLogInfo, pAt_Kv_List, pAt_feedback_str)
     }
 }
 
-IAtOperationRegister(kCmdSetCurrent, pAt_Kv_List, pAt_feedback_str)
-{
-    asAtKvUnit_Enum my_kvs[1];
-    ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
-
-    if (kAtControlType == IGetAtCmdType(&at_obj))
-    {
-        if (kKeyOn == my_kvs[0].value)
-        {
-            debug_printf("system on\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-        else if (kKeyOff == my_kvs[0].value)
-        {
-            debug_printf("system off\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-    }
-    else
-    {
-        if (kKeyStatus == my_kvs[0].key)
-        {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-    }
-}
-
-IAtOperationRegister(kCmdGetCurrent, pAt_Kv_List, pAt_feedback_str)
+IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);

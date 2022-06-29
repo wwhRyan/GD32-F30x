@@ -236,7 +236,6 @@ void reload_idu_current(void)
 
 inline void R_to_G()
 {
-    gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
     laser_dac_set(G_CURRENT);
 
     // gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
@@ -248,7 +247,6 @@ inline void R_to_G()
 
 inline void G_to_B()
 {
-    gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
     laser_dac_set(B_CURRENT);
 
     gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
@@ -260,7 +258,6 @@ inline void G_to_B()
 
 inline void G_to_R()
 {
-    gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
     laser_dac_set(R_CURRENT);
 
     gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
@@ -272,7 +269,6 @@ inline void G_to_R()
 
 inline void B_to_G()
 {
-    gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
     laser_dac_set(G_CURRENT);
 
     // gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
@@ -317,17 +313,6 @@ void spoke(color_t last_color, color_t next_color)
     }
 }
 
-void color_on(color_t color)
-{
-    gpio_bit_reset(I_SPOKER_PORT, I_SPOKER_PIN);
-}
-
-void error_detect()
-{
-    gpio_bit_set(I_SPOKER_PORT, I_SPOKER_PIN);
-    laser_dac_set(0.00);
-}
-
 void color_EN_EXIT_IRQ(color_t color)
 {
     static uint8_t cnt[color_num] = {0};
@@ -337,21 +322,17 @@ void color_EN_EXIT_IRQ(color_t color)
     uint8_t y = (color + 2) % color_num;
     if (cnt[x] == 0 && cnt[y] == 0)
     {
-        if (cnt[color] == 2)
+        if (cnt[color] == 2) // It is time to switch different colors and change the current value of different colors
         {
             spoke(color, color_index[color]);
             cnt[color] = 0;
         }
-        else if (cnt[color] == 1)
-        {
-            color_on(color);
-        }
     }
     else
-    {
+    { // Two red, green and blue pulses appear at the same time, abnormal, clear the count value
         cnt[x] = 0;
         cnt[y] = 0;
         cnt[color] = 1;
-        error_detect();
+        // error_detect();
     }
 }

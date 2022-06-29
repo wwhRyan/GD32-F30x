@@ -101,12 +101,12 @@ const fan_timer_config_t cw_wheel_fg = {
     .p_st_calc = &cw_wheel_fg_calc,
 };
 
-const ntc_adc_config_t ld_ntc = {
+const ntc_adc_config_t red_ld_ntc = {
     .adc_clock = RCU_ADC0,
     .adc_base = ADC0,
     .adc_channel = ADC_CHANNEL_8,
-    .gpio_port = LD_NTC_PORT,
-    .gpio_pin = LD_NTC_PIN,
+    .gpio_port = R_LD_NTC_PORT,
+    .gpio_pin = R_LD_NTC_PIN,
 };
 
 const ntc_adc_config_t green_led_ntc = {
@@ -125,9 +125,17 @@ const ntc_adc_config_t evn_ntc = {
     .gpio_pin = EVN_NTC_PIN,
 };
 
+const ntc_adc_config_t lcos_panel_ntc = {
+    .adc_clock = RCU_ADC0,
+    .adc_base = ADC0,
+    .adc_channel = ADC_CHANNEL_4,
+    .gpio_port = LCOS_PANEL_NTC_PORT,
+    .gpio_pin = LCOS_PANEL_NTC_PIN,
+};
+
 const dac_t laser_dac = {
     .dac_clock = RCU_DAC,
-    .dac_base = DAC,
+    .dac_base = DAC1,
     .gpio_port = DAC1_PORT,
     .gpio_pin = DAC1_PIN,
 };
@@ -140,14 +148,22 @@ const SoftwareI2C ovp921_i2c = {
     .delay_time = SCCB_DELAY_TIME,
 };
 
+const SoftwareI2C sensor_i2c = {
+    .sda_port = SENSOR_SDA_PORT,
+    .sda_pin = SENSOR_SDA_PIN,
+    .scl_port = SENSOR_SCL_PORT,
+    .scl_pin = SENSOR_SCL_PIN,
+    .delay_time = SCCB_DELAY_TIME,
+};
+
 const exti_gpio_t R_pwm_led = {
     .gpio_port = R_LED_PWM_PORT,
     .gpio_pin = R_LED_PWM_PIN,
     .gpio_clk = RCU_GPIOA,
-    .exti_line = EXTI_0,
+    .exti_line = EXTI_8,
     .port_source = GPIO_PORT_SOURCE_GPIOA,
-    .pin_source = GPIO_PIN_SOURCE_0,
-    .gpio_IRQ = EXTI0_IRQn,
+    .pin_source = GPIO_PIN_SOURCE_8,
+    .gpio_IRQ = EXTI5_9_IRQn,
 };
 
 const exti_gpio_t G_pwm_led = {
@@ -177,19 +193,17 @@ gpio_config_t gpio_config_table[] = {
     {DISCHARGE_PORT, DISCHARGE_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
     {DISCHARGE2_PORT, DISCHARGE2_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
     {SYS_12V_ON_PORT, SYS_12V_ON_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET},
-    {EE_WP_PORT, EE_WP_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
     {OVP921_RESET_PORT, OVP921_RESET_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET},
-    {MCU_B_LED_EN_PORT, MCU_B_LED_EN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {MCU_R_LED_EN_PORT, MCU_R_LED_EN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {MCU_G_LED_EN_PORT, MCU_G_LED_EN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {OVP2200_1_5V_EN_PORT, OVP2200_1_5V_EN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {I_SPOKER_PORT, I_SPOKER_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+    {MCU_GPIO_INT_PORT, MCU_GPIO_INT_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
 
     // input
-    // {HW_PORT, HW_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
-    // {R_LED_PWM_PORT, R_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
-    // {G_LED_PWM_PORT, G_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
-    // {B_LED_PWM_PORT, B_LED_PWM_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
+    {HW_VER0_PORT, HW_VER0_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
+    {HW_VER1_PORT, HW_VER1_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
+
+    {RESERVERD_1_PORT, RESERVERD_1_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+    {RESERVERD_2_PORT, RESERVERD_2_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+    {EE_WP_PORT, EE_WP_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+
 };
 
 SemaphoreHandle_t uart_Semaphore = NULL;
@@ -240,12 +254,13 @@ void application_init()
 
     fan_timer_FG_config(&cw_wheel_fg);
 
-    ntc_adc_config(&ld_ntc);
+    ntc_adc_config(&red_ld_ntc);
     ntc_adc_config(&green_led_ntc);
     ntc_adc_config(&evn_ntc);
+    ntc_adc_config(&lcos_panel_ntc);
 
     laser_dac_init(&laser_dac);
-    // laser_dac_set_value(&laser_dac, 2047);
+    // laser_dac_set_value(&laser_dac, 4095);
     laser_dac_set(2.00);
 
     INewSoftwareI2C(&ovp921_i2c);
@@ -276,15 +291,6 @@ void TIMER0_Channel_IRQHandler(void)
     timer_input_capture_IRQ(&cw_wheel_fg);
 }
 
-void EXTI0_IRQHandler(void)
-{
-    if (RESET != exti_interrupt_flag_get(EXTI_0))
-    {
-        color_EN_EXIT_IRQ(RED);
-        exti_interrupt_flag_clear(EXTI_0);
-    }
-}
-
 void EXTI5_9_IRQHandler(void)
 {
 
@@ -297,6 +303,11 @@ void EXTI5_9_IRQHandler(void)
     {
         color_EN_EXIT_IRQ(BLUE);
         exti_interrupt_flag_clear(EXTI_7);
+    }
+    if (RESET != exti_interrupt_flag_get(EXTI_8))
+    {
+        color_EN_EXIT_IRQ(RED);
+        exti_interrupt_flag_clear(EXTI_8);
     }
 }
 

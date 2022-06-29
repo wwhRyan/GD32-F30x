@@ -52,8 +52,8 @@ typedef enum sys_sig_t
 } sys_sig_t;
 
 /*<! Red laser NTC !>*/
-#define LD_NTC_PORT GPIOB
-#define LD_NTC_PIN GPIO_PIN_0
+#define R_LD_NTC_PORT GPIOB
+#define R_LD_NTC_PIN GPIO_PIN_0
 
 /*<! G LED NTC !>*/
 #define G_LED_NTC_PORT GPIOB
@@ -87,27 +87,31 @@ typedef enum sys_sig_t
 #define SYS_12V_ON_PORT GPIOB
 #define SYS_12V_ON_PIN GPIO_PIN_10
 
-#define EE_WP_PORT GPIOA
-#define EE_WP_PIN GPIO_PIN_8
+/*<! PWM driving !>*/
+#define FAN_PWM_PORT GPIOB
+#define FAN_PWM_PIN GPIO_PIN_11
 
 #define OVP921_RESET_PORT GPIOB
 #define OVP921_RESET_PIN GPIO_PIN_12
 
-#define MCU_R_LED_EN_PORT GPIOB
-#define MCU_R_LED_EN_PIN GPIO_PIN_13
+#define MCU_GPIO_INT_PORT GPIOB
+#define MCU_GPIO_INT_PIN GPIO_PIN_13
 
-#define MCU_G_LED_EN_PORT GPIOB
-#define MCU_G_LED_EN_PIN GPIO_PIN_14
+#define SENSOR_SCL_PORT GPIOB
+#define SENSOR_SCL_PIN GPIO_PIN_14
 
-#define MCU_B_LED_EN_PORT GPIOB
-#define MCU_B_LED_EN_PIN GPIO_PIN_15
+#define SENSOR_SDA_PORT GPIOB
+#define SENSOR_SDA_PIN GPIO_PIN_15
 
 /*<! hardware version detect !>*/
-// #define HW_PORT GPIOA
-// #define HW_PIN GPIO_PIN_0
+#define HW_VER0_PORT GPIOC
+#define HW_VER0_PIN GPIO_PIN_14
 
-#define OVP2200_1_5V_EN_PORT GPIOC
-#define OVP2200_1_5V_EN_PIN GPIO_PIN_14
+#define HW_VER1_PORT GPIOC
+#define HW_VER1_PIN GPIO_PIN_15
+
+#define B_LED_NTC_PORT GPIOA
+#define B_LED_NTC_PIN GPIO_PIN_0
 
 /*<! environment !>*/
 #define EVN_NTC_PORT GPIOA
@@ -125,9 +129,8 @@ typedef enum sys_sig_t
 #define DAC1_PORT GPIOA
 #define DAC1_PIN GPIO_PIN_4
 
-/*<! ovp921 red light on signal !>*/
-#define R_LED_PWM_PORT GPIOA
-#define R_LED_PWM_PIN GPIO_PIN_0
+#define LCOS_PANEL_NTC_PORT GPIOA
+#define LCOS_PANEL_NTC_PIN GPIO_PIN_5
 
 /*<! ovp921 green light on signal !>*/
 #define G_LED_PWM_PORT GPIOA
@@ -136,6 +139,10 @@ typedef enum sys_sig_t
 /*<! ovp921 blue light on signal !>*/
 #define B_LED_PWM_PORT GPIOA
 #define B_LED_PWM_PIN GPIO_PIN_7
+
+/*<! ovp921 red light on signal !>*/
+#define R_LED_PWM_PORT GPIOA
+#define R_LED_PWM_PIN GPIO_PIN_8
 
 /*<!  !>*/
 #define TV_UART_TX_PORT GPIOA
@@ -149,16 +156,16 @@ typedef enum sys_sig_t
 #define FG_PORT GPIOA
 #define FG_PIN GPIO_PIN_11
 
-/*<! PWM driving !>*/
-#define FAN_PWM_PORT GPIOB
-#define FAN_PWM_PIN GPIO_PIN_11
+/*<! None using. !>*/
+#define RESERVERD_1_PORT GPIOA
+#define RESERVERD_1_PIN GPIO_PIN_12
 
 /*<! None using. !>*/
-#define CC_EN_PORT GPIOA
-#define CC_EN_PIN GPIO_PIN_15
+#define RESERVERD_2_PORT GPIOA
+#define RESERVERD_2_PIN GPIO_PIN_15
 
-/*<!  !>*/
-#define I_SPOKER_PORT GPIOC
-#define I_SPOKER_PIN GPIO_PIN_13
+/*<! EE_WP !>*/
+#define EE_WP_PORT GPIOC
+#define EE_WP_PIN GPIO_PIN_13
 
 #endif
