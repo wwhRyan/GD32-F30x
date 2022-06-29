@@ -37,9 +37,9 @@ void uarter_init(const Uarter *pUarter)
     /* USART configure */
     usart_deinit(pUarter->uart_base);
     usart_baudrate_set(pUarter->uart_base, pUarter->baudrate);
-    usart_word_length_set(pUarter->uart_base, USART_WL_8BIT);              // USART word length 8 bit
+    usart_word_length_set(pUarter->uart_base, USART_WL_9BIT);              // USART word length 8 bit
     usart_stop_bit_set(pUarter->uart_base, USART_STB_1BIT);                // USART stop bit 1 bit
-    usart_parity_config(pUarter->uart_base, USART_PM_NONE);                // USART parity mode none, 奇偶校验位无效
+    usart_parity_config(pUarter->uart_base, USART_PM_EVEN);                // USART parity mode none
     usart_hardware_flow_rts_config(pUarter->uart_base, USART_RTS_DISABLE); // RTS disable, none used
     usart_hardware_flow_cts_config(pUarter->uart_base, USART_CTS_DISABLE); // CTS disable, none used
     usart_receive_config(pUarter->uart_base, USART_RECEIVE_ENABLE);
