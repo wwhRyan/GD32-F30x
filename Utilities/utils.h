@@ -18,6 +18,7 @@
 // #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)   //获取文件名 linux下
 // #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__) //获取文件名 windows下
 
+#if 0
 #ifdef DEBUG
 /**
  * @brief 假设没有中断的影响，时间精度是1Us
@@ -34,6 +35,7 @@
     } while (0)
 #else
 #define GET_TIME(func, ...) func(__VA_ARGS__);
+#endif
 #endif
 
 #ifdef DEBUG

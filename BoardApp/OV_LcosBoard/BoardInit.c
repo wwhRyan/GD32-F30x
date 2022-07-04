@@ -222,9 +222,9 @@ void system_ipc_init(void)
     // Attempt to create the event group.
     sys_sig = xEventGroupCreate();
     E_assert(sys_sig != NULL);
-    set_sig(sys_sig, at_lightsource, true);
-    clear_sig(sys_sig, ovp921_status);
-    clear_sig(sys_sig, at_lightsource);
+    set_sig(sys_sig, sig_lightsource, true);
+    clear_sig(sys_sig, sig_ovp921_status);
+    clear_sig(sys_sig, sig_lightsource);
 }
 
 void omnivision_lcos_init(void);

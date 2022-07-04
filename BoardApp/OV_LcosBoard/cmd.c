@@ -314,12 +314,12 @@ void laser(char argc, char *argv)
         }
         else if (!strcmp("on", &argv[argv[1]]))
         {
-            set_sig(sys_sig, at_lightsource, true);
+            set_sig(sys_sig, sig_lightsource, true);
             cmd_printf("laser on\r\n");
         }
         else if (!strcmp("off", &argv[argv[1]]))
         {
-            clear_sig(sys_sig, at_lightsource);
+            clear_sig(sys_sig, sig_lightsource);
             cmd_printf("laser off\r\n");
         }
         else
