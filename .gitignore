@@ -70,3 +70,4 @@ Template/My_Keil_project/Core_Board.uvoptx
 log.txt
 *.cppcheck
 *cppcheck-build-dir*
+*.code-workspace

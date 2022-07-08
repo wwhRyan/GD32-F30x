@@ -336,3 +336,30 @@ void color_EN_EXIT_IRQ(color_t color)
         // error_detect();
     }
 }
+
+char *get_sn(int number, char *buff)
+{
+    char *tmp = NULL;
+    switch (number)
+    {
+    case 0:
+        tmp = eeprom.Sn_LightEngine;
+        break;
+    case 1:
+        tmp = eeprom.Sn_SourceLight;
+        break;
+    case 2:
+        tmp = eeprom.Sn_Projector;
+        break;
+    default:
+        E_assert(0);
+        break;
+    }
+
+    if (*((uint32_t *)tmp) != 0xffffffff && *((uint32_t *)tmp) != 0)
+        strcpy(buff, tmp);
+    else
+        strcpy(buff, "NULL");
+
+    return buff;
+}

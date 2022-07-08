@@ -46,10 +46,14 @@ typedef struct eeprom_t
 {
     uint32_t check_sum;
     uint32_t magic_num;
+    uint32_t version;
     float red;
     float green;
     float blue;
     uint32_t light_source_time;
+    char Sn_LightEngine[32];
+    char Sn_SourceLight[32];
+    char Sn_Projector[32];
 } eeprom_t;
 
 void laser_on(void);
@@ -85,5 +89,7 @@ void init_eeprom(void);
 void reload_idu_current(void);
 
 void color_EN_EXIT_IRQ(color_t color);
+
+char *get_sn(int number, char *buff);
 
 #endif
