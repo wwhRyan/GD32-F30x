@@ -12,6 +12,7 @@
 #include "AtProtocol.h"
 #include "basicApp.h"
 #include "ovp921.h"
+#include "utilsAsciiConvert.h"
 
 extern asAtProtocol at_obj;
 
@@ -45,6 +46,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             laser_off();
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
+            clear_sig(sys_sig, sig_update_anf);
             debug_printf("sig_lightsource off\n");
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
@@ -521,6 +523,9 @@ IAtOperationRegister(kCmdUpgradeOvp921Anf, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
+    size_t anf_idx = 0;
+    uint32_t at_crc = 0;
+    uint8_t anf_data[256] = {0};
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
         for (size_t i = 0; i < pAt_Kv_List->size; i++)
@@ -528,19 +533,33 @@ IAtOperationRegister(kCmdUpgradeOvp921Anf, pAt_Kv_List, pAt_feedback_str)
             switch (my_kvs[i].key)
             {
             case kKeyIdx:
-                // todo
+                sscanf(my_kvs[i].value, "%X", &anf_idx);
+                if (anf_idx > 9 || anf_idx == 0)
+                    goto VALUE_ERROR;
                 break;
             case kKeyCrc:
-                // todo
+                sscanf(my_kvs[i].value, "%X", &at_crc);
                 break;
             case kKeyData:
-                // todo
+                if (512 != strlen(my_kvs[i].value))
+                    goto VALUE_ERROR;
+                AsciiToIntPro(my_kvs[i].value, anf_data, 1);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
                 break;
             }
         }
+
+        if (at_crc != get_array_crc(anf_data, sizeof(anf_data)))
+            goto VALUE_ERROR;
+        if (!update_anf(anf_idx, anf_data, sizeof(anf_data)))
+            goto VALUE_ERROR;
+
+    VALUE_ERROR:
+        clear_sig(sys_sig, sig_update_anf);
+        IAddFeedbackStrTo(pAt_feedback_str, "InvalidValue\n");
+        return;
     }
     else
     {

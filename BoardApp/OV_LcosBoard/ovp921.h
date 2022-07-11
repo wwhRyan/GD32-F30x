@@ -30,7 +30,7 @@ bool get_ovp921_status(void);
 void vertical_flip(bool enable);
 void horizontal_flip(bool enable);
 
-void update_anf_ovp2200_921_pgen_v4_05(void);
+bool update_anf(int idx, const uint8_t *p_anf, int anf_size);
 bool ovp921_erase(uint32_t addr);
 void get_anf_version(char *p_version, int anf_idx);
 void get_firmware_version(char *p_version);

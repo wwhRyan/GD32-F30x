@@ -363,3 +363,20 @@ char *get_sn(int number, char *buff)
 
     return buff;
 }
+
+uint32_t get_array_crc(uint8_t *array, size_t size)
+{
+    E_assert(size % sizeof(uint32_t) == 0);
+    rcu_periph_clock_enable(RCU_CRC);
+    /* reset the CRC data register and calculate the CRC of the value */
+    crc_data_register_reset();
+
+    uint32_t valcrc = 0;
+    uint32_t *pval32 = (uint32_t *)array;
+    for (size_t i = 0; i < size / sizeof(uint32_t); i++)
+    {
+        valcrc = crc_single_data_calculate(BSWAP_32(*(pval32 + i)));
+    }
+    debug_printf("valcrc %#x\n", valcrc);
+    return valcrc;
+}

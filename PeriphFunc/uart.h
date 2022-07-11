@@ -1,12 +1,12 @@
 /**
  * @file uart.h
  * @author Wu Wenhao (whwu@appotronics.com)
- * @brief 
+ * @brief
  * @version 1.02
  * @date 2022-02-18
- * 
+ *
  * @copyright Copyright@appotronics 2022. All Rights Reserved
- * 
+ *
  */
 
 #ifndef __UART_H__
@@ -16,7 +16,7 @@
 #include "gd32f30x.h"
 
 #define BAUDRATE (115200)
-#define DMA_BUFFER_SIZE (255)
+#define DMA_BUFFER_SIZE (1024)
 #define BUFF_CACHE_SIZE (3) /* uart buffer number, more buffer, more memery need, more safety for uart receive. */
 
 #define USART0_DATA_ADDRESS ((uint32_t)&USART_DATA(USART0))

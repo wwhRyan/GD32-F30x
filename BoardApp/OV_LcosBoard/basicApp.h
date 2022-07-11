@@ -91,5 +91,6 @@ void reload_idu_current(void);
 void color_EN_EXIT_IRQ(color_t color);
 
 char *get_sn(int number, char *buff);
+uint32_t get_array_crc(uint8_t* array, size_t size);
 
 #endif

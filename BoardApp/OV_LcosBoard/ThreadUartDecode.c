@@ -40,10 +40,9 @@ void TaskUartDecode(void *pvParameters)
 
         if (0 != GetRxlen(&uart1_debug))
         {
-            debug_printf("cmd rec->:%s\r\n", GetRxData(&uart1_debug));
-            ICmdLinesInput(GetRxData(&uart1_debug));
+            // debug_printf("cmd rec->:%s\r\n", GetRxData(&uart1_debug));
+            // ICmdLinesInput(GetRxData(&uart1_debug));
             debug_printf("AT rec->:%s\r\n", GetRxData(&uart1_debug));
-
             IAtCmdDecodeAndRun(&at_obj, GetRxData(&uart1_debug));
             ClearRxData(&uart1_debug);
         }

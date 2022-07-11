@@ -29,7 +29,7 @@
 
 // configMINIMAL_STACK_SIZE
 #define TASK_IDLE_STACK_SIZE 1024
-#define TASK_UART_DECODE_STACK_SIZE 1024
+#define TASK_UART_DECODE_STACK_SIZE (1024 * 3)
 #define TASK_SECTION_CURENT_STACK_SIZE configMINIMAL_STACK_SIZE
 
 void TaskIdle(void *pvParameters);
@@ -50,6 +50,7 @@ typedef enum sys_sig_t
     sig_ovp921_status,
     sig_light_status,
     sig_slientasyncmsg,
+    sig_update_anf,
 } sys_sig_t;
 
 /*<! Red laser NTC !>*/

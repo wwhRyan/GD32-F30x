@@ -326,6 +326,9 @@ bool get_ovp921_status()
     }
 }
 
+#define ANF_BASE_ADDR 0x8000
+#define ANF_ADDR(anf_idx) (ANF_BASE_ADDR + 0x2000 * (anf_idx - 1))
+
 void halting_internal_mcu()
 {
     set_reg(0x01ff, 0x05);
@@ -441,31 +444,38 @@ void ovp921_write_page(uint32_t addr, const uint8_t *data)
     vTaskDelay(150 + 10);
 }
 
-void update_anf(int addr, const uint8_t *p_anf, int anf_size)
+bool update_anf(int idx, const uint8_t *p_anf, int anf_size)
 {
-    E_assert(anf_size % 0x2000 == 0); // must be a multiple of 0x2000
-    E_assert(anf_size % 0x100 == 0);  // must be multiple of 256
-    halting_internal_mcu();
-    if (ovp921_erase(addr) == false)
+    static uint8_t idx_check;
+    static uint8_t iteration = 0;
+    E_assert(anf_size % 0x100 == 0); // must be multiple of 256
+    if (!get_sig(sys_sig, sig_update_anf))
     {
-        debug_printf("erase failed\n");
-        return;
+        halting_internal_mcu();
+        if (ovp921_erase(ANF_ADDR(idx)) == false)
+        {
+            debug_printf("erase failed\n");
+            return false;
+        }
+        if (ovp921_erase(ANF_ADDR(idx) + 0x100) == false)
+        {
+            debug_printf("erase failed\n");
+            return false;
+        }
+        set_sig(sys_sig, sig_update_anf, true);
+        idx_check = idx;
+        iteration = 0;
     }
-    if (ovp921_erase(addr + 0x100) == false)
-    {
-        debug_printf("erase failed\n");
-        return;
-    }
-    for (int i = 0; i < anf_size / 0x100; i++)
-    {
-        ovp921_write_page(addr + i * 0x100, p_anf + i * 0x100);
-        debug_printf(" %s %#x \n", __func__, addr + i * 0x100);
-    }
-}
 
-void update_anf_ovp2200_921_pgen_v4_05(void)
-{
-    update_anf(0xA000, OVP2200_921_pgen_v4_05, OVP2200_921_pgen_v4_05_size);
+    if (idx != idx_check)
+        return false;
+
+    ovp921_write_page(ANF_ADDR(idx) + iteration * 0x100, p_anf);
+    debug_printf(" %s %#x \n", __func__, ANF_ADDR(idx) + iteration * 0x100);
+
+    if (iteration == 0x2000 / 0x100)
+        clear_sig(sys_sig, sig_update_anf);
+    return true;
 }
 
 uint8_t ovp921_read_flash(uint32_t addr)
@@ -507,9 +517,6 @@ uint8_t ovp921_read_flash(uint32_t addr)
 
     return ret;
 }
-
-#define ANF_BASE_ADDR 0x8000
-#define ANF_ADDR(anf_idx) (ANF_BASE_ADDR + 0x2000 * (anf_idx - 1))
 
 void get_anf_version(char *p_version, int anf_idx)
 {
