@@ -261,13 +261,15 @@ uint8_t get_reg(uint16_t reg_addr)
     return reg_val;
 }
 
-void set_reg(uint16_t reg_addr, uint8_t reg_val)
+bool set_reg(uint16_t reg_addr, uint8_t reg_val)
 {
+    bool ret;
     xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
 
-    ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, reg_addr,
-                         REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);
+    ret = ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, reg_addr,
+                               REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);
     xSemaphoreGive(i2c_Semaphore);
+    return ret;
 }
 
 void omnivision_lcos_init()
@@ -329,18 +331,20 @@ bool get_ovp921_status()
 #define ANF_BASE_ADDR 0x8000
 #define ANF_ADDR(anf_idx) (ANF_BASE_ADDR + 0x2000 * (anf_idx - 1))
 
-void halting_internal_mcu()
+bool halting_internal_mcu()
 {
-    set_reg(0x01ff, 0x05);
-    set_reg(0x7ffe, 0x01);
-    set_reg(0x8000, 0x00);
-    set_reg(0x8001, 0x75);
-    set_reg(0x8002, 0x87);
-    set_reg(0x8003, 0x02);
-    set_reg(0x8004, 0x00);
-    set_reg(0x8005, 0x00);
-    set_reg(0x7ffe, 0x00);
-    set_reg(0x7fc0, 0x03);
+    bool ret = true;
+    ret &= set_reg(0x01ff, 0x05);
+    ret &= set_reg(0x7ffe, 0x01);
+    ret &= set_reg(0x8000, 0x00);
+    ret &= set_reg(0x8001, 0x75);
+    ret &= set_reg(0x8002, 0x87);
+    ret &= set_reg(0x8003, 0x02);
+    ret &= set_reg(0x8004, 0x00);
+    ret &= set_reg(0x8005, 0x00);
+    ret &= set_reg(0x7ffe, 0x00);
+    ret &= set_reg(0x7fc0, 0x03);
+    return ret;
 }
 
 #define RETRY_TIMES 10
@@ -352,10 +356,11 @@ uint8_t get_reg_delay(uint16_t reg_addr)
     return reg;
 }
 
-void set_reg_delay(uint16_t reg_addr, uint8_t reg_val)
+bool set_reg_delay(uint16_t reg_addr, uint8_t reg_val)
 {
-    set_reg(reg_addr, reg_val);
+    bool ret = set_reg(reg_addr, reg_val);
     DelayUs(400);
+    return ret;
 }
 
 bool ovp921_erase(uint32_t addr) // erase one page
@@ -411,14 +416,15 @@ bool ovp921_erase(uint32_t addr) // erase one page
 }
 
 #define FLASH_PAGE_SIZE 0x100
-void ovp921_write_page(uint32_t addr, const uint8_t *data)
+bool ovp921_write_page(uint32_t addr, const uint8_t *data)
 {
-    set_reg_delay(0x0213, 0x00);
-    set_reg_delay(0x0218, 0x06);
+    bool ret = true;
+    ret &= set_reg_delay(0x0213, 0x00);
+    ret &= set_reg_delay(0x0218, 0x06);
     vTaskDelay(105 + 5);
-    set_reg_delay(0x0213, 0x01);
-    set_reg_delay(0x0218, 0x05);
-    set_reg_delay(0x0218, 0x00);
+    ret &= set_reg_delay(0x0213, 0x01);
+    ret &= set_reg_delay(0x0218, 0x05);
+    ret &= set_reg_delay(0x0218, 0x00);
     uint8_t read_fifo_times = 0;
 
     read_fifo_times = get_reg_delay(0x021e);
@@ -427,31 +433,33 @@ void ovp921_write_page(uint32_t addr, const uint8_t *data)
         get_reg_delay(0x0218);
     }
 
-    set_reg_delay(0x0213, 0x04);
-    set_reg_delay(0x0218, 0x02);
+    ret &= set_reg_delay(0x0213, 0x04);
+    ret &= set_reg_delay(0x0218, 0x02);
 
-    set_reg_delay(0x0218, (uint8_t)((addr >> 16) & 0xFF));
-    set_reg_delay(0x0218, (uint8_t)((addr >> 8) & 0xFF));
-    set_reg_delay(0x0218, (uint8_t)(addr & 0xFF));
+    ret &= set_reg_delay(0x0218, (uint8_t)((addr >> 16) & 0xFF));
+    ret &= set_reg_delay(0x0218, (uint8_t)((addr >> 8) & 0xFF));
+    ret &= set_reg_delay(0x0218, (uint8_t)(addr & 0xFF));
 
     for (size_t i = 0; i < FLASH_PAGE_SIZE; i++)
     {
-        set_reg_delay(0x0218, *(data + i));
+        ret &= set_reg_delay(0x0218, *(data + i));
         get_reg_delay(0x0218);
     }
-    set_reg_delay(0x0213, 0x00);
-    set_reg_delay(0x0218, 0x00);
+    ret &= set_reg_delay(0x0213, 0x00);
+    ret &= set_reg_delay(0x0218, 0x00);
     vTaskDelay(150 + 10);
+    return ret;
 }
 
 bool update_anf(int idx, const uint8_t *p_anf, int anf_size)
 {
+    bool ret = true;
     static uint8_t idx_check;
     static uint8_t iteration = 0;
     E_assert(anf_size % 0x100 == 0); // must be multiple of 256
     if (!get_sig(sys_sig, sig_update_anf))
     {
-        halting_internal_mcu();
+        ret &= halting_internal_mcu();
         if (ovp921_erase(ANF_ADDR(idx)) == false)
         {
             debug_printf("erase failed\n");
@@ -470,12 +478,15 @@ bool update_anf(int idx, const uint8_t *p_anf, int anf_size)
     if (idx != idx_check)
         return false;
 
-    ovp921_write_page(ANF_ADDR(idx) + iteration * 0x100, p_anf);
+    ret &= ovp921_write_page(ANF_ADDR(idx) + iteration * 0x100, p_anf);
     debug_printf(" %s %#x \n", __func__, ANF_ADDR(idx) + iteration * 0x100);
+    iteration++;
 
-    if (iteration == 0x2000 / 0x100)
+    if (iteration == 0x2000 / 0x100){
         clear_sig(sys_sig, sig_update_anf);
-    return true;
+        debug_printf("update anf success!\n");
+    }
+    return ret;
 }
 
 uint8_t ovp921_read_flash(uint32_t addr)

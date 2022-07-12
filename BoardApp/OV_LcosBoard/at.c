@@ -24,9 +24,9 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
-        if (kKeyOn == my_kvs[0].value)
+        switch (my_kvs[0].value)
         {
-
+        case kKeyOn:
             gpio_bit_set(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             if (get_sig(sys_sig, sig_ovp921_status) != true) // if ovp921 is not working, then reset it
             {
@@ -39,9 +39,16 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             set_sig(sys_sig, sig_system, true);
             debug_printf("sig_lightsource on\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
-        }
-        else if (kKeyOff == my_kvs[0].value)
-        {
+            break;
+
+        case kKeyIdle:
+            clear_sig(sys_sig, sig_lightsource);
+            clear_sig(sys_sig, sig_system);
+            clear_sig(sys_sig, sig_update_anf);
+            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            break;
+
+        case kKeyOff:
             debug_printf("system off\n");
             laser_off();
             clear_sig(sys_sig, sig_lightsource);
@@ -50,6 +57,11 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             debug_printf("sig_lightsource off\n");
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            break;
+
+        default:
+            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+            break;
         }
     }
     else
@@ -65,6 +77,8 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
                 IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
             }
         }
+        else
+            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
     }
 }
 
@@ -87,6 +101,8 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
             debug_printf("sig_lightsource off\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
+        else
+            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
     }
     else
     {
@@ -101,6 +117,8 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
                 IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
             }
         }
+        else
+            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
     }
 }
 
@@ -539,11 +557,13 @@ IAtOperationRegister(kCmdUpgradeOvp921Anf, pAt_Kv_List, pAt_feedback_str)
                 break;
             case kKeyCrc:
                 sscanf(my_kvs[i].value, "%X", &at_crc);
+                debug_printf("at_crc: %#x\n", at_crc);
                 break;
             case kKeyData:
                 if (512 != strlen(my_kvs[i].value))
                     goto VALUE_ERROR;
-                AsciiToIntPro(my_kvs[i].value, anf_data, 1);
+                if (false == AsciiToInt(my_kvs[i].value, anf_data, 1))
+                    goto VALUE_ERROR;
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -553,8 +573,20 @@ IAtOperationRegister(kCmdUpgradeOvp921Anf, pAt_Kv_List, pAt_feedback_str)
 
         if (at_crc != get_array_crc(anf_data, sizeof(anf_data)))
             goto VALUE_ERROR;
+
+        clear_sig(sys_sig, sig_system);
+
         if (!update_anf(anf_idx, anf_data, sizeof(anf_data)))
-            goto VALUE_ERROR;
+        {
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+            clear_sig(sys_sig, sig_update_anf);
+            return;
+        }
+        else
+        {
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+            return;
+        }
 
     VALUE_ERROR:
         clear_sig(sys_sig, sig_update_anf);

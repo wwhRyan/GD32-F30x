@@ -28,8 +28,9 @@ void TaskIdle(void *pvParameters)
         // debug_printf("TaskIdle\r\n");
         // debug_printf("TaskIdle min free stack size %d\r\n",(int)uxTaskGetStackHighWaterMark(NULL));
         vTaskDelay(500);
-        bool status = get_ovp921_status();
-        set_sig(sys_sig, sig_ovp921_status, status);
+        if (get_sig(sys_sig, sig_system))
+            set_sig(sys_sig, sig_ovp921_status, get_ovp921_status());
+
         set_sig(sys_sig, sig_light_status, gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN));
 
         if (get_sig(sys_sig, sig_ovp921_status) == true && get_sig(sys_sig, sig_lightsource) && !get_sig(sys_sig, sig_light_status))
@@ -43,7 +44,7 @@ void TaskIdle(void *pvParameters)
             debug_printf("laser off\r\n");
         }
 
-        if (gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN) && is_one_second() == true)
+        if (gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN) &&is_one_second() == true)
         {
             EEPROM_SET(eeprom.light_source_time + 1, light_source_time, sizeof(uint32_t));
         }
