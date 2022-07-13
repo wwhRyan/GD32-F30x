@@ -28,13 +28,13 @@
 #endif
 
 // configMINIMAL_STACK_SIZE
-#define TASK_IDLE_STACK_SIZE 1024
-#define TASK_UART_DECODE_STACK_SIZE (1024 * 3)
-#define TASK_SECTION_CURENT_STACK_SIZE configMINIMAL_STACK_SIZE
+#define THREAD_FIRST_CONSUMER_STACK_SIZE 1024
+#define THREAD_UART_EVENT_STACK_SIZE (1024 * 3)
+#define THREAD_SECOND_CONSUMER_STACK_SIZE 1024
 
-void TaskIdle(void *pvParameters);
-void TaskUartDecode(void *pvParameters);
-void TaskSectionCurrent(void *pvParameters);
+void ThreadFirstConsumer(void *pvParameters);
+void ThreadUartEvent(void *pvParameters);
+void ThreadSecondConsumer(void *pvParameters);
 
 void output_printf(const char *fmt, ...);
 void system_ipc_init(void);
@@ -42,6 +42,7 @@ void system_ipc_init(void);
 extern EventGroupHandle_t sys_sig;
 extern SemaphoreHandle_t uart_Semaphore;
 extern SemaphoreHandle_t i2c_Semaphore;
+extern QueueHandle_t xQueue_eeprom;
 
 typedef enum sys_sig_t
 {

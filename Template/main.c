@@ -14,9 +14,9 @@
 #include "main.h"
 #include "timers.h"
 
-TaskHandle_t TaskIdleHandle = NULL;
-TaskHandle_t TaskUartDecodeHandle = NULL;
-TaskHandle_t TaskCurrentHandle = NULL;
+TaskHandle_t ThreadFirstConsumerHandle = NULL;
+TaskHandle_t ThreadUartEventHandle = NULL;
+TaskHandle_t ThreadSecondConsumerHandle = NULL;
 
 void TimerCallFunc(TimerHandle_t xTimer);
 
@@ -37,9 +37,9 @@ int main(void)
     // init all the peripherals.
     application_init();
 
-    xTaskCreate(TaskIdle, "TaskIdle", TASK_IDLE_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskIdleHandle);
-    xTaskCreate(TaskUartDecode, "TaskUartDecode", TASK_UART_DECODE_STACK_SIZE, NULL, configMAX_PRIORITIES - 1, &TaskUartDecodeHandle);
-    xTaskCreate(TaskSectionCurrent, "TaskSectionCurrent", TASK_SECTION_CURENT_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &TaskCurrentHandle);
+    xTaskCreate(ThreadUartEvent, "THREADUARTEVENT", THREAD_UART_EVENT_STACK_SIZE, NULL, configMAX_PRIORITIES - 1, &ThreadUartEventHandle);
+    xTaskCreate(ThreadFirstConsumer, "ThreadFirstConsumer", THREAD_FIRST_CONSUMER_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &ThreadFirstConsumerHandle);
+    xTaskCreate(ThreadSecondConsumer, "ThreadSecondConsumer", THREAD_SECOND_CONSUMER_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &ThreadSecondConsumerHandle);
 
 #if 0
     TimerHandle_t xTimer;
@@ -59,9 +59,9 @@ int main(void)
 #if 0
 void TimerCallFunc(TimerHandle_t xTimer)
 {
-    debug_printf("TaskIdle min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskIdleHandle));
-    debug_printf("TaskUartDecode min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskUartDecodeHandle));
-    debug_printf("TaskCurrent min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(TaskCurrentHandle));
+    debug_printf("ThreadFirstConsumer min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(ThreadFirstConsumerHandle));
+    debug_printf("ThreadUartEvent min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(ThreadUartEventHandle));
+    debug_printf("TaskCurrent min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(ThreadSecondConsumerHandle));
 }
 
 #endif

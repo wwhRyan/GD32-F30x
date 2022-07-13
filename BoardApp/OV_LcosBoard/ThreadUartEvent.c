@@ -21,7 +21,7 @@ asAtProtocol at_obj;
 extern const Uarter uart0_output;
 extern const Uarter uart1_debug;
 
-void TaskUartDecode(void *pvParameters)
+void ThreadUartEvent(void *pvParameters)
 {
     reload_idu_current();
 

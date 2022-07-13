@@ -56,6 +56,28 @@ typedef struct eeprom_t
     char Sn_Projector[32];
 } eeprom_t;
 
+typedef enum eeprom_idx_t
+{
+    idx_check_sum,
+    idx_magic_num,
+    idx_version,
+    idx_red,
+    idx_green,
+    idx_blue,
+    idx_light_source_time,
+    idx_Sn_LightEngine,
+    idx_Sn_SourceLight,
+    idx_Sn_Projector,
+} eeprom_idx_t;
+
+typedef struct unit_t
+{
+    uint8_t idx;
+    void *pData;
+    uint16_t addr;
+    uint8_t size;
+} unit_t;
+
 void laser_on(void);
 void laser_off(void);
 bool laser_set(int idx, float current);
@@ -67,7 +89,7 @@ float get_temperature(int adc_value);
 
 extern eeprom_t eeprom;
 void eeprom_lock(bool lock);
-bool eeprom_write(uint8_t addr, uint8_t data);
+bool eeprom_write(uint16_t addr, uint8_t *data, uint16_t size);
 uint8_t eeprom_read(uint8_t addr);
 void init_eeprom(void);
 
@@ -91,6 +113,6 @@ void reload_idu_current(void);
 void color_EN_EXIT_IRQ(color_t color);
 
 char *get_sn(int number, char *buff);
-uint32_t get_array_crc(uint8_t* array, size_t size);
+uint32_t get_array_crc(uint8_t *array, size_t size);
 
 #endif

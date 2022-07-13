@@ -15,6 +15,7 @@
 #include "utilsAsciiConvert.h"
 
 extern asAtProtocol at_obj;
+extern const unit_t eeprom_msg[];
 
 // testcase AT+System=On
 IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
@@ -489,23 +490,34 @@ IAtOperationRegister(kCmdLogInfo, pAt_Kv_List, pAt_feedback_str)
 
 IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
 {
-    asAtKvUnit_Int my_kvs[MAX_KV_COUPLES_NUM];
-    ICastAtKvListTo(kAtValueInt, pAt_Kv_List, my_kvs);
+    asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
+    ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
+        float current;
+
         for (size_t i = 0; i < pAt_Kv_List->size; i++)
         {
             switch (my_kvs[i].key)
             {
             case kKeyR:
-                // todo
+                sscanf(my_kvs[i].value, "%f", &current);
+                // check current
+                eeprom.red = current;
+                xQueueSend(xQueue_eeprom, (void *)&eeprom_msg[idx_red], (TickType_t)10);
                 break;
             case kKeyG:
-                // todo
+                sscanf(my_kvs[i].value, "%f", &current);
+                // check current
+                eeprom.green = current;
+                xQueueSend(xQueue_eeprom, (void *)&eeprom_msg[idx_green], (TickType_t)10);
                 break;
             case kKeyB:
-                // todo
+                sscanf(my_kvs[i].value, "%f", &current);
+                // check current
+                eeprom.blue = current;
+                xQueueSend(xQueue_eeprom, (void *)&eeprom_msg[idx_blue], (TickType_t)10);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -520,13 +532,16 @@ IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
             switch (my_kvs[i].key)
             {
             case kKeyR:
-                // todo
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%f\n",
+                                  pAt_Kv_List->pList[i].key.pData, eeprom.red);
                 break;
             case kKeyG:
-                // todo
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%f\n",
+                                  pAt_Kv_List->pList[i].key.pData, eeprom.green);
                 break;
             case kKeyB:
-                // todo
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%f\n",
+                                  pAt_Kv_List->pList[i].key.pData, eeprom.blue);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");

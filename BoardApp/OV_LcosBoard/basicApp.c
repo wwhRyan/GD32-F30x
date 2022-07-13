@@ -131,12 +131,24 @@ bool laser_set(int idx, float current)
 eeprom_t eeprom;
 const uint32_t eeprom_magic_number = 0x12344321;
 
-bool eeprom_write(uint8_t addr, uint8_t data)
+const unit_t eeprom_msg[] = {
+    {.idx = idx_check_sum, .pData = &eeprom.check_sum, .addr = offsetof(eeprom_t, check_sum), .size = sizeof(uint32_t)},
+    {.idx = idx_magic_num, .pData = &eeprom.magic_num, .addr = offsetof(eeprom_t, magic_num), .size = sizeof(uint32_t)},
+    {.idx = idx_version, .pData = &eeprom.version, .addr = offsetof(eeprom_t, version), .size = sizeof(uint32_t)},
+    {.idx = idx_red, .pData = &eeprom.red, .addr = offsetof(eeprom_t, red), .size = sizeof(float)},
+    {.idx = idx_green, .pData = &eeprom.green, .addr = offsetof(eeprom_t, green), .size = sizeof(float)},
+    {.idx = idx_blue, .pData = &eeprom.blue, .addr = offsetof(eeprom_t, blue), .size = sizeof(float)},
+    {.idx = idx_light_source_time, .pData = &eeprom.light_source_time, .addr = offsetof(eeprom_t, light_source_time), .size = sizeof(uint32_t)},
+    {.idx = idx_Sn_LightEngine, .pData = &eeprom.Sn_LightEngine, .addr = offsetof(eeprom_t, Sn_LightEngine), .size = sizeof(char) * 32},
+    {.idx = idx_Sn_SourceLight, .pData = &eeprom.Sn_SourceLight, .addr = offsetof(eeprom_t, Sn_SourceLight), .size = sizeof(char) * 32},
+    {.idx = idx_Sn_Projector, .pData = &eeprom.Sn_Projector, .addr = offsetof(eeprom_t, Sn_Projector), .size = sizeof(char) * 32},
+};
+
+bool eeprom_write(uint16_t addr, uint8_t *data, uint16_t size)
 {
     bool ret = false;
     eeprom_lock(UNLOCK);
     xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-    ret = ISoftwareI2CRegWrite(&ovp921_i2c, EEPROM_WRITE, addr, REG_ADDR_1BYTE, &data, 1, 0xFFFF);
     xSemaphoreGive(i2c_Semaphore);
     eeprom_lock(LOCK);
     return ret;

@@ -944,21 +944,6 @@
           <GroupName>OV_LcosBoard</GroupName>
           <Files>
             <File>
-              <FileName>ThreadUartDecode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadUartDecode.c</FilePath>
-            </File>
-            <File>
-              <FileName>ThreadSectionalCurrent.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadSectionalCurrent.c</FilePath>
-            </File>
-            <File>
-              <FileName>ThreadIdle.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadIdle.c</FilePath>
-            </File>
-            <File>
               <FileName>BoardInit.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\BoardInit.c</FilePath>
@@ -987,6 +972,21 @@
               <FileName>ovp921_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\ovp921_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>ThreadFirstConsumer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadFirstConsumer.c</FilePath>
+            </File>
+            <File>
+              <FileName>ThreadSecondConsumer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadSecondConsumer.c</FilePath>
+            </File>
+            <File>
+              <FileName>ThreadUartEvent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadUartEvent.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1879,21 +1879,6 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>ThreadUartDecode.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadUartDecode.c</FilePath>
-            </File>
-            <File>
-              <FileName>ThreadSectionalCurrent.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadSectionalCurrent.c</FilePath>
-            </File>
-            <File>
-              <FileName>ThreadIdle.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadIdle.c</FilePath>
-            </File>
-            <File>
               <FileName>BoardInit.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\BoardInit.c</FilePath>
@@ -1922,6 +1907,21 @@
               <FileName>ovp921_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\OV_LcosBoard\ovp921_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>ThreadFirstConsumer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadFirstConsumer.c</FilePath>
+            </File>
+            <File>
+              <FileName>ThreadSecondConsumer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadSecondConsumer.c</FilePath>
+            </File>
+            <File>
+              <FileName>ThreadUartEvent.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadUartEvent.c</FilePath>
             </File>
           </Files>
         </Group>
