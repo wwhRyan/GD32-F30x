@@ -272,6 +272,28 @@ bool set_reg(uint16_t reg_addr, uint8_t reg_val)
     return ret;
 }
 
+bool get_reg_block(uint16_t reg_addr, uint8_t *reg_val, size_t size)
+{
+    bool ret;
+
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+    ret = ISoftwareI2CRegRead(&ovp921_i2c, OVP921_SCCB_ADDRESS_READ, reg_addr,
+                              REG_ADDR_2BYTE, reg_val, size, SCCB_DELAY_TIME);
+    xSemaphoreGive(i2c_Semaphore);
+    return reg_val;
+}
+
+bool set_reg_block(uint16_t reg_addr, uint8_t *reg_val, size_t size)
+{
+    bool ret;
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+
+    ret = ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, reg_addr,
+                               REG_ADDR_2BYTE, reg_val, size, SCCB_DELAY_TIME);
+    xSemaphoreGive(i2c_Semaphore);
+    return ret;
+}
+
 void omnivision_lcos_init()
 {
     DelayMs(10);
@@ -482,7 +504,8 @@ bool update_anf(int idx, const uint8_t *p_anf, int anf_size)
     ULOG_DEBUG(" %s %#x \n", __func__, ANF_ADDR(idx) + iteration * 0x100);
     iteration++;
 
-    if (iteration == 0x2000 / 0x100){
+    if (iteration == 0x2000 / 0x100)
+    {
         clear_sig(sys_sig, sig_update_anf);
         ULOG_INFO("update anf success!\n");
     }

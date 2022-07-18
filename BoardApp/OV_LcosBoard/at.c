@@ -575,7 +575,7 @@ IAtOperationRegister(kCmdUpgradeOvp921Anf, pAt_Kv_List, pAt_feedback_str)
             case kKeyIdx:
                 sscanf(my_kvs[i].value, "%X", &anf_idx);
                 if (anf_idx > 9 || anf_idx == 0)
-                    goto VALUE_ERROR;
+                    goto OVP921ANF_VALUE_ERROR;
                 break;
             case kKeyCrc:
                 sscanf(my_kvs[i].value, "%X", &at_crc);
@@ -583,9 +583,9 @@ IAtOperationRegister(kCmdUpgradeOvp921Anf, pAt_Kv_List, pAt_feedback_str)
                 break;
             case kKeyData:
                 if (512 != strlen(my_kvs[i].value))
-                    goto VALUE_ERROR;
+                    goto OVP921ANF_VALUE_ERROR;
                 if (false == AsciiToInt(my_kvs[i].value, anf_data, 1))
-                    goto VALUE_ERROR;
+                    goto OVP921ANF_VALUE_ERROR;
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -594,7 +594,7 @@ IAtOperationRegister(kCmdUpgradeOvp921Anf, pAt_Kv_List, pAt_feedback_str)
         }
 
         if (at_crc != get_array_crc(anf_data, sizeof(anf_data)))
-            goto VALUE_ERROR;
+            goto OVP921ANF_VALUE_ERROR;
 
         clear_sig(sys_sig, sig_system);
 
@@ -610,7 +610,7 @@ IAtOperationRegister(kCmdUpgradeOvp921Anf, pAt_Kv_List, pAt_feedback_str)
             return;
         }
 
-    VALUE_ERROR:
+    OVP921ANF_VALUE_ERROR:
         clear_sig(sys_sig, sig_update_anf);
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidValue\n");
         return;
@@ -655,6 +655,12 @@ IAtOperationRegister(kCmdOvp921, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
+    size_t size = 0;
+    size_t addr = 0;
+    uint8_t data[256] = {0};
+    char ascii_output[512 + 1] = {0};
+    int ret;
+
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
         for (size_t i = 0; i < pAt_Kv_List->size; i++)
@@ -662,19 +668,28 @@ IAtOperationRegister(kCmdOvp921, pAt_Kv_List, pAt_feedback_str)
             switch (my_kvs[i].key)
             {
             case kKeyAddr:
-                // todo
+                ret = sscanf(my_kvs[i].value, "%X", &addr);
                 break;
             case kKeySize:
-                // todo
+                ret = sscanf(my_kvs[i].value, "%X", &size);
                 break;
             case kKeyData:
-                // todo
+                ret = sscanf(my_kvs[i].value, "%256s", data);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
-                break;
+                return;
             }
+            if (ret == EOF || ret == 0)
+                goto OVP921_VALUE_ERROR;
         }
+        if (size > 256)
+            goto OVP921_VALUE_ERROR;
+
+        if (set_reg_block(addr, data, size) != true)
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        else
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
     }
     else
     {
@@ -683,17 +698,37 @@ IAtOperationRegister(kCmdOvp921, pAt_Kv_List, pAt_feedback_str)
             switch (my_kvs[i].key)
             {
             case kKeyAddr:
-                // todo
+                ret = sscanf(my_kvs[i].value, "%X", &addr);
                 break;
             case kKeySize:
-                // todo
+                ret = sscanf(my_kvs[i].value, "%X", &size);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
-                break;
+                return;
             }
+            if (ret == EOF || ret == 0)
+                goto OVP921_VALUE_ERROR;
+        }
+        if (size > 256)
+            goto OVP921_VALUE_ERROR;
+
+        if (get_reg_block(addr, data, size) != true)
+        {
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+            return;
+        }
+        else
+        {
+            IntToAscii(data, ascii_output, 1, size);
+            IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_output);
+            return;
         }
     }
+
+OVP921_VALUE_ERROR:
+    IAddFeedbackStrTo(pAt_feedback_str, "InvalidValue\n");
+    return;
 }
 
 IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)

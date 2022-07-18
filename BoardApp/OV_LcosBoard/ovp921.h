@@ -25,6 +25,8 @@ void get_chipid(void);
 void off_pattern(void);
 uint8_t get_reg(uint16_t reg_addr);
 bool set_reg(uint16_t reg_addr, uint8_t reg_val);
+bool get_reg_block(uint16_t reg_addr, uint8_t *reg_val, size_t size);
+bool set_reg_block(uint16_t reg_addr, uint8_t *reg_val, size_t size);
 void omnivision_lcos_init(void);
 bool get_ovp921_status(void);
 void vertical_flip(bool enable);
