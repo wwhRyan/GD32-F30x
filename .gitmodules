@@ -1,3 +1,6 @@
 [submodule "easy-mcu"]
 	path = easy-mcu
 	url = git@github.com:wwhRyan/easy-mcu.git
+[submodule "ulog"]
+	path = ulog
+	url = git@github.com:wwhRyan/ulog.git

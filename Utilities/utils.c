@@ -14,6 +14,8 @@
 #include "gd32f307c_eval.h"
 #include "Boardinit.h"
 
+extern eeprom_t eeprom;
+
 /**
  * @brief debug_printf is Thread safety printf function
  *
@@ -74,4 +76,23 @@ void set_sig(EventGroupHandle_t pEventGroup, int BitInx, bool status)
 void clear_sig(EventGroupHandle_t pEventGroup, int BitInx)
 {
     xEventGroupClearBits(pEventGroup, (0x00000001 << BitInx));
+}
+
+void my_console_logger(ulog_level_t severity, char *msg)
+{
+    debug_printf("%s.%s", ulog_level_name(severity), msg);
+}
+
+void my_file_logger(ulog_level_t severity, char *msg)
+{
+    // debug_printf("%s.%s", ulog_level_name(severity), msg);
+    debug_printf("%s.%d-%02d-%02d.%s", ulog_level_name(severity), eeprom.light_source_time / 60 / 60, (eeprom.light_source_time / 60) % 60, eeprom.light_source_time % 60, msg);
+}
+
+void log_init()
+{
+    ULOG_INIT();
+    ULOG_SUBSCRIBE(my_console_logger, ULOG_DEBUG_LEVEL);
+    ULOG_SUBSCRIBE(my_file_logger, ULOG_WARNING_LEVEL);
+    ULOG_INFO("ULOG init\n"); // logs to file and console
 }

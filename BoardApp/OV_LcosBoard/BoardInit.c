@@ -239,6 +239,8 @@ void application_init()
     uarter_init(&uart0_output);
     uarter_init(&uart1_debug);
 
+    log_init();
+
     /* GPIO remap */
     rcu_periph_clock_enable(RCU_AF);
     gpio_pin_remap_config(GPIO_SWJ_SWDPENABLE_REMAP, ENABLE);

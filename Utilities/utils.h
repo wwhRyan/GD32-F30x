@@ -13,6 +13,7 @@
 
 #include "main.h"
 #include "gd32f30x.h"
+#include "ulog.h"
 
 #define GET_SysTick (uint32_t)(SysTick->VAL)
 // #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)   //获取文件名 linux下
@@ -56,5 +57,6 @@ void debug_printf(const char *fmt, ...);
 bool get_sig(EventGroupHandle_t pEventGroup, int BitInx);
 void set_sig(EventGroupHandle_t pEventGroup, int BitInx, bool status);
 void clear_sig(EventGroupHandle_t pEventGroup, int BitInx);
+void log_init(void);
 
 #endif

@@ -22,6 +22,7 @@
 #include "event_groups.h"
 #include "semphr.h"
 #include "basicApp.h"
+#include "ulog.h"
 
 #ifndef ATHENA_OV_LCOS
 #error "Please define ATHENA_OV_LCOS"

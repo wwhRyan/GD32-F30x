@@ -462,12 +462,12 @@ bool update_anf(int idx, const uint8_t *p_anf, int anf_size)
         ret &= halting_internal_mcu();
         if (ovp921_erase(ANF_ADDR(idx)) == false)
         {
-            debug_printf("erase failed\n");
+            ULOG_ERROR("erase failed\n");
             return false;
         }
         if (ovp921_erase(ANF_ADDR(idx) + 0x100) == false)
         {
-            debug_printf("erase failed\n");
+            ULOG_ERROR("erase failed\n");
             return false;
         }
         set_sig(sys_sig, sig_update_anf, true);
@@ -479,12 +479,12 @@ bool update_anf(int idx, const uint8_t *p_anf, int anf_size)
         return false;
 
     ret &= ovp921_write_page(ANF_ADDR(idx) + iteration * 0x100, p_anf);
-    debug_printf(" %s %#x \n", __func__, ANF_ADDR(idx) + iteration * 0x100);
+    ULOG_DEBUG(" %s %#x \n", __func__, ANF_ADDR(idx) + iteration * 0x100);
     iteration++;
 
     if (iteration == 0x2000 / 0x100){
         clear_sig(sys_sig, sig_update_anf);
-        debug_printf("update anf success!\n");
+        ULOG_INFO("update anf success!\n");
     }
     return ret;
 }

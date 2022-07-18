@@ -35,10 +35,10 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
                 vTaskDelay(1000);
                 gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
             }
-            debug_printf("system on\n");
+            ULOG_DEBUG("system on\n");
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
-            debug_printf("sig_lightsource on\n");
+            ULOG_DEBUG("sig_lightsource on\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
             break;
 
@@ -50,12 +50,12 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             break;
 
         case kKeyOff:
-            debug_printf("system off\n");
+            ULOG_DEBUG("system off\n");
             laser_off();
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
             clear_sig(sys_sig, sig_update_anf);
-            debug_printf("sig_lightsource off\n");
+            ULOG_DEBUG("sig_lightsource off\n");
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
             break;
@@ -71,7 +71,10 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
         {
             if (gpio_output_bit_get(SYS_12V_ON_PORT, SYS_12V_ON_PIN))
             {
-                IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+                if (get_sig(sys_sig, sig_system))
+                    IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+                else
+                    IAddFeedbackStrTo(pAt_feedback_str, "Idle\n");
             }
             else
             {
@@ -93,13 +96,16 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
         if (kKeyOn == my_kvs[0].value)
         {
             set_sig(sys_sig, sig_lightsource, true);
-            debug_printf("sig_lightsource on\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            ULOG_DEBUG("sig_lightsource on\n");
+            if (get_sig(sys_sig, sig_ovp921_status))
+                IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            else
+                IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n"); // ovp921 must work normal with MIPI input
         }
         else if (kKeyOff == my_kvs[0].value)
         {
             clear_sig(sys_sig, sig_lightsource);
-            debug_printf("sig_lightsource off\n");
+            ULOG_DEBUG("sig_lightsource off\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
         }
         else
@@ -130,7 +136,7 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
     char str_buff[32] = {0};
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
-        debug_printf("no support setting!\n");
+        ULOG_DEBUG("no support setting!\n");
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     }
     else
@@ -140,31 +146,31 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
             switch (my_kvs[i].key)
             {
             case kKeyMcu:
-                debug_printf("kKeyMcu\n");
+                ULOG_DEBUG("kKeyMcu\n");
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, MCU_VERSION);
                 break;
             case kKeyLightEngineBoard:
-                debug_printf("kKeyLightEngineBoard\n");
+                ULOG_DEBUG("kKeyLightEngineBoard\n");
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:VER1%01X.VER0%01X\n", pAt_Kv_List->pList[i].key.pData,
                                   gpio_output_bit_get(HW_VER1_PORT, HW_VER1_PIN), gpio_output_bit_get(HW_VER0_PORT, HW_VER0_PIN));
                 break;
             case kKeyAnf1:
-                debug_printf("kKeyAnf1\n");
+                ULOG_DEBUG("kKeyAnf1\n");
                 get_anf_version(str_buff, 1);
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
                 break;
             case kKeyAnf2:
-                debug_printf("kKeyAnf2\n");
+                ULOG_DEBUG("kKeyAnf2\n");
                 get_anf_version(str_buff, 2);
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
                 break;
             case kKeyAnf3:
-                debug_printf("kKeyAnf3\n");
+                ULOG_DEBUG("kKeyAnf3\n");
                 get_anf_version(str_buff, 3);
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
                 break;
             case kKeyOvp921:
-                debug_printf("kKeyOvp921\n");
+                ULOG_DEBUG("kKeyOvp921\n");
                 get_firmware_version(str_buff);
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
                 break;
@@ -219,7 +225,7 @@ IAtOperationRegister(kCmdLightSourceTime, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
-        debug_printf("no support setting!\n");
+        ULOG_DEBUG("no support setting!\n");
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     }
     else
@@ -572,7 +578,7 @@ IAtOperationRegister(kCmdUpgradeOvp921Anf, pAt_Kv_List, pAt_feedback_str)
                 break;
             case kKeyCrc:
                 sscanf(my_kvs[i].value, "%X", &at_crc);
-                debug_printf("at_crc: %#x\n", at_crc);
+                ULOG_DEBUG("at_crc: %#x\n", at_crc);
                 break;
             case kKeyData:
                 if (512 != strlen(my_kvs[i].value))

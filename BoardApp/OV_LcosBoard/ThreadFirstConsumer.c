@@ -15,6 +15,7 @@
 #include "basicApp.h"
 
 extern const SoftwareI2C ovp921_i2c;
+extern const unit_t eeprom_msg[];
 
 void ThreadFirstConsumer(void *pvParameters)
 {
@@ -25,8 +26,8 @@ void ThreadFirstConsumer(void *pvParameters)
     while (1)
     {
 
-        // debug_printf("ThreadFirstConsumer\r\n");
-        // debug_printf("ThreadFirstConsumer min free stack size %d\r\n",(int)uxTaskGetStackHighWaterMark(NULL));
+        // ULOG_DEBUG("ThreadFirstConsumer\r\n");
+        // ULOG_DEBUG("ThreadFirstConsumer min free stack size %d\r\n",(int)uxTaskGetStackHighWaterMark(NULL));
         vTaskDelay(500);
         if (get_sig(sys_sig, sig_system))
             set_sig(sys_sig, sig_ovp921_status, get_ovp921_status());
@@ -36,12 +37,12 @@ void ThreadFirstConsumer(void *pvParameters)
         if (get_sig(sys_sig, sig_ovp921_status) == true && get_sig(sys_sig, sig_lightsource) && !get_sig(sys_sig, sig_light_status))
         {
             laser_on();
-            debug_printf("laser on\r\n");
+            ULOG_INFO("laser on\r\n");
         }
         else if ((get_sig(sys_sig, sig_ovp921_status) == false || !get_sig(sys_sig, sig_lightsource)) && get_sig(sys_sig, sig_light_status))
         {
             laser_off();
-            debug_printf("laser off\r\n");
+            ULOG_INFO("laser off\r\n");
         }
 
         if (gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN) && is_one_second() == true)
