@@ -55,6 +55,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
             clear_sig(sys_sig, sig_update_anf);
+            clear_sig(sys_sig, sig_slient_async_msg);
             ULOG_DEBUG("sig_lightsource off\n");
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
@@ -753,15 +754,28 @@ IAtOperationRegister(kCmdSilentAsyncMessages, pAt_Kv_List, pAt_feedback_str)
     {
         if (kKeyOn == my_kvs[0].value)
         {
-            // todo
+            set_sig(sys_sig, sig_slient_async_msg, true);
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         }
         else if (kKeyOff == my_kvs[0].value)
         {
-            // todo
+            set_sig(sys_sig, sig_slient_async_msg, false);
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+        }
+        else
+        {
+            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
     }
     else
     {
-        // todo
+        if (get_sig(sys_sig, sig_slient_async_msg) == true)
+        {
+            IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+        }
+        else
+        {
+            IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
+        }
     }
 }

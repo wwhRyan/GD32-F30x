@@ -23,6 +23,7 @@ void ThreadFirstConsumer(void *pvParameters)
     set_sig(sys_sig, sig_system, true);
     set_sig(sys_sig, sig_light_status, false);
     set_sig(sys_sig, sig_ovp921_status, false);
+    set_sig(sys_sig, sig_slient_async_msg, false);
     while (1)
     {
 

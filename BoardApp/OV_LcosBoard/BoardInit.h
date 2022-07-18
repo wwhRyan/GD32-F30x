@@ -51,7 +51,7 @@ typedef enum sys_sig_t
     sig_system,
     sig_ovp921_status,
     sig_light_status,
-    sig_slientasyncmsg,
+    sig_slient_async_msg,
     sig_update_anf,
 } sys_sig_t;
 
