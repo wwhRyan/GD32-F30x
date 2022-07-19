@@ -11,14 +11,11 @@
 
 #include "basicApp.h"
 #include "i2c.h"
+#include "eeprom.h"
 #include <math.h>
 
 extern const SoftwareI2C ovp921_i2c;
 extern const dac_t laser_dac;
-
-#define EEPROM_ADDRESS 0xA0 // 8'h 0xA0
-#define EEPROM_WRITE (EEPROM_ADDRESS | 0x00)
-#define EEPROM_READ (EEPROM_ADDRESS | 0x01)
 
 const ntc_t NCP18WB473F10RB = {
     .B = 4108,
@@ -78,25 +75,6 @@ float get_current_value(uint8_t idu)
 }
 
 /**
- * @brief eeprom lock function
- *
- * @param lock true: lock, false: unlock
- */
-void eeprom_lock(bool lock)
-{
-    if (lock == false)
-    {
-        gpio_bit_set(EE_WP_PORT, EE_WP_PIN); // set WP pin to high, can write
-        DelayUs(10);
-    }
-    else
-    {
-        DelayUs(10);
-        gpio_bit_reset(EE_WP_PORT, EE_WP_PIN); // set WP pin to low, can't write
-    }
-}
-
-/**
  * @brief
  *
  * @param idx R\G\B\Y 0\1\2\3
@@ -126,77 +104,6 @@ bool laser_set(int idx, float current)
         vTaskDelay(1);
     }
     return true;
-}
-
-eeprom_t eeprom;
-const uint32_t eeprom_magic_number = 0x12344321;
-
-const unit_t eeprom_msg[] = {
-    {.idx = idx_check_sum, .pData = &eeprom.check_sum, .addr = offsetof(eeprom_t, check_sum), .size = sizeof(uint32_t)},
-    {.idx = idx_magic_num, .pData = &eeprom.magic_num, .addr = offsetof(eeprom_t, magic_num), .size = sizeof(uint32_t)},
-    {.idx = idx_version, .pData = &eeprom.version, .addr = offsetof(eeprom_t, version), .size = sizeof(uint32_t)},
-    {.idx = idx_red, .pData = &eeprom.red, .addr = offsetof(eeprom_t, red), .size = sizeof(float)},
-    {.idx = idx_green, .pData = &eeprom.green, .addr = offsetof(eeprom_t, green), .size = sizeof(float)},
-    {.idx = idx_blue, .pData = &eeprom.blue, .addr = offsetof(eeprom_t, blue), .size = sizeof(float)},
-    {.idx = idx_light_source_time, .pData = &eeprom.light_source_time, .addr = offsetof(eeprom_t, light_source_time), .size = sizeof(uint32_t)},
-    {.idx = idx_Sn_LightEngine, .pData = &eeprom.Sn_LightEngine, .addr = offsetof(eeprom_t, Sn_LightEngine), .size = sizeof(char) * 32},
-    {.idx = idx_Sn_SourceLight, .pData = &eeprom.Sn_SourceLight, .addr = offsetof(eeprom_t, Sn_SourceLight), .size = sizeof(char) * 32},
-    {.idx = idx_Sn_Projector, .pData = &eeprom.Sn_Projector, .addr = offsetof(eeprom_t, Sn_Projector), .size = sizeof(char) * 32},
-};
-
-bool eeprom_write(uint16_t addr, uint8_t *data, uint16_t size)
-{
-    bool ret = false;
-    eeprom_lock(UNLOCK);
-    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-    xSemaphoreGive(i2c_Semaphore);
-    eeprom_lock(LOCK);
-    return ret;
-}
-
-uint8_t eeprom_read(uint8_t addr)
-{
-    uint8_t data;
-    eeprom_lock(UNLOCK);
-    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-    ISoftwareI2CRegRead(&ovp921_i2c, EEPROM_READ, addr, REG_ADDR_1BYTE, &data, 1, 0xFFFF);
-    xSemaphoreGive(i2c_Semaphore);
-    eeprom_lock(LOCK);
-    return data;
-}
-
-/**
- * @brief Call before rtos task
- */
-void init_eeprom()
-{
-
-    ISoftwareI2CRegRead(&ovp921_i2c, EEPROM_WRITE, 0x00,
-                        REG_ADDR_1BYTE, ((uint8_t *)&eeprom), sizeof(eeprom_t), 0xFFFF);
-
-    if (eeprom.magic_num != eeprom_magic_number)
-    {
-        eeprom_lock(UNLOCK);
-
-        printf("reset eeprom!\n");
-        eeprom.magic_num = eeprom_magic_number;
-        eeprom.red = 1.00;
-        eeprom.green = 0.80;
-        eeprom.blue = 0.623;
-        eeprom.light_source_time = 0;
-
-        for (size_t i = 0; i < sizeof(eeprom_t); i++)
-        {
-            ISoftwareI2CRegWrite(&ovp921_i2c, EEPROM_WRITE, i,
-                                 REG_ADDR_1BYTE, ((uint8_t *)&eeprom) + i, 1, 0xFFFF);
-            DelayMs(10);
-        }
-        eeprom_lock(LOCK);
-    }
-    else
-    {
-        printf("Ok eeprom.\n");
-    }
 }
 
 void reload_idu_current(void)
@@ -241,10 +148,6 @@ void reload_idu_current(void)
 
 // DISCHARGE2 voltage big --> little
 // DISCHARGE current big --> little
-
-#define R_CURRENT (2.5 + 0.3)
-#define G_CURRENT (4.6 + 0.5)
-#define B_CURRENT (4.6 + 0.5)
 
 inline void R_to_G()
 {

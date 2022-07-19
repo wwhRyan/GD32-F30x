@@ -23,6 +23,8 @@
 #include "semphr.h"
 #include "basicApp.h"
 #include "ulog.h"
+#include "i2c.h"
+#include "eeprom.h"
 
 #ifndef ATHENA_OV_LCOS
 #error "Please define ATHENA_OV_LCOS"

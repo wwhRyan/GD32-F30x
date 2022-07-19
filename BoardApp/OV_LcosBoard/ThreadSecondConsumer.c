@@ -16,6 +16,7 @@
 #include "basicApp.h"
 
 extern const Uarter uart0_output;
+extern const eeprom_model_t BL24C64A;
 
 #define QUEUE_EEPROM_NUM 5
 QueueHandle_t xQueue_eeprom = NULL;
@@ -30,7 +31,7 @@ void ThreadSecondConsumer(void *pvParameters)
     {
         if (xQueueReceive(xQueue_eeprom, &(xQueue_eeprom_recv), (TickType_t)10) == pdPASS)
         {
-            eeprom_write(xQueue_eeprom_recv.addr, (uint8_t *)xQueue_eeprom_recv.pData, xQueue_eeprom_recv.size);
+            eeprom_block_write(&BL24C64A, xQueue_eeprom_recv.addr, (uint8_t *)xQueue_eeprom_recv.pData, xQueue_eeprom_recv.size);
         }
         vTaskDelay(200);
     }

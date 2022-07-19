@@ -15,6 +15,7 @@
 #include "BoardInit.h"
 #include "Common.h"
 #include "i2c.h"
+#include "eeprom.h"
 #include "ovp921.h"
 #include "basicApp.h"
 
@@ -156,6 +157,15 @@ const SoftwareI2C sensor_i2c = {
     .delay_time = SCCB_DELAY_TIME,
 };
 
+const eeprom_model_t BL24C64A = {
+    .i2c_addr = EEPROM_ADDRESS,
+    .i2c_addr_type = REG_ADDR_2BYTE,
+    .lock = eeprom_lock,
+    .page_size = 32,
+    .write_delay_time = 3 + 3,
+    .i2c = &ovp921_i2c,
+};
+
 const exti_gpio_t R_pwm_led = {
     .gpio_port = R_LED_PWM_PORT,
     .gpio_pin = R_LED_PWM_PIN,
@@ -274,7 +284,7 @@ void application_init()
     printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
     printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
 
-    init_eeprom();
+    init_eeprom(&BL24C64A);
     omnivision_lcos_init();
 }
 

@@ -280,7 +280,7 @@ bool get_reg_block(uint16_t reg_addr, uint8_t *reg_val, size_t size)
     ret = ISoftwareI2CRegRead(&ovp921_i2c, OVP921_SCCB_ADDRESS_READ, reg_addr,
                               REG_ADDR_2BYTE, reg_val, size, SCCB_DELAY_TIME);
     xSemaphoreGive(i2c_Semaphore);
-    return reg_val;
+    return ret;
 }
 
 bool set_reg_block(uint16_t reg_addr, uint8_t *reg_val, size_t size)

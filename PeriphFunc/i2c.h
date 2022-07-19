@@ -9,7 +9,7 @@
 #define __I2C_H
 
 #include "gd32f30x.h"
-#include "main.h"
+#include "Common.h"
 
 #define REG_ADDR_1BYTE 1
 #define REG_ADDR_2BYTE 2
