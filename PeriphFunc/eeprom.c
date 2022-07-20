@@ -12,24 +12,24 @@
 #include "basicApp.h"
 #include "i2c.h"
 #include "eeprom.h"
+#include "BoardInit.h"
 
 void eeprom_lock(bool lock);
-extern const eeprom_model_t BL24C64A;
 
 eeprom_t eeprom;
 const uint32_t eeprom_magic_number = 0x12344321;
 
-const unit_t eeprom_msg[] = {
-    {.idx = idx_check_sum, .pData = &eeprom.check_sum, .addr = offsetof(eeprom_t, check_sum) + CONFIG_START_ADDR, .size = sizeof(uint32_t)},
-    {.idx = idx_magic_num, .pData = &eeprom.magic_num, .addr = offsetof(eeprom_t, magic_num) + CONFIG_START_ADDR, .size = sizeof(uint32_t)},
-    {.idx = idx_version, .pData = &eeprom.version, .addr = offsetof(eeprom_t, version) + CONFIG_START_ADDR, .size = sizeof(uint32_t)},
-    {.idx = idx_red, .pData = &eeprom.red, .addr = offsetof(eeprom_t, red) + CONFIG_START_ADDR, .size = sizeof(float)},
-    {.idx = idx_green, .pData = &eeprom.green, .addr = offsetof(eeprom_t, green) + CONFIG_START_ADDR, .size = sizeof(float)},
-    {.idx = idx_blue, .pData = &eeprom.blue, .addr = offsetof(eeprom_t, blue) + CONFIG_START_ADDR, .size = sizeof(float)},
-    {.idx = idx_light_source_time, .pData = &eeprom.light_source_time, .addr = offsetof(eeprom_t, light_source_time) + CONFIG_START_ADDR, .size = sizeof(uint32_t)},
-    {.idx = idx_Sn_LightEngine, .pData = &eeprom.Sn_LightEngine, .addr = offsetof(eeprom_t, Sn_LightEngine) + CONFIG_START_ADDR, .size = sizeof(char) * 32},
-    {.idx = idx_Sn_SourceLight, .pData = &eeprom.Sn_SourceLight, .addr = offsetof(eeprom_t, Sn_SourceLight) + CONFIG_START_ADDR, .size = sizeof(char) * 32},
-    {.idx = idx_Sn_Projector, .pData = &eeprom.Sn_Projector, .addr = offsetof(eeprom_t, Sn_Projector) + CONFIG_START_ADDR, .size = sizeof(char) * 32},
+const mem_t eeprom_mem[] = {
+    {.default_uint32 = 0, .type = uint32_type, .idx = idx_check_sum, .pData = &eeprom.check_sum, .addr = offsetof(eeprom_t, check_sum) + CONFIG_START_ADDR, .size = sizeof(uint32_t)},
+    {.default_uint32 = eeprom_magic_number, .type = uint32_type, .idx = idx_magic_num, .pData = &eeprom.magic_num, .addr = offsetof(eeprom_t, magic_num) + CONFIG_START_ADDR, .size = sizeof(uint32_t)},
+    {.default_uint32 = 0, .type = uint32_type, .idx = idx_version, .pData = &eeprom.version, .addr = offsetof(eeprom_t, version) + CONFIG_START_ADDR, .size = sizeof(uint32_t)},
+    {.default_float = 2.0, .type = float_type, .idx = idx_red, .pData = &eeprom.red, .addr = offsetof(eeprom_t, red) + CONFIG_START_ADDR, .size = sizeof(float)},
+    {.default_float = 4.0, .type = float_type, .idx = idx_green, .pData = &eeprom.green, .addr = offsetof(eeprom_t, green) + CONFIG_START_ADDR, .size = sizeof(float)},
+    {.default_float = 4.0, .type = float_type, .idx = idx_blue, .pData = &eeprom.blue, .addr = offsetof(eeprom_t, blue) + CONFIG_START_ADDR, .size = sizeof(float)},
+    {.default_uint32 = 0, .type = uint32_type, .idx = idx_light_source_time, .pData = &eeprom.light_source_time, .addr = offsetof(eeprom_t, light_source_time) + CONFIG_START_ADDR, .size = sizeof(uint32_t)},
+    {.default_string = "NULL", .type = string_type, .idx = idx_Sn_LightEngine, .pData = &eeprom.Sn_LightEngine, .addr = offsetof(eeprom_t, Sn_LightEngine) + CONFIG_START_ADDR, .size = sizeof(char) * 32},
+    {.default_string = "NULL", .type = string_type, .idx = idx_Sn_SourceLight, .pData = &eeprom.Sn_SourceLight, .addr = offsetof(eeprom_t, Sn_SourceLight) + CONFIG_START_ADDR, .size = sizeof(char) * 32},
+    {.default_string = "NULL", .type = string_type, .idx = idx_Sn_Projector, .pData = &eeprom.Sn_Projector, .addr = offsetof(eeprom_t, Sn_Projector) + CONFIG_START_ADDR, .size = sizeof(char) * 32},
 };
 
 /**
@@ -51,38 +51,36 @@ void eeprom_lock(bool lock)
     }
 }
 
-/**
- * @brief Call before rtos task
- */
-void init_eeprom(const eeprom_model_t *model)
+bool eeprom_update_crc(const eeprom_model_t *model)
 {
+    bool ret = true;
+    eeprom.check_sum = get_LSB_array_crc((uint8_t *)(&eeprom) + sizeof(uint32_t), sizeof(eeprom_t) - sizeof(uint32_t));
+    ret = eeprom_block_write(model, CONFIG_START_ADDR, ((uint8_t *)&eeprom.check_sum), sizeof(uint32_t));
 
-    ISoftwareI2CRegRead(model->i2c, model->i2c_addr, CONFIG_START_ADDR,
-                        model->i2c_addr_type, ((uint8_t *)&eeprom), sizeof(eeprom_t), 0xFFFF);
+    return ret;
+}
 
-    if (eeprom.magic_num != eeprom_magic_number)
+void eeprom_memory_reset(void)
+{
+    for (size_t i = 0; i < ARRAY_SIZE(eeprom_mem); i++)
     {
-        eeprom_lock(UNLOCK);
-
-        printf("reset eeprom!\n");
-        eeprom.magic_num = eeprom_magic_number;
-        eeprom.red = 1.00;
-        eeprom.green = 0.80;
-        eeprom.blue = 0.623;
-        eeprom.light_source_time = 0;
-
-        // todo
-        for (size_t i = 0; i < sizeof(eeprom_t); i++)
+        switch (eeprom_mem[i].type)
         {
-            ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, i,
-                                 model->i2c_addr_type, ((uint8_t *)&eeprom) + i, 1, 0xFFFF);
-            DelayMs(10);
+        case uint32_type:
+            *((uint32_t *)eeprom_mem[i].pData) = eeprom_mem[i].default_uint32;
+            break;
+
+        case float_type:
+            *((float *)eeprom_mem[i].pData) = eeprom_mem[i].default_float;
+            break;
+
+        case string_type:
+            strcpy((char *)eeprom_mem[i].pData, eeprom_mem[i].default_string);
+            break;
+
+        default:
+            break;
         }
-        eeprom_lock(LOCK);
-    }
-    else
-    {
-        printf("Ok eeprom.\n");
     }
 }
 
@@ -154,4 +152,32 @@ bool eeprom_block_read(const eeprom_model_t *model, uint16_t addr, uint8_t *data
     xSemaphoreGive(i2c_Semaphore);
     vTaskDelay(model->write_delay_time);
     return ret;
+}
+
+/**
+ * @brief Call before rtos task
+ */
+void init_eeprom(const eeprom_model_t *model)
+{
+
+    ISoftwareI2CRegRead(model->i2c, model->i2c_addr, CONFIG_START_ADDR,
+                        model->i2c_addr_type, ((uint8_t *)&eeprom), sizeof(eeprom_t), 0xFFFF);
+
+    uint32_t calc_check_sum = get_LSB_array_crc((uint8_t *)(&eeprom) + sizeof(uint32_t), sizeof(eeprom_t) - sizeof(uint32_t));
+
+    if (eeprom.magic_num != eeprom_magic_number ||
+        calc_check_sum != eeprom.check_sum)
+    {
+        printf("eeprom check_sum = %08X!\n", eeprom.check_sum);
+        printf("calc_check_sum = %08X!\n", calc_check_sum);
+        printf("reset eeprom!\n");
+        eeprom_memory_reset();
+        eeprom.check_sum = calc_check_sum;
+        eeprom_block_write(model, CONFIG_START_ADDR, ((uint8_t *)&eeprom), sizeof(eeprom_t));
+        ULOG_ERROR("EEPROM DATA RESET!\n");
+    }
+    else
+    {
+        printf("Ok eeprom.\n");
+    }
 }

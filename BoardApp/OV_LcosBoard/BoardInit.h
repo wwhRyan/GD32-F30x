@@ -47,6 +47,9 @@ extern SemaphoreHandle_t uart_Semaphore;
 extern SemaphoreHandle_t i2c_Semaphore;
 extern QueueHandle_t xQueue_eeprom;
 
+extern const eeprom_model_t BL24C64A;
+extern const eeprom_model_t AT24C02D;
+
 typedef enum sys_sig_t
 {
     sig_lightsource,
@@ -55,7 +58,16 @@ typedef enum sys_sig_t
     sig_light_status,
     sig_slient_async_msg,
     sig_update_anf,
+    sig_eeprom_write,
 } sys_sig_t;
+
+typedef struct msg_t
+{
+    uint8_t idx;
+    void *pData;
+    uint16_t addr;
+    uint8_t size;
+} msg_t;
 
 /*<! Red laser NTC !>*/
 #define R_LD_NTC_PORT GPIOB

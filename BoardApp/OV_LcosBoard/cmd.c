@@ -35,7 +35,7 @@ extern const ntc_adc_config_t lcos_panel_ntc;
 
 extern struct ovp921_t ovp921;
 extern const Uarter uart1_debug;
-extern const unit_t eeprom_msg[];
+extern const mem_t eeprom_mem[];
 
 void fanset(char argc, char *argv)
 {
@@ -348,17 +348,17 @@ void laser(char argc, char *argv)
             {
             case RED:
                 eeprom.red = current;
-                xQueueSend(xQueue_eeprom, (void *)&eeprom_msg[idx_red], (TickType_t)10);
+                xQueueSend(xQueue_eeprom, (void *)&eeprom_mem[idx_red], (TickType_t)10);
 
                 break;
             case GREEN:
                 eeprom.green = current;
-                xQueueSend(xQueue_eeprom, (void *)&eeprom_msg[idx_green], (TickType_t)10);
+                xQueueSend(xQueue_eeprom, (void *)&eeprom_mem[idx_green], (TickType_t)10);
 
                 break;
             case BLUE:
                 eeprom.blue = current;
-                xQueueSend(xQueue_eeprom, (void *)&eeprom_msg[idx_blue], (TickType_t)10);
+                xQueueSend(xQueue_eeprom, (void *)&eeprom_mem[idx_blue], (TickType_t)10);
 
                 break;
             }

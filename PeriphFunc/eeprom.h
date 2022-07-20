@@ -66,15 +66,30 @@ typedef enum eeprom_idx_t
     idx_Sn_LightEngine,
     idx_Sn_SourceLight,
     idx_Sn_Projector,
+    /* for msg handle */
+    idx_eeprom_write,
 } eeprom_idx_t;
 
-typedef struct unit_t
+typedef enum type_t{
+    uint32_type,
+    float_type,
+    string_type,
+}type_t;
+
+#pragma anon_unions
+typedef struct mem_t
 {
     uint8_t idx;
     void *pData;
     uint16_t addr;
     uint8_t size;
-} unit_t;
+    type_t type;
+    union{
+        uint32_t default_uint32;
+        float default_float;
+        char * default_string;
+    };
+} mem_t;
 
 extern eeprom_t eeprom;
 
@@ -84,5 +99,7 @@ bool eeprom_block_write(const eeprom_model_t *model, uint16_t addr, uint8_t *dat
 uint8_t eeprom_read(const eeprom_model_t *model, uint8_t addr);
 bool eeprom_block_read(const eeprom_model_t *model, uint16_t addr, uint8_t *data, uint16_t size);
 void init_eeprom(const eeprom_model_t *model);
+void eeprom_reset(void);
+bool eeprom_update_crc(const eeprom_model_t *model);
 
 #endif
