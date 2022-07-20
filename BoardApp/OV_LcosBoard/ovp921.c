@@ -487,7 +487,7 @@ bool update_anf(int idx, const uint8_t *p_anf, int anf_size)
             ULOG_ERROR("erase failed\n");
             return false;
         }
-        if (ovp921_erase(ANF_ADDR(idx) + 0x100) == false)
+        if (ovp921_erase(ANF_ADDR(idx) + 0x1000) == false)
         {
             ULOG_ERROR("erase failed\n");
             return false;
@@ -509,6 +509,36 @@ bool update_anf(int idx, const uint8_t *p_anf, int anf_size)
         clear_sig(sys_sig, sig_update_anf);
         ULOG_INFO("update anf success!\n");
     }
+    return ret;
+}
+
+bool update_firmware(const uint8_t *p_data, int size)
+{
+    bool ret = true;
+    static uint8_t iteration = 0;
+    E_assert(size % 0x100 == 0); // must be multiple of 256
+    if (!get_sig(sys_sig, sig_update_firmware))
+    {
+        ret &= halting_internal_mcu();
+        for (size_t i = 0; i < 8; i++)
+        {
+            if (ovp921_erase(i * 0x1000) == false)
+            {
+                ULOG_ERROR("erase failed\n");
+                return false;
+            }
+        }
+
+        set_sig(sys_sig, sig_update_firmware, true);
+        iteration = 0;
+    }
+
+    ret &= ovp921_write_page(iteration * 0x100, p_data);
+    ULOG_DEBUG(" %s %#x \n", __func__, iteration * 0x100);
+    iteration++;
+
+    ULOG_INFO("update firmware %04X.\n", iteration * 0x100);
+
     return ret;
 }
 

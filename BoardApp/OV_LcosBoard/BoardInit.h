@@ -49,6 +49,7 @@ extern QueueHandle_t xQueue_eeprom;
 
 extern const eeprom_model_t BL24C64A;
 extern const eeprom_model_t AT24C02D;
+extern const fan_timer_config_t cw_wheel_fg;
 
 typedef enum sys_sig_t
 {
@@ -58,6 +59,7 @@ typedef enum sys_sig_t
     sig_light_status,
     sig_slient_async_msg,
     sig_update_anf,
+    sig_update_firmware,
     sig_eeprom_write,
 } sys_sig_t;
 

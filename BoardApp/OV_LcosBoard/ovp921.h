@@ -33,6 +33,7 @@ void vertical_flip(bool enable);
 void horizontal_flip(bool enable);
 
 bool update_anf(int idx, const uint8_t *p_anf, int anf_size);
+bool update_firmware(const uint8_t *p_data, int size);
 bool ovp921_erase(uint32_t addr);
 void get_anf_version(char *p_version, int anf_idx);
 void get_firmware_version(char *p_version);

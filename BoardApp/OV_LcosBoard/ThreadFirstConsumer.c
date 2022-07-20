@@ -24,6 +24,7 @@ void ThreadFirstConsumer(void *pvParameters)
     set_sig(sys_sig, sig_light_status, false);
     set_sig(sys_sig, sig_ovp921_status, false);
     clear_sig(sys_sig, sig_update_anf);
+    clear_sig(sys_sig, sig_update_firmware);
     clear_sig(sys_sig, sig_eeprom_write);
     set_sig(sys_sig, sig_slient_async_msg, false);
     while (1)

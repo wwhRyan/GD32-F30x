@@ -46,6 +46,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
             clear_sig(sys_sig, sig_update_anf);
+            clear_sig(sys_sig, sig_update_firmware);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
             break;
 
@@ -55,6 +56,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
             clear_sig(sys_sig, sig_update_anf);
+            clear_sig(sys_sig, sig_update_firmware);
             clear_sig(sys_sig, sig_slient_async_msg);
             ULOG_DEBUG("sig_lightsource off\n");
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
@@ -425,7 +427,7 @@ IAtOperationRegister(kCmdCwSpeed, pAt_Kv_List, pAt_feedback_str)
     {
         if (kKeyScatteringWheel == my_kvs[0].key)
         {
-            IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, Get_fan_timer_FG(&cw_wheel_fg));
+            IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[0].key.pData, Get_fan_timer_FG(&cw_wheel_fg));
         }
         else
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -443,8 +445,8 @@ IAtOperationRegister(kCmdReset, pAt_Kv_List, pAt_feedback_str)
         {
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
-            vTaskDelay(10);
-            eeprom_reset();
+            eeprom_write(&BL24C64A, eeprom_mem[idx_check_sum].addr, 0);
+            init_eeprom(&BL24C64A);
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
         }
@@ -568,8 +570,7 @@ IAtOperationRegister(kCmdUpgradeOvp921Anf, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
-    size_t anf_idx = 0;
-    uint32_t at_crc = 0;
+    size_t anf_idx, at_crc = 0;
     uint8_t anf_data[256] = {0};
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
@@ -628,6 +629,8 @@ IAtOperationRegister(kCmdUpgradeOvp921Firmware, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
+    size_t at_crc = 0;
+    uint8_t firmware_data[256] = {0};
     if (kAtControlType == IGetAtCmdType(&at_obj))
     {
         for (size_t i = 0; i < pAt_Kv_List->size; i++)
@@ -635,21 +638,43 @@ IAtOperationRegister(kCmdUpgradeOvp921Firmware, pAt_Kv_List, pAt_feedback_str)
             switch (my_kvs[i].key)
             {
             case kKeyCrc:
-                // todo
+                sscanf(my_kvs[i].value, "%X", &at_crc);
+                ULOG_DEBUG("at_crc: %#x\n", at_crc);
                 break;
             case kKeyData:
-                // todo
+                if (512 != strlen(my_kvs[i].value))
+                    goto OVP921FIRMWARE_VALUE_ERROR;
+                if (false == AsciiToInt(my_kvs[i].value, firmware_data, 1))
+                    goto OVP921FIRMWARE_VALUE_ERROR;
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
                 return;
             }
         }
+
+        if (at_crc != get_MSB_array_crc(firmware_data, sizeof(firmware_data)))
+            goto OVP921FIRMWARE_VALUE_ERROR;
+
+        clear_sig(sys_sig, sig_system);
+        if (!update_firmware(firmware_data, sizeof(firmware_data)))
+        {
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+            clear_sig(sys_sig, sig_update_firmware);
+        }
+        else
+        {
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+        }
     }
     else
     {
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     }
+    return;
+OVP921FIRMWARE_VALUE_ERROR:
+    IAddFeedbackStrTo(pAt_feedback_str, "InvalidValue\n");
+    clear_sig(sys_sig, sig_update_firmware);
 }
 
 IAtOperationRegister(kCmdOvp921, pAt_Kv_List, pAt_feedback_str)
