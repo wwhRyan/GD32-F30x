@@ -1,0 +1,2 @@
+add_subdirectory(CMSIS)
+add_subdirectory(GD32F30x_standard_peripheral)
