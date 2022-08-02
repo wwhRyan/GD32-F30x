@@ -23,6 +23,7 @@ extern const Uarter uart1_debug;
 
 void ThreadUartEvent(void *pvParameters)
 {
+    ULOG_DEBUG("%s\n",__func__);
     reload_idu_current();
 
     IInitAtLib(&at_obj, kAtNormalMode, NULL, debug_printf);

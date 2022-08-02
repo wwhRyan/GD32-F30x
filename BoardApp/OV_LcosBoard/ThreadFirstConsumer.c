@@ -17,8 +17,12 @@
 extern const SoftwareI2C ovp921_i2c;
 extern const mem_t eeprom_mem[];
 
-void ThreadFirstConsumer(void *pvParameters)
+#define EEPROM_W_QUEUE_LENGTH 5
+QueueHandle_t xQueue_eeprom = NULL;
+
+void ThreadFirstConsumer(void* pvParameters)
 {
+    ULOG_DEBUG("%s\n", __func__);
     set_sig(sys_sig, sig_lightsource, true);
     set_sig(sys_sig, sig_system, true);
     set_sig(sys_sig, sig_light_status, false);
@@ -27,8 +31,11 @@ void ThreadFirstConsumer(void *pvParameters)
     clear_sig(sys_sig, sig_update_firmware);
     clear_sig(sys_sig, sig_eeprom_write);
     set_sig(sys_sig, sig_slient_async_msg, false);
-    while (1)
-    {
+
+    xQueue_eeprom = xQueueCreate(EEPROM_W_QUEUE_LENGTH, sizeof(msg_t));
+    E_assert(xQueue_eeprom);
+    ULOG_INFO("xQueue_eeprom create\n");
+    while (1) {
 
         // ULOG_DEBUG("ThreadFirstConsumer\r\n");
         // ULOG_DEBUG("ThreadFirstConsumer min free stack size %d\r\n",(int)uxTaskGetStackHighWaterMark(NULL));

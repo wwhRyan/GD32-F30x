@@ -12,6 +12,7 @@
 #include "AtProtocol.h"
 #include "basicApp.h"
 #include "ovp921.h"
+#include "ulog.h"
 #include "utilsAsciiConvert.h"
 
 extern asAtProtocol at_obj;
@@ -32,13 +33,12 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             if (get_sig(sys_sig, sig_ovp921_status) != true) // if ovp921 is not working, then reset it
             {
                 gpio_bit_set(OVP921_RESET_PORT, OVP921_RESET_PIN);
-                vTaskDelay(1000);
+                vTaskDelay(100);
                 gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
             }
             ULOG_DEBUG("system on\n");
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
-            ULOG_DEBUG("sig_lightsource on\n");
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
             break;
 
@@ -58,6 +58,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             clear_sig(sys_sig, sig_update_anf);
             clear_sig(sys_sig, sig_update_firmware);
             clear_sig(sys_sig, sig_slient_async_msg);
+            clear_sig(sys_sig, sig_ovp921_status);
             ULOG_DEBUG("sig_lightsource off\n");
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
@@ -684,7 +685,8 @@ IAtOperationRegister(kCmdOvp921, pAt_Kv_List, pAt_feedback_str)
 
     size_t size = 0;
     size_t addr = 0;
-    uint8_t data[256] = {0};
+    char string[256] = {0};
+    uint8_t data[128] = {0};
     int ret;
 
     if (kAtControlType == IGetAtCmdType(&at_obj))
@@ -700,7 +702,7 @@ IAtOperationRegister(kCmdOvp921, pAt_Kv_List, pAt_feedback_str)
                 ret = sscanf(my_kvs[i].value, "%X", &size);
                 break;
             case kKeyData:
-                ret = sscanf(my_kvs[i].value, "%256s", data);
+                ret = sscanf(my_kvs[i].value, "%256s", string);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -709,13 +711,20 @@ IAtOperationRegister(kCmdOvp921, pAt_Kv_List, pAt_feedback_str)
             if (ret == EOF || ret == 0)
                 goto OVP921_VALUE_ERROR;
         }
-        if (size > 256)
+        if (size > 128)
+            goto OVP921_VALUE_ERROR;
+
+        if(AsciiToInt(string, data, size) == false)
             goto OVP921_VALUE_ERROR;
 
         if (set_reg_block(addr, data, size) != true)
             IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
         else
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+
+        memset(string, 0, size);
+        IntToAscii(data, string, 1, size);
+        ULOG_DEBUG("set_reg_block %#X:%s\n", addr, string);
     }
     else
     {
@@ -747,7 +756,7 @@ IAtOperationRegister(kCmdOvp921, pAt_Kv_List, pAt_feedback_str)
         else
         {
             IntToAscii(data, ascii_output, 1, size);
-            IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_output);
+            IAddFeedbackStrTo(pAt_feedback_str, "Data:%s\n", ascii_output);
         }
     }
     return;

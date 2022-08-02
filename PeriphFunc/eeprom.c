@@ -86,6 +86,8 @@ void eeprom_memory_reset(void)
 
 bool eeprom_write(const eeprom_model_t *model, uint16_t addr, uint8_t data)
 {
+    return false;
+    #if 0
     bool ret = true;
     model->lock(UNLOCK);
 
@@ -98,15 +100,19 @@ bool eeprom_write(const eeprom_model_t *model, uint16_t addr, uint8_t data)
     model->lock(LOCK);
 
     return ret;
+    #endif
 }
 
 uint8_t eeprom_read(const eeprom_model_t *model, uint8_t addr)
 {
+    return 0;
+    #if 0
     uint8_t data;
     xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
     ISoftwareI2CRegRead(model->i2c, model->i2c_addr, addr, model->i2c_addr_type, &data, 1, 0xFFFF);
     xSemaphoreGive(i2c_Semaphore);
     return data;
+    #endif
 }
 
 bool eeprom_block_write(const eeprom_model_t *model, uint16_t addr, uint8_t *data, uint16_t size)

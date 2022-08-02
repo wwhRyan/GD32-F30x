@@ -437,6 +437,39 @@ bool ovp921_erase(uint32_t addr) // erase one page
     return true;
 }
 
+bool ovp921_write(uint32_t addr, const uint8_t* data, size_t size)
+{
+    bool ret = true;
+    ret &= set_reg_delay(0x0213, 0x00);
+    ret &= set_reg_delay(0x0218, 0x06);
+    vTaskDelay(105 + 5);
+    ret &= set_reg_delay(0x0213, 0x01);
+    ret &= set_reg_delay(0x0218, 0x05);
+    ret &= set_reg_delay(0x0218, 0x00);
+    uint8_t read_fifo_times = 0;
+
+    read_fifo_times = get_reg_delay(0x021e);
+    for (uint8_t i = 0; i < read_fifo_times; i++) {
+        get_reg_delay(0x0218);
+    }
+
+    ret &= set_reg_delay(0x0213, 0x04);
+    ret &= set_reg_delay(0x0218, 0x02);
+
+    ret &= set_reg_delay(0x0218, (uint8_t)((addr >> 16) & 0xFF));
+    ret &= set_reg_delay(0x0218, (uint8_t)((addr >> 8) & 0xFF));
+    ret &= set_reg_delay(0x0218, (uint8_t)(addr & 0xFF));
+
+    for (size_t i = 0; i < size; i++) {
+        ret &= set_reg_delay(0x0218, *(data + i));
+        get_reg_delay(0x0218);
+    }
+    ret &= set_reg_delay(0x0213, 0x00);
+    ret &= set_reg_delay(0x0218, 0x00);
+    vTaskDelay(150 + 10);
+    return ret;
+}
+
 #define FLASH_PAGE_SIZE 0x100
 bool ovp921_write_page(uint32_t addr, const uint8_t *data)
 {
@@ -529,6 +562,11 @@ bool update_firmware(const uint8_t *p_data, int size)
             }
         }
 
+        /* Temporarily set to the firmware size */
+        // TODO: update the size.
+        uint16_t check_data = BSWAP_16(0x4000);
+        ovp921_write(0x7ffe, (uint8_t*)&check_data, 2);
+
         set_sig(sys_sig, sig_update_firmware, true);
         iteration = 0;
     }
@@ -591,7 +629,8 @@ void get_anf_version(char *p_version, int anf_idx)
         uint8_t month = ovp921_read_flash(ANF_ADDR(anf_idx) + 0x82);
         uint8_t minor = ovp921_read_flash(ANF_ADDR(anf_idx) + 0x81);
         uint8_t major = ovp921_read_flash(ANF_ADDR(anf_idx) + 0x80);
-        sprintf(p_version, "%d-%02d-%02d.%d.%d", year, month, day, major, minor);
+        // sprintf(p_version, "%d-%02d-%02d.%d.%d", year, month, day, major, minor);
+        sprintf(p_version, "%d.%d", major, minor);
     }
     else
     {
@@ -607,5 +646,6 @@ void get_firmware_version(char *p_version)
     uint8_t month = ovp921_read_flash(0x000a);
     uint8_t minor = ovp921_read_flash(0x0009);
     uint8_t major = ovp921_read_flash(0x0008);
-    sprintf(p_version, "%d-%02d-%02d.%d.%d", year, month, day, major, minor);
+    // sprintf(p_version, "%d-%02d-%02d.%d.%d", year, month, day, major, minor);
+    sprintf(p_version, "%d.%d", major, minor);
 }

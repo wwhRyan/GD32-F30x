@@ -293,7 +293,7 @@ void application_init()
     printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
     printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
 
-    init_eeprom(&BL24C64A);
+    // init_eeprom(&BL24C64A);
     omnivision_lcos_init();
 }
 

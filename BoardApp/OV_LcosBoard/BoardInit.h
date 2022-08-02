@@ -31,9 +31,9 @@
 #endif
 
 // configMINIMAL_STACK_SIZE
-#define THREAD_FIRST_CONSUMER_STACK_SIZE 1024
-#define THREAD_UART_EVENT_STACK_SIZE (1024 * 3)
-#define THREAD_SECOND_CONSUMER_STACK_SIZE 1024
+#define THREAD_UART_EVENT_STACK_SIZE (1024 * 2)
+#define THREAD_FIRST_CONSUMER_STACK_SIZE (1024 * 2)
+#define THREAD_SECOND_CONSUMER_STACK_SIZE 512
 
 void ThreadFirstConsumer(void *pvParameters);
 void ThreadUartEvent(void *pvParameters);
