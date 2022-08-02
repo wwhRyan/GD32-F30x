@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.5)
 project(GD32-F303CC)
 
 set(CMAKE_C_STANDARD 99)
+enable_language(C ASM)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -25,6 +26,7 @@ if(${FORCE_COLORED_OUTPUT})
 endif()
 
 # add MCU build c flags
+add_definitions(-DDEBUG)
 add_definitions(-DGD32F30X_HD)
 
 add_subdirectory(easy-mcu)

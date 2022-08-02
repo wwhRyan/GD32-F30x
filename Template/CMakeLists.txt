@@ -22,6 +22,8 @@ include_directories(${PROJECT_SOURCE_DIR}/easy-mcu/CmdProtocol)
 include_directories(${PROJECT_SOURCE_DIR}/easy-mcu/AtProtocol)
 include_directories(${PROJECT_SOURCE_DIR}/easy-mcu/AtProtocol/Src/At_HashTable)
 include_directories(${PROJECT_SOURCE_DIR}/easy-mcu/AtProtocol/Src/At_internal)
+include_directories(${PROJECT_SOURCE_DIR}/BoardApp/OV_LcosBoard)
+include_directories(${PROJECT_SOURCE_DIR}/Utilities)
 
 add_executable(${EXEC_NAME} gd32f30x_it.c main.c systick.c ${FreeRTOSSrc})
 
