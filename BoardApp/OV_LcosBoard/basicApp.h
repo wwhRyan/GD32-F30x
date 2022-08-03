@@ -12,27 +12,26 @@
 #ifndef _BASICAPP_H_
 #define _BASICAPP_H_
 
-#include "i2c.h"
-#include "main.h"
-#include "gd32f30x.h"
 #include "BoardInit.h"
 #include "Common.h"
+#include "gd32f30x.h"
+#include "i2c.h"
+#include "main.h"
 #include "ovp921.h"
+
 
 #define R_CURRENT (2.5 + 0.3)
 #define G_CURRENT (4.6 + 0.5)
 #define B_CURRENT (4.6 + 0.5)
 
-typedef enum color_t
-{
+typedef enum color_t {
     RED,
     GREEN,
     BLUE,
     color_num,
 } color_t;
 
-typedef struct ntc_t
-{
+typedef struct ntc_t {
     uint16_t B;
     uint16_t normal_R;
     uint16_t divided_voltage_R;
@@ -52,8 +51,8 @@ void reload_idu_current(void);
 
 void color_EN_EXIT_IRQ(color_t color);
 
-char *get_sn(int number, char *buff);
-uint32_t get_MSB_array_crc(uint8_t *array, size_t size);
-uint32_t get_LSB_array_crc(uint8_t *array, size_t size);
+char* get_sn(int number, char* buff);
+uint32_t get_MSB_array_crc(uint8_t* array, size_t size);
+uint32_t get_LSB_array_crc(uint8_t* array, size_t size);
 
 #endif

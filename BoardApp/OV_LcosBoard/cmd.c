@@ -9,11 +9,12 @@
  *
  */
 
-#include "main.h"
 #include "Cmdline.h"
-#include "timer.h"
-#include "ovp921.h"
 #include "basicApp.h"
+#include "main.h"
+#include "ovp921.h"
+#include "timer.h"
+
 
 #ifdef DEBUG
 #undef cmd_printf
@@ -37,159 +38,130 @@ extern struct ovp921_t ovp921;
 extern const Uarter uart1_debug;
 extern const mem_t eeprom_mem[];
 
-void fanset(char argc, char *argv)
+void fanset(char argc, char* argv)
 {
     int fan_idx;
     int fan_speed;
-    if (argc == 1 + 2)
-    {
-        sscanf((const char *)&(argv[argv[1]]), "%d", &fan_idx);
-        sscanf((const char *)&(argv[argv[2]]), "%d", &fan_speed);
+    if (argc == 1 + 2) {
+        sscanf((const char*)&(argv[argv[1]]), "%d", &fan_idx);
+        sscanf((const char*)&(argv[argv[2]]), "%d", &fan_speed);
 
-        if (fan_idx > FAN_MAX_NUM || fan_idx <= 0)
-        {
+        if (fan_idx > FAN_MAX_NUM || fan_idx <= 0) {
             cmd_printf("%s param fan_idx error!\n", __func__);
             return;
         }
 
-        if (fan_speed > 100 || fan_speed < 0)
-        {
+        if (fan_speed > 100 || fan_speed < 0) {
             cmd_printf("%s param fan_speed error!\n", __func__);
             return;
         }
         if (fan_idx == 1)
             Set_fan_timer_pwm(&cw_wheel_pwm, fan_speed);
-    }
-    else
-    {
+    } else {
         cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
-void fanget(char argc, char *argv)
+void fanget(char argc, char* argv)
 {
-    if (argc == 1 + 1)
-    {
+    if (argc == 1 + 1) {
         int fan_idx;
-        sscanf((const char *)&(argv[argv[1]]), "%d", &fan_idx);
-        if (fan_idx > FAN_MAX_NUM || fan_idx <= 0)
-        {
+        sscanf((const char*)&(argv[argv[1]]), "%d", &fan_idx);
+        if (fan_idx > FAN_MAX_NUM || fan_idx <= 0) {
             cmd_printf("%s param fan_idx error!\n", __func__);
             return;
         }
         if (fan_idx == 1)
             cmd_printf("%d\n", Get_fan_timer_FG(&cw_wheel_fg));
-    }
-    else
-    {
+    } else {
         cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
-void bypassfanset(char argc, char *argv)
+void bypassfanset(char argc, char* argv)
 {
     output_printf("%s\n", GetRxData(&uart1_debug));
     cmd_printf("To SignalBoard: %s\n", GetRxData(&uart1_debug));
 }
 
-void bypassfanget(char argc, char *argv)
+void bypassfanget(char argc, char* argv)
 {
     output_printf("%s\n", GetRxData(&uart1_debug));
     cmd_printf("To SignalBoard: %s\n", GetRxData(&uart1_debug));
 }
 
-void dacset(char argc, char *argv)
+void dacset(char argc, char* argv)
 {
     int dac_idx;
     int dac_value;
-    if (argc == 1 + 2)
-    {
-        sscanf((const char *)&(argv[argv[1]]), "%d", &dac_idx);
-        sscanf((const char *)&(argv[argv[2]]), "%d", &dac_value);
+    if (argc == 1 + 2) {
+        sscanf((const char*)&(argv[argv[1]]), "%d", &dac_idx);
+        sscanf((const char*)&(argv[argv[2]]), "%d", &dac_value);
 
-        if (dac_idx > DAC_MAX_NUM || dac_idx <= 0)
-        {
+        if (dac_idx > DAC_MAX_NUM || dac_idx <= 0) {
             cmd_printf("%s param dac_idx error!\n", __func__);
             return;
         }
 
-        if (dac_value > 100 || dac_value < 0)
-        {
+        if (dac_value > 100 || dac_value < 0) {
             cmd_printf("%s param dac_value error!\n", __func__);
             return;
         }
-        if (dac_idx == 1)
-        {
+        if (dac_idx == 1) {
             laser_dac_set_value(&laser_dac, dac_value * 4095 / 100);
             cmd_printf("laser_dac_set_value %d\r\n", dac_value);
         }
-    }
-    else
-    {
+    } else {
         cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
-void adcget(char argc, char *argv)
+void adcget(char argc, char* argv)
 {
     int adc_idx;
     int value;
-    if (argc == 1 + 1)
-    {
-        sscanf((const char *)&(argv[argv[1]]), "%d", &adc_idx);
-        if (adc_idx > ADC_MAX_NUM || adc_idx <= 0)
-        {
+    if (argc == 1 + 1) {
+        sscanf((const char*)&(argv[argv[1]]), "%d", &adc_idx);
+        if (adc_idx > ADC_MAX_NUM || adc_idx <= 0) {
             cmd_printf("%s param adc_idx error!\n", __func__);
             return;
         }
-        if (adc_idx == 1)
-        {
+        if (adc_idx == 1) {
             value = get_ntc_adc_sample(&red_ld_ntc);
             cmd_printf("value %d\n", value);
             cmd_printf("temperature %f\n", get_temperature(value));
-        }
-        else if (adc_idx == 2)
-        {
+        } else if (adc_idx == 2) {
             value = get_ntc_adc_sample(&green_led_ntc);
             cmd_printf("value %d\n", value);
             cmd_printf("temperature %f\n", get_temperature(value));
-        }
-        else if (adc_idx == 3)
-        {
+        } else if (adc_idx == 3) {
             value = get_ntc_adc_sample(&evn_ntc);
             cmd_printf("value %d\n", value);
             cmd_printf("temperature %f\n", get_temperature(value));
-        }
-        else if (adc_idx == 4)
-        {
+        } else if (adc_idx == 4) {
             value = get_ntc_adc_sample(&lcos_panel_ntc);
             cmd_printf("value %d\n", value);
             cmd_printf("temperature %f\n", get_temperature(value));
         }
-    }
-    else
-    {
+    } else {
         cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
-void gettime(char argc, char *argv)
+void gettime(char argc, char* argv)
 {
     int val;
-    if (argc == 1 + 1)
-    {
-        sscanf((const char *)&(argv[argv[1]]), "%d", &val);
+    if (argc == 1 + 1) {
+        sscanf((const char*)&(argv[argv[1]]), "%d", &val);
         cmd_printf("set laser val = %d\n", val);
         GET_TIME(laser_dac_set_value, &laser_dac, val); // 81Us
         GET_NOP_TIME;
-    }
-    else
-    {
+    } else {
         cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
-void chipid(char argc, char *argv)
+void chipid(char argc, char* argv)
 {
     get_chipid();
     cmd_printf("ovp921 id:%04X\r\n", ovp921.chipid.chip_id);
@@ -197,12 +169,10 @@ void chipid(char argc, char *argv)
     cmd_printf("ovp921 id2:%04X\r\n", ovp921.chipid2.chip_id2);
 }
 
-void testpattern(char argc, char *argv)
+void testpattern(char argc, char* argv)
 {
-    if (argc == 1 + 1)
-    {
-        if (!strcmp("-h", &argv[argv[1]]))
-        {
+    if (argc == 1 + 1) {
+        if (!strcmp("-h", &argv[argv[1]])) {
             cmd_printf("useage: %s [options]\r\n", __func__);
             cmd_printf("options: \r\n");
             cmd_printf("\t red \t: show red\r\n");
@@ -217,79 +187,51 @@ void testpattern(char argc, char *argv)
             cmd_printf("\t ramp \t: show ramp\r\n");
             cmd_printf("\t checkerboard \t: show checkerboard\r\n");
             cmd_printf("\t off \t: show off\r\n");
-        }
-        else if (!strcmp("ramp", &argv[argv[1]]))
-        {
+        } else if (!strcmp("ramp", &argv[argv[1]])) {
             gray_ramp_pattern();
             cmd_printf("show ramp\r\n");
-        }
-        else if (!strcmp("red", &argv[argv[1]]))
-        {
+        } else if (!strcmp("red", &argv[argv[1]])) {
             show_solid_color_pattern(0xFF, 0x00, 0x00);
             cmd_printf("show red\r\n");
-        }
-        else if (!strcmp("blue", &argv[argv[1]]))
-        {
+        } else if (!strcmp("blue", &argv[argv[1]])) {
             show_solid_color_pattern(0x00, 0x00, 0xFF);
             cmd_printf("show blue\r\n");
-        }
-        else if (!strcmp("green", &argv[argv[1]]))
-        {
+        } else if (!strcmp("green", &argv[argv[1]])) {
             show_solid_color_pattern(0x00, 0xFF, 0x00);
             cmd_printf("show green\r\n");
-        }
-        else if (!strcmp("white", &argv[argv[1]]))
-        {
+        } else if (!strcmp("white", &argv[argv[1]])) {
             show_solid_color_pattern(0xFF, 0xFF, 0xFF);
             cmd_printf("show white\r\n");
-        }
-        else if (!strcmp("black", &argv[argv[1]]))
-        {
+        } else if (!strcmp("black", &argv[argv[1]])) {
             show_solid_color_pattern(0x00, 0x00, 0x00);
             cmd_printf("show black\r\n");
-        }
-        else if (!strcmp("yellow", &argv[argv[1]]))
-        {
+        } else if (!strcmp("yellow", &argv[argv[1]])) {
             show_solid_color_pattern(0xFF, 0xFF, 0x00);
             cmd_printf("show yellow\r\n");
-        }
-        else if (!strcmp("cyan", &argv[argv[1]]))
-        {
+        } else if (!strcmp("cyan", &argv[argv[1]])) {
             show_solid_color_pattern(0x00, 0xFF, 0xFF);
             cmd_printf("show cyan\r\n");
-        }
-        else if (!strcmp("magenta", &argv[argv[1]]))
-        {
+        } else if (!strcmp("magenta", &argv[argv[1]])) {
             show_solid_color_pattern(0xFF, 0x00, 0xFF);
             cmd_printf("show magenta\r\n");
-        }
-        else if (!strcmp("gray", &argv[argv[1]]))
-        {
+        } else if (!strcmp("gray", &argv[argv[1]])) {
             show_solid_color_pattern(0x80, 0x80, 0x80);
             cmd_printf("show gray\r\n");
-        }
-        else if (!strcmp("checkerboard", &argv[argv[1]]))
-        {
+        } else if (!strcmp("checkerboard", &argv[argv[1]])) {
             checkerboard_pattern();
             cmd_printf("show checkerboard\r\n");
-        }
-        else if (!strcmp("off", &argv[argv[1]]))
-        {
+        } else if (!strcmp("off", &argv[argv[1]])) {
             off_pattern();
             cmd_printf("show off\r\n");
-        }
-        else
-        {
+        } else {
             cmd_printf("%s param error!\n", __func__);
         }
-    }
-    else
-    {
+    } else {
         cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
-int get_color_idx(char *color)
+int get_color_idx(char* color)
 {
     if (!strcmp("r", color) || !strcmp("R", color))
         return (int)RED;
@@ -301,155 +243,120 @@ int get_color_idx(char *color)
         return -1;
 }
 
-void laser(char argc, char *argv)
+void laser(char argc, char* argv)
 {
-    if (argc == 1 + 1)
-    {
-        if (!strcmp("-h", &argv[argv[1]]))
-        {
+    if (argc == 1 + 1) {
+        if (!strcmp("-h", &argv[argv[1]])) {
             cmd_printf("useage: %s [options]\r\n", __func__);
             cmd_printf("options: \r\n");
             cmd_printf("\t on \t: turn on laser\r\n");
             cmd_printf("\t off \t: turn off laser\r\n");
             cmd_printf("\t R 0.7 \t: set laser Red current\r\n");
-        }
-        else if (!strcmp("on", &argv[argv[1]]))
-        {
+        } else if (!strcmp("on", &argv[argv[1]])) {
             set_sig(sys_sig, sig_lightsource, true);
             cmd_printf("laser on\r\n");
-        }
-        else if (!strcmp("off", &argv[argv[1]]))
-        {
+        } else if (!strcmp("off", &argv[argv[1]])) {
             clear_sig(sys_sig, sig_lightsource);
             cmd_printf("laser off\r\n");
-        }
-        else
-        {
+        } else {
             cmd_printf("%s param error!\n", __func__);
         }
-    }
-    else if (argc == 1 + 2)
-    {
+    } else if (argc == 1 + 2) {
         float current;
         int idx = get_color_idx(&argv[argv[1]]);
-        if (idx < 0)
-        {
+        if (idx < 0) {
             cmd_printf("%s color can`t resolve!\n", __func__);
             return;
         }
 
         printf("old current: %f\n", *(&eeprom.red + idx));
 
-        sscanf((const char *)&(argv[argv[2]]), "%f", &current);
-        if (true == laser_set(idx, current))
-        {
+        sscanf((const char*)&(argv[argv[2]]), "%f", &current);
+        if (true == laser_set(idx, current)) {
             cmd_printf("laser idx %d current set to %f\r\n", idx, current);
-            switch (idx)
-            {
+            switch (idx) {
             case RED:
                 eeprom.red = current;
-                xQueueSend(xQueue_eeprom, (void *)&eeprom_mem[idx_red], (TickType_t)10);
+                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_red], (TickType_t)10);
 
                 break;
             case GREEN:
                 eeprom.green = current;
-                xQueueSend(xQueue_eeprom, (void *)&eeprom_mem[idx_green], (TickType_t)10);
+                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_green], (TickType_t)10);
 
                 break;
             case BLUE:
                 eeprom.blue = current;
-                xQueueSend(xQueue_eeprom, (void *)&eeprom_mem[idx_blue], (TickType_t)10);
+                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_blue], (TickType_t)10);
 
                 break;
             }
-        }
-        else
+        } else
             cmd_printf("laser idx %d current set failed!\r\n", idx);
-    }
-    else
-    {
+    } else {
         cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
-void write(char argc, char *argv)
+void write(char argc, char* argv)
 {
     uint32_t addr;
     uint32_t val;
-    if (argc >= 2 + 1)
-    {
-        sscanf((const char *)&(argv[argv[1]]), "%x", &addr);
-        for (size_t i = 0; i < argc - 2; i++)
-        {
-            sscanf((const char *)&(argv[argv[i + 2]]), "%x", &val);
+    if (argc >= 2 + 1) {
+        sscanf((const char*)&(argv[argv[1]]), "%x", &addr);
+        for (size_t i = 0; i < argc - 2; i++) {
+            sscanf((const char*)&(argv[argv[i + 2]]), "%x", &val);
             set_reg((uint16_t)addr, (uint8_t)val);
             cmd_printf("write addr:%04x val:%02x ", addr, val);
             cmd_printf("read addr:%04x val:%02x\r\n", addr, get_reg((uint16_t)addr));
             addr++;
             val = 0x00;
         }
-    }
-    else
-    {
+    } else {
         cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
-void read(char argc, char *argv)
+void read(char argc, char* argv)
 {
     uint32_t addr;
-    if (argc == 1 + 1)
-    {
-        sscanf((const char *)&(argv[argv[1]]), "%x", &addr);
+    if (argc == 1 + 1) {
+        sscanf((const char*)&(argv[argv[1]]), "%x", &addr);
         cmd_printf("read addr:%04x val:%02x\r\n", addr, get_reg((uint16_t)addr));
-    }
-    else if (argc == 1 + 2)
-    {
+    } else if (argc == 1 + 2) {
         int num;
-        sscanf((const char *)&(argv[argv[1]]), "%x", &addr);
-        sscanf((const char *)&(argv[argv[2]]), "%d", &num);
+        sscanf((const char*)&(argv[argv[1]]), "%x", &addr);
+        sscanf((const char*)&(argv[argv[2]]), "%d", &num);
 
-        if (num > 256)
-        {
+        if (num > 256) {
             cmd_printf("%s num > 256!\n", __func__);
             return;
-        }
-        else
-        {
-            for (int i = 0; i < num; i++)
-            {
+        } else {
+            for (int i = 0; i < num; i++) {
                 cmd_printf("addr:%04x val:%02x \r\n", addr, get_reg((uint16_t)addr));
                 addr += 1;
             }
             cmd_printf("\r\n");
         }
-    }
-    else
-    {
+    } else {
         cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
-void reset(char argc, char *argv)
+void reset(char argc, char* argv)
 {
-    if (argc == 1 + 1)
-    {
-        if (!strcmp("-h", &argv[argv[1]]))
-        {
+    if (argc == 1 + 1) {
+        if (!strcmp("-h", &argv[argv[1]])) {
             cmd_printf("useage: %s [options]\r\n", __func__);
             cmd_printf("options: \r\n");
             cmd_printf("\t ov \t: ovp921 reset\r\n");
             cmd_printf("\t sys \t: sys 12V reset\r\n");
-        }
-        else if (!strcmp("ov", &argv[argv[1]]))
-        {
+        } else if (!strcmp("ov", &argv[argv[1]])) {
             gpio_bit_set(OVP921_RESET_PORT, OVP921_RESET_PIN);
             vTaskDelay(1000);
             gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
             cmd_printf("reset ovp921 reset pin.\r\n");
-        }
-        else if (!strcmp("sys", &argv[argv[1]]))
-        {
+        } else if (!strcmp("sys", &argv[argv[1]])) {
             gpio_bit_set(OVP921_RESET_PORT, OVP921_RESET_PIN);
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             vTaskDelay(1000);
@@ -458,19 +365,15 @@ void reset(char argc, char *argv)
             vTaskDelay(1000);
             gpio_bit_reset(OVP921_RESET_PORT, OVP921_RESET_PIN);
             cmd_printf("reset ovp921 reset pin.\r\n");
-        }
-        else
-        {
+        } else {
             cmd_printf("%s param error!\n", __func__);
         }
-    }
-    else
-    {
+    } else {
         cmd_printf("%s Please input right param!\n", __func__);
     }
 }
 
-void lcos(char argc, char *argv)
+void lcos(char argc, char* argv)
 {
     /*
     if (argc == 1 + 1)

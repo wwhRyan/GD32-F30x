@@ -14,17 +14,18 @@
 
 #define MCU_VERSION "V1.0"
 
-#include "uart.h"
-#include "timer.h"
 #include "adc_mcu.h"
-#include "dac.h"
-#include "port.h"
-#include "event_groups.h"
-#include "semphr.h"
 #include "basicApp.h"
-#include "ulog.h"
-#include "i2c.h"
+#include "dac.h"
 #include "eeprom.h"
+#include "event_groups.h"
+#include "i2c.h"
+#include "port.h"
+#include "semphr.h"
+#include "timer.h"
+#include "uart.h"
+#include "ulog.h"
+
 
 #ifndef ATHENA_OV_LCOS
 #error "Please define ATHENA_OV_LCOS"
@@ -35,11 +36,11 @@
 #define THREAD_FIRST_CONSUMER_STACK_SIZE (1024 * 2)
 #define THREAD_SECOND_CONSUMER_STACK_SIZE 512
 
-void ThreadFirstConsumer(void *pvParameters);
-void ThreadUartEvent(void *pvParameters);
-void ThreadSecondConsumer(void *pvParameters);
+void ThreadFirstConsumer(void* pvParameters);
+void ThreadUartEvent(void* pvParameters);
+void ThreadSecondConsumer(void* pvParameters);
 
-void output_printf(const char *fmt, ...);
+void output_printf(const char* fmt, ...);
 void system_ipc_init(void);
 
 extern EventGroupHandle_t sys_sig;
@@ -51,8 +52,7 @@ extern const eeprom_model_t BL24C64A;
 extern const eeprom_model_t AT24C02D;
 extern const fan_timer_config_t cw_wheel_fg;
 
-typedef enum sys_sig_t
-{
+typedef enum sys_sig_t {
     sig_lightsource,
     sig_system,
     sig_ovp921_status,
@@ -63,10 +63,9 @@ typedef enum sys_sig_t
     sig_eeprom_write,
 } sys_sig_t;
 
-typedef struct msg_t
-{
+typedef struct msg_t {
     uint8_t idx;
-    void *pData;
+    void* pData;
     uint16_t addr;
     uint8_t size;
 } msg_t;

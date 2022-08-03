@@ -14,6 +14,7 @@
 #include "main.h"
 #include "gd32f30x.h"
 #include "ulog.h"
+#include "event_groups.h"
 
 #define GET_SysTick (uint32_t)(SysTick->VAL)
 // #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)   //获取文件名 linux下

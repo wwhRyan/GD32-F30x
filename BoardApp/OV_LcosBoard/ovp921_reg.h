@@ -52,11 +52,9 @@
 \___//_/ /_//_// .___/  /_/ \__,_/  /____/ \___//_/   /_/ \__,_//_/  / .___/ \____//_/    \__/
               /_/                                                   /_/
 */
-typedef struct reg_chipid_t
-{
+typedef struct reg_chipid_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -66,11 +64,9 @@ typedef struct reg_chipid_t
     };
 } reg_chipid_t;
 
-typedef struct reg_microlcd_serial_port_address_low_t
-{
+typedef struct reg_microlcd_serial_port_address_low_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -79,11 +75,9 @@ typedef struct reg_microlcd_serial_port_address_low_t
     };
 } reg_microlcd_serial_port_address_low_t;
 
-typedef struct reg_microlcd_serial_port_address_high_t
-{
+typedef struct reg_microlcd_serial_port_address_high_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -94,11 +88,9 @@ typedef struct reg_microlcd_serial_port_address_high_t
     };
 } reg_microlcd_serial_port_address_high_t;
 
-typedef struct reg_microlcd_serial_port_data_t
-{
+typedef struct reg_microlcd_serial_port_data_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -107,11 +99,9 @@ typedef struct reg_microlcd_serial_port_data_t
     };
 } reg_microlcd_serial_port_data_t;
 
-typedef struct reg_chipid2_t
-{
+typedef struct reg_chipid2_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -128,11 +118,9 @@ typedef struct reg_chipid2_t
 /_/  /_//___/ \____//_/ |_| \____//_____/\____//_____/   \____/ \____//_/ |_/  /_/  /_/ |_| \____//_____/
 */
 
-typedef struct reg_microlcd_controls_t
-{
+typedef struct reg_microlcd_controls_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -146,11 +134,9 @@ typedef struct reg_microlcd_controls_t
     };
 } reg_microlcd_controls_t;
 
-typedef struct reg_ulcd_xydim_h_t
-{
+typedef struct reg_ulcd_xydim_h_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -161,11 +147,9 @@ typedef struct reg_ulcd_xydim_h_t
     };
 } reg_ulcd_xydim_h_t;
 
-typedef struct reg_horizontal_mode_t
-{
+typedef struct reg_horizontal_mode_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -184,11 +168,9 @@ typedef struct reg_horizontal_mode_t
                                             /____/                                  /_/                 /_/
 */
 
-typedef struct reg_video_input_bus_byte_swap_t
-{
+typedef struct reg_video_input_bus_byte_swap_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -200,11 +182,9 @@ typedef struct reg_video_input_bus_byte_swap_t
     };
 } reg_video_input_bus_byte_swap_t;
 
-typedef struct reg_video_input_bus_bit_swap_t
-{
+typedef struct reg_video_input_bus_bit_swap_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -216,11 +196,9 @@ typedef struct reg_video_input_bus_bit_swap_t
     };
 } reg_video_input_bus_bit_swap_t;
 
-typedef struct reg_XPan_t
-{
+typedef struct reg_XPan_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -230,11 +208,9 @@ typedef struct reg_XPan_t
     };
 } reg_XPan_t;
 
-typedef struct reg_YPan_t
-{
+typedef struct reg_YPan_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -244,11 +220,9 @@ typedef struct reg_YPan_t
     };
 } reg_YPan_t;
 
-typedef struct reg_video_Xdim_manuall_t
-{
+typedef struct reg_video_Xdim_manuall_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -257,11 +231,9 @@ typedef struct reg_video_Xdim_manuall_t
     };
 } reg_video_Xdim_manuall_t;
 
-typedef struct reg_video_Ydim_manuall_t
-{
+typedef struct reg_video_Ydim_manuall_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -270,11 +242,9 @@ typedef struct reg_video_Ydim_manuall_t
     };
 } reg_video_Ydim_manuall_t;
 
-typedef struct reg_video_XYdim_manuall_t
-{
+typedef struct reg_video_XYdim_manuall_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -300,11 +270,9 @@ typedef struct reg_video_XYdim_manuall_t
 
 */
 
-typedef struct reg_scalar_Xdim_low_t
-{
+typedef struct reg_scalar_Xdim_low_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -313,11 +281,9 @@ typedef struct reg_scalar_Xdim_low_t
     };
 } reg_scalar_Xdim_low_t;
 
-typedef struct reg_scalar_Ydim_low_t
-{
+typedef struct reg_scalar_Ydim_low_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -326,11 +292,9 @@ typedef struct reg_scalar_Ydim_low_t
     };
 } reg_scalar_Ydim_low_t;
 
-typedef struct reg_scalar_XYdim_high_t
-{
+typedef struct reg_scalar_XYdim_high_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -342,11 +306,9 @@ typedef struct reg_scalar_XYdim_high_t
     };
 } reg_scalar_XYdim_high_t;
 
-typedef struct reg_keystone_scalar_control_t
-{
+typedef struct reg_keystone_scalar_control_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -361,11 +323,9 @@ typedef struct reg_keystone_scalar_control_t
     };
 } reg_keystone_scalar_control_t;
 
-typedef struct reg_keystone_offset_t
-{
+typedef struct reg_keystone_offset_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -383,11 +343,9 @@ typedef struct reg_keystone_offset_t
 /_/                                           /____/
 */
 
-typedef struct reg_pattern_generator_t
-{
+typedef struct reg_pattern_generator_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -399,11 +357,9 @@ typedef struct reg_pattern_generator_t
     };
 } reg_pattern_generator_t;
 
-typedef struct reg_pattern_gen_vsync_width_t
-{
+typedef struct reg_pattern_gen_vsync_width_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -413,11 +369,9 @@ typedef struct reg_pattern_gen_vsync_width_t
     };
 } reg_pattern_gen_vsync_width_t;
 
-typedef struct reg_pattern_gen_vsync_front_porch_t
-{
+typedef struct reg_pattern_gen_vsync_front_porch_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -426,11 +380,9 @@ typedef struct reg_pattern_gen_vsync_front_porch_t
     };
 } reg_pattern_gen_vsync_front_porch_t;
 
-typedef struct reg_pattern_gen_vsync_back_porch_t
-{
+typedef struct reg_pattern_gen_vsync_back_porch_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -439,11 +391,9 @@ typedef struct reg_pattern_gen_vsync_back_porch_t
     };
 } reg_pattern_gen_vsync_back_porch_t;
 
-typedef struct reg_pattern_gen_hsync_width_t
-{
+typedef struct reg_pattern_gen_hsync_width_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -453,11 +403,9 @@ typedef struct reg_pattern_gen_hsync_width_t
     };
 } reg_pattern_gen_hsync_width_t;
 
-typedef struct reg_pattern_gen_hsync_front_porch_t
-{
+typedef struct reg_pattern_gen_hsync_front_porch_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -466,11 +414,9 @@ typedef struct reg_pattern_gen_hsync_front_porch_t
     };
 } reg_pattern_gen_hsync_front_porch_t;
 
-typedef struct reg_pattern_gen_hsync_back_porch_t
-{
+typedef struct reg_pattern_gen_hsync_back_porch_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -479,11 +425,9 @@ typedef struct reg_pattern_gen_hsync_back_porch_t
     };
 } reg_pattern_gen_hsync_back_porch_t;
 
-typedef struct reg_pattern_gen_red_data_t
-{
+typedef struct reg_pattern_gen_red_data_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -492,11 +436,9 @@ typedef struct reg_pattern_gen_red_data_t
     };
 } reg_pattern_gen_red_data_t;
 
-typedef struct reg_pattern_gen_green_data_t
-{
+typedef struct reg_pattern_gen_green_data_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -505,11 +447,9 @@ typedef struct reg_pattern_gen_green_data_t
     };
 } reg_pattern_gen_green_data_t;
 
-typedef struct reg_pattern_gen_blue_data_t
-{
+typedef struct reg_pattern_gen_blue_data_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -518,11 +458,9 @@ typedef struct reg_pattern_gen_blue_data_t
     };
 } reg_pattern_gen_blue_data_t;
 
-typedef struct reg_pattern_gen_grayramp_step_low_t
-{
+typedef struct reg_pattern_gen_grayramp_step_low_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -531,11 +469,9 @@ typedef struct reg_pattern_gen_grayramp_step_low_t
     };
 } reg_pattern_gen_grayramp_step_low_t;
 
-typedef struct reg_pattern_gen_grayramp_step_high_t
-{
+typedef struct reg_pattern_gen_grayramp_step_high_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -544,11 +480,9 @@ typedef struct reg_pattern_gen_grayramp_step_high_t
     };
 } reg_pattern_gen_grayramp_step_high_t;
 
-typedef struct reg_pattern_gen_horizontal_cross_hatch_y_offset_t
-{
+typedef struct reg_pattern_gen_horizontal_cross_hatch_y_offset_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -557,11 +491,9 @@ typedef struct reg_pattern_gen_horizontal_cross_hatch_y_offset_t
     };
 } reg_pattern_gen_horizontal_cross_hatch_y_offset_t;
 
-typedef struct reg_pattern_gen_horizontal_cross_hatch_y_on_t
-{
+typedef struct reg_pattern_gen_horizontal_cross_hatch_y_on_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -570,11 +502,9 @@ typedef struct reg_pattern_gen_horizontal_cross_hatch_y_on_t
     };
 } reg_pattern_gen_horizontal_cross_hatch_y_on_t;
 
-typedef struct reg_pattern_gen_horizontal_cross_hatch_y_off_t
-{
+typedef struct reg_pattern_gen_horizontal_cross_hatch_y_off_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -583,11 +513,9 @@ typedef struct reg_pattern_gen_horizontal_cross_hatch_y_off_t
     };
 } reg_pattern_gen_horizontal_cross_hatch_y_off_t;
 
-typedef struct reg_pattern_gen_horizontal_cross_hatch_x_offset_t
-{
+typedef struct reg_pattern_gen_horizontal_cross_hatch_x_offset_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -596,11 +524,9 @@ typedef struct reg_pattern_gen_horizontal_cross_hatch_x_offset_t
     };
 } reg_pattern_gen_horizontal_cross_hatch_x_offset_t;
 
-typedef struct reg_pattern_gen_horizontal_cross_hatch_x_on_t
-{
+typedef struct reg_pattern_gen_horizontal_cross_hatch_x_on_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -609,11 +535,9 @@ typedef struct reg_pattern_gen_horizontal_cross_hatch_x_on_t
     };
 } reg_pattern_gen_horizontal_cross_hatch_x_on_t;
 
-typedef struct reg_pattern_gen_horizontal_cross_hatch_x_off_t
-{
+typedef struct reg_pattern_gen_horizontal_cross_hatch_x_off_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -622,11 +546,9 @@ typedef struct reg_pattern_gen_horizontal_cross_hatch_x_off_t
     };
 } reg_pattern_gen_horizontal_cross_hatch_x_off_t;
 
-typedef struct reg_pattern_gen_vertical_cross_hatch_y_offset_t
-{
+typedef struct reg_pattern_gen_vertical_cross_hatch_y_offset_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -635,11 +557,9 @@ typedef struct reg_pattern_gen_vertical_cross_hatch_y_offset_t
     };
 } reg_pattern_gen_vertical_cross_hatch_y_offset_t;
 
-typedef struct reg_pattern_gen_vertical_cross_hatch_y_on_t
-{
+typedef struct reg_pattern_gen_vertical_cross_hatch_y_on_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -648,11 +568,9 @@ typedef struct reg_pattern_gen_vertical_cross_hatch_y_on_t
     };
 } reg_pattern_gen_vertical_cross_hatch_y_on_t;
 
-typedef struct reg_pattern_gen_vertical_cross_hatch_y_off_t
-{
+typedef struct reg_pattern_gen_vertical_cross_hatch_y_off_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -661,11 +579,9 @@ typedef struct reg_pattern_gen_vertical_cross_hatch_y_off_t
     };
 } reg_pattern_gen_vertical_cross_hatch_y_off_t;
 
-typedef struct reg_pattern_gen_vertical_cross_hatch_x_offset_t
-{
+typedef struct reg_pattern_gen_vertical_cross_hatch_x_offset_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -674,11 +590,9 @@ typedef struct reg_pattern_gen_vertical_cross_hatch_x_offset_t
     };
 } reg_pattern_gen_vertical_cross_hatch_x_offset_t;
 
-typedef struct reg_pattern_gen_vertical_cross_hatch_x_on_t
-{
+typedef struct reg_pattern_gen_vertical_cross_hatch_x_on_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -687,11 +601,9 @@ typedef struct reg_pattern_gen_vertical_cross_hatch_x_on_t
     };
 } reg_pattern_gen_vertical_cross_hatch_x_on_t;
 
-typedef struct reg_pattern_gen_vertical_cross_hatch_x_off_t
-{
+typedef struct reg_pattern_gen_vertical_cross_hatch_x_off_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -700,11 +612,9 @@ typedef struct reg_pattern_gen_vertical_cross_hatch_x_off_t
     };
 } reg_pattern_gen_vertical_cross_hatch_x_off_t;
 
-typedef struct reg_led_control_t
-{
+typedef struct reg_led_control_t {
     uint16_t addr;
-    union
-    {
+    union {
         uint8_t byte;
         struct
         {
@@ -725,8 +635,7 @@ typedef struct reg_led_control_t
            /_/                   /_____/
 */
 
-struct ovp921_t
-{
+struct ovp921_t {
     // chip ID and serial port
     reg_chipid_t chipid;
     reg_microlcd_serial_port_address_low_t microlcd_serial_port_address_low;

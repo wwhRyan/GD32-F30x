@@ -10,9 +10,10 @@
  */
 
 #include "ovp921.h"
+#include "BoardInit.h"
 #include "Common.h"
 #include "main.h"
-#include "BoardInit.h"
+
 
 extern const SoftwareI2C ovp921_i2c;
 extern int OVP2200_921_pgen_v4_05_size;
@@ -134,11 +135,9 @@ struct ovp921_t ovp921 = {
 
 void change_anf(uint8_t num)
 {
-    if (get_reg(0x0046) != num)
-    {
+    if (get_reg(0x0046) != num) {
         set_reg(0x0046, 0xA0 | num);
-    }
-    else
+    } else
         return;
     vTaskDelay(100); // wait for the register to be updated in first change.
 }
@@ -151,16 +150,16 @@ void show_solid_color_pattern(uint8_t red, uint8_t green, uint8_t blue)
     ovp921.pattern_gen_blue_data.reg_pgen_data_b = blue;
 
     set_reg(ovp921.pattern_gen_red_data.addr,
-            ovp921.pattern_gen_red_data.byte);
+        ovp921.pattern_gen_red_data.byte);
     set_reg(ovp921.pattern_gen_green_data.addr,
-            ovp921.pattern_gen_green_data.byte);
+        ovp921.pattern_gen_green_data.byte);
     set_reg(ovp921.pattern_gen_blue_data.addr,
-            ovp921.pattern_gen_blue_data.byte);
+        ovp921.pattern_gen_blue_data.byte);
 
     ovp921.pattern_generator.pattern_generator_type = 0;
     ovp921.pattern_generator.pattern_generator_en = 1;
     set_reg(ovp921.pattern_generator.addr,
-            ovp921.pattern_generator.byte);
+        ovp921.pattern_generator.byte);
     vTaskDelay(1);
     set_reg(0x4E, 0xAA);
 }
@@ -176,7 +175,7 @@ void gray_ramp_pattern()
     ovp921.pattern_generator.pattern_generator_type = 1;
     ovp921.pattern_generator.pattern_generator_en = 1;
     set_reg(ovp921.pattern_generator.addr,
-            ovp921.pattern_generator.byte);
+        ovp921.pattern_generator.byte);
     vTaskDelay(1);
     set_reg(0x4E, 0xAA);
 }
@@ -203,34 +202,34 @@ void checkerboard_pattern()
     show_solid_color_pattern(0xFF, 0xff, 0xff);
 
     set_reg(ovp921.pattern_gen_horizontal_cross_hatch_y_offset.addr,
-            ovp921.pattern_gen_horizontal_cross_hatch_y_offset.byte);
+        ovp921.pattern_gen_horizontal_cross_hatch_y_offset.byte);
     set_reg(ovp921.pattern_gen_horizontal_cross_hatch_y_on.addr,
-            ovp921.pattern_gen_horizontal_cross_hatch_y_on.byte);
+        ovp921.pattern_gen_horizontal_cross_hatch_y_on.byte);
     set_reg(ovp921.pattern_gen_horizontal_cross_hatch_y_off.addr,
-            ovp921.pattern_gen_horizontal_cross_hatch_y_off.byte);
+        ovp921.pattern_gen_horizontal_cross_hatch_y_off.byte);
     set_reg(ovp921.pattern_gen_horizontal_cross_hatch_x_offset.addr,
-            ovp921.pattern_gen_horizontal_cross_hatch_x_offset.byte);
+        ovp921.pattern_gen_horizontal_cross_hatch_x_offset.byte);
     set_reg(ovp921.pattern_gen_horizontal_cross_hatch_x_on.addr,
-            ovp921.pattern_gen_horizontal_cross_hatch_x_on.byte);
+        ovp921.pattern_gen_horizontal_cross_hatch_x_on.byte);
     set_reg(ovp921.pattern_gen_horizontal_cross_hatch_x_off.addr,
-            ovp921.pattern_gen_horizontal_cross_hatch_x_off.byte);
+        ovp921.pattern_gen_horizontal_cross_hatch_x_off.byte);
     set_reg(ovp921.pattern_gen_vertical_cross_hatch_y_offset.addr,
-            ovp921.pattern_gen_vertical_cross_hatch_y_offset.byte);
+        ovp921.pattern_gen_vertical_cross_hatch_y_offset.byte);
     set_reg(ovp921.pattern_gen_vertical_cross_hatch_y_on.addr,
-            ovp921.pattern_gen_vertical_cross_hatch_y_on.byte);
+        ovp921.pattern_gen_vertical_cross_hatch_y_on.byte);
     set_reg(ovp921.pattern_gen_vertical_cross_hatch_y_off.addr,
-            ovp921.pattern_gen_vertical_cross_hatch_y_off.byte);
+        ovp921.pattern_gen_vertical_cross_hatch_y_off.byte);
     set_reg(ovp921.pattern_gen_vertical_cross_hatch_x_offset.addr,
-            ovp921.pattern_gen_vertical_cross_hatch_x_offset.byte);
+        ovp921.pattern_gen_vertical_cross_hatch_x_offset.byte);
     set_reg(ovp921.pattern_gen_vertical_cross_hatch_x_on.addr,
-            ovp921.pattern_gen_vertical_cross_hatch_x_on.byte);
+        ovp921.pattern_gen_vertical_cross_hatch_x_on.byte);
     set_reg(ovp921.pattern_gen_vertical_cross_hatch_x_off.addr,
-            ovp921.pattern_gen_vertical_cross_hatch_x_off.byte);
+        ovp921.pattern_gen_vertical_cross_hatch_x_off.byte);
 
     ovp921.pattern_generator.pattern_generator_type = 2;
     ovp921.pattern_generator.pattern_generator_en = 1;
     set_reg(ovp921.pattern_generator.addr,
-            ovp921.pattern_generator.byte);
+        ovp921.pattern_generator.byte);
     vTaskDelay(1);
     set_reg(0x4E, 0xAA);
 }
@@ -246,7 +245,7 @@ void off_pattern()
 {
     ovp921.pattern_generator.pattern_generator_en = 0;
     set_reg(ovp921.pattern_generator.addr,
-            ovp921.pattern_generator.byte);
+        ovp921.pattern_generator.byte);
     change_anf(1);
 }
 
@@ -256,7 +255,7 @@ uint8_t get_reg(uint16_t reg_addr)
 
     xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
     ISoftwareI2CRegRead(&ovp921_i2c, OVP921_SCCB_ADDRESS_READ, reg_addr,
-                        REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);
+        REG_ADDR_2BYTE, (uint8_t*)&reg_val, 1, SCCB_DELAY_TIME);
     xSemaphoreGive(i2c_Semaphore);
     return reg_val;
 }
@@ -267,29 +266,29 @@ bool set_reg(uint16_t reg_addr, uint8_t reg_val)
     xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
 
     ret = ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, reg_addr,
-                               REG_ADDR_2BYTE, (uint8_t *)&reg_val, 1, SCCB_DELAY_TIME);
+        REG_ADDR_2BYTE, (uint8_t*)&reg_val, 1, SCCB_DELAY_TIME);
     xSemaphoreGive(i2c_Semaphore);
     return ret;
 }
 
-bool get_reg_block(uint16_t reg_addr, uint8_t *reg_val, size_t size)
+bool get_reg_block(uint16_t reg_addr, uint8_t* reg_val, size_t size)
 {
     bool ret;
 
     xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
     ret = ISoftwareI2CRegRead(&ovp921_i2c, OVP921_SCCB_ADDRESS_READ, reg_addr,
-                              REG_ADDR_2BYTE, reg_val, size, SCCB_DELAY_TIME);
+        REG_ADDR_2BYTE, reg_val, size, SCCB_DELAY_TIME);
     xSemaphoreGive(i2c_Semaphore);
     return ret;
 }
 
-bool set_reg_block(uint16_t reg_addr, uint8_t *reg_val, size_t size)
+bool set_reg_block(uint16_t reg_addr, uint8_t* reg_val, size_t size)
 {
     bool ret;
     xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
 
     ret = ISoftwareI2CRegWrite(&ovp921_i2c, OVP921_SCCB_ADDRESS_WRITE, reg_addr,
-                               REG_ADDR_2BYTE, reg_val, size, SCCB_DELAY_TIME);
+        REG_ADDR_2BYTE, reg_val, size, SCCB_DELAY_TIME);
     xSemaphoreGive(i2c_Semaphore);
     return ret;
 }
@@ -308,8 +307,7 @@ void vertical_flip(bool enable)
     set_reg(ovp921.microlcd_serial_port_address_low.addr, ovp921.microlcd_serial_port_address_low.byte);
     set_reg(ovp921.microlcd_serial_port_address_high.addr, ovp921.microlcd_serial_port_address_high.byte);
 
-    while ((0x80 & get_reg(ovp921.microlcd_serial_port_address_high.addr)) != 0x00)
-    {
+    while ((0x80 & get_reg(ovp921.microlcd_serial_port_address_high.addr)) != 0x00) {
         vTaskDelay(1);
     }
 
@@ -318,14 +316,11 @@ void vertical_flip(bool enable)
     ovp921.microlcd_serial_port_address_low.dp_addr = 0x06;
     ovp921.microlcd_serial_port_address_high.byte = 0x00;
 
-    if (enable)
-    {
+    if (enable) {
         set_reg(ovp921.microlcd_serial_port_address_low.addr, ovp921.microlcd_serial_port_address_low.byte);
         set_reg(ovp921.microlcd_serial_port_address_high.addr, ovp921.microlcd_serial_port_address_high.byte);
         set_reg(ovp921.microlcd_serial_port_data.addr, dp_data | 0x40);
-    }
-    else
-    {
+    } else {
         set_reg(ovp921.microlcd_serial_port_address_low.addr, ovp921.microlcd_serial_port_address_low.byte);
         set_reg(ovp921.microlcd_serial_port_address_high.addr, ovp921.microlcd_serial_port_address_high.byte);
         set_reg(ovp921.microlcd_serial_port_data.addr, dp_data & (uint8_t)(~0x40));
@@ -340,12 +335,9 @@ void horizontal_flip(bool enable)
 
 bool get_ovp921_status()
 {
-    if (get_reg(0x004C) == 0x17)
-    {
+    if (get_reg(0x004C) == 0x17) {
         return true;
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
@@ -393,13 +385,11 @@ bool ovp921_erase(uint32_t addr) // erase one page
     set_reg_delay(0x0210, 0x03);
 
     int times = 0;
-    while (get_reg_delay(0x021d) != 0x00 && times < RETRY_TIMES)
-    {
+    while (get_reg_delay(0x021d) != 0x00 && times < RETRY_TIMES) {
         times++;
         vTaskDelay(5 + 5);
     }
-    if (times >= RETRY_TIMES)
-    {
+    if (times >= RETRY_TIMES) {
         return false;
     }
 
@@ -416,8 +406,7 @@ bool ovp921_erase(uint32_t addr) // erase one page
 
     uint8_t read_fifo_times = 0;
     read_fifo_times = get_reg_delay(0x021e);
-    for (uint8_t i = 0; i < read_fifo_times; i++)
-    {
+    for (uint8_t i = 0; i < read_fifo_times; i++) {
         get_reg_delay(0x0218);
     }
 
@@ -471,7 +460,7 @@ bool ovp921_write(uint32_t addr, const uint8_t* data, size_t size)
 }
 
 #define FLASH_PAGE_SIZE 0x100
-bool ovp921_write_page(uint32_t addr, const uint8_t *data)
+bool ovp921_write_page(uint32_t addr, const uint8_t* data)
 {
     bool ret = true;
     ret &= set_reg_delay(0x0213, 0x00);
@@ -483,8 +472,7 @@ bool ovp921_write_page(uint32_t addr, const uint8_t *data)
     uint8_t read_fifo_times = 0;
 
     read_fifo_times = get_reg_delay(0x021e);
-    for (uint8_t i = 0; i < read_fifo_times; i++)
-    {
+    for (uint8_t i = 0; i < read_fifo_times; i++) {
         get_reg_delay(0x0218);
     }
 
@@ -495,8 +483,7 @@ bool ovp921_write_page(uint32_t addr, const uint8_t *data)
     ret &= set_reg_delay(0x0218, (uint8_t)((addr >> 8) & 0xFF));
     ret &= set_reg_delay(0x0218, (uint8_t)(addr & 0xFF));
 
-    for (size_t i = 0; i < FLASH_PAGE_SIZE; i++)
-    {
+    for (size_t i = 0; i < FLASH_PAGE_SIZE; i++) {
         ret &= set_reg_delay(0x0218, *(data + i));
         get_reg_delay(0x0218);
     }
@@ -506,22 +493,19 @@ bool ovp921_write_page(uint32_t addr, const uint8_t *data)
     return ret;
 }
 
-bool update_anf(int idx, const uint8_t *p_anf, int anf_size)
+bool update_anf(int idx, const uint8_t* p_anf, int anf_size)
 {
     bool ret = true;
     static uint8_t idx_check;
     static uint8_t iteration = 0;
     E_assert(anf_size % 0x100 == 0); // must be multiple of 256
-    if (!get_sig(sys_sig, sig_update_anf))
-    {
+    if (!get_sig(sys_sig, sig_update_anf)) {
         ret &= halting_internal_mcu();
-        if (ovp921_erase(ANF_ADDR(idx)) == false)
-        {
+        if (ovp921_erase(ANF_ADDR(idx)) == false) {
             ULOG_ERROR("erase failed\n");
             return false;
         }
-        if (ovp921_erase(ANF_ADDR(idx) + 0x1000) == false)
-        {
+        if (ovp921_erase(ANF_ADDR(idx) + 0x1000) == false) {
             ULOG_ERROR("erase failed\n");
             return false;
         }
@@ -537,26 +521,22 @@ bool update_anf(int idx, const uint8_t *p_anf, int anf_size)
     ULOG_DEBUG(" %s %#x \n", __func__, ANF_ADDR(idx) + iteration * 0x100);
     iteration++;
 
-    if (iteration == 0x2000 / 0x100)
-    {
+    if (iteration == 0x2000 / 0x100) {
         clear_sig(sys_sig, sig_update_anf);
         ULOG_INFO("update anf success!\n");
     }
     return ret;
 }
 
-bool update_firmware(const uint8_t *p_data, int size)
+bool update_firmware(const uint8_t* p_data, int size)
 {
     bool ret = true;
     static uint8_t iteration = 0;
     E_assert(size % 0x100 == 0); // must be multiple of 256
-    if (!get_sig(sys_sig, sig_update_firmware))
-    {
+    if (!get_sig(sys_sig, sig_update_firmware)) {
         ret &= halting_internal_mcu();
-        for (size_t i = 0; i < 8; i++)
-        {
-            if (ovp921_erase(i * 0x1000) == false)
-            {
+        for (size_t i = 0; i < 8; i++) {
+            if (ovp921_erase(i * 0x1000) == false) {
                 ULOG_ERROR("erase failed\n");
                 return false;
             }
@@ -587,13 +567,11 @@ uint8_t ovp921_read_flash(uint32_t addr)
     vTaskDelay(5 + 5);
     set_reg_delay(0x0210, 0x03);
     int times = 0;
-    while (get_reg_delay(0x021d) != 0x00 && times < RETRY_TIMES)
-    {
+    while (get_reg_delay(0x021d) != 0x00 && times < RETRY_TIMES) {
         times++;
         vTaskDelay(5 + 5);
     }
-    if (times >= RETRY_TIMES)
-    {
+    if (times >= RETRY_TIMES) {
         return false;
     }
 
@@ -606,8 +584,7 @@ uint8_t ovp921_read_flash(uint32_t addr)
     uint8_t read_fifo_times = 0;
 
     read_fifo_times = get_reg_delay(0x021e);
-    for (uint8_t i = 0; i < read_fifo_times; i++)
-    {
+    for (uint8_t i = 0; i < read_fifo_times; i++) {
         get_reg_delay(0x0218);
     }
 
@@ -620,10 +597,9 @@ uint8_t ovp921_read_flash(uint32_t addr)
     return ret;
 }
 
-void get_anf_version(char *p_version, int anf_idx)
+void get_anf_version(char* p_version, int anf_idx)
 {
-    if (ovp921_read_flash(ANF_ADDR(anf_idx) + 0x100) != 0xff)
-    {
+    if (ovp921_read_flash(ANF_ADDR(anf_idx) + 0x100) != 0xff) {
         uint16_t year = ovp921_read_flash(ANF_ADDR(anf_idx) + 0x84) + 2000;
         uint8_t day = ovp921_read_flash(ANF_ADDR(anf_idx) + 0x83);
         uint8_t month = ovp921_read_flash(ANF_ADDR(anf_idx) + 0x82);
@@ -631,14 +607,12 @@ void get_anf_version(char *p_version, int anf_idx)
         uint8_t major = ovp921_read_flash(ANF_ADDR(anf_idx) + 0x80);
         // sprintf(p_version, "%d-%02d-%02d.%d.%d", year, month, day, major, minor);
         sprintf(p_version, "%d.%d", major, minor);
-    }
-    else
-    {
+    } else {
         strcpy(p_version, "NULL");
     }
 }
 
-void get_firmware_version(char *p_version)
+void get_firmware_version(char* p_version)
 {
 
     uint16_t year = ovp921_read_flash(0x000c) + 2000;

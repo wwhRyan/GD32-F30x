@@ -9,11 +9,12 @@
  *
  */
 
-#include "main.h"
-#include "gd32f30x.h"
 #include "BoardInit.h"
-#include "ovp921.h"
 #include "basicApp.h"
+#include "gd32f30x.h"
+#include "main.h"
+#include "ovp921.h"
+
 
 extern const Uarter uart0_output;
 

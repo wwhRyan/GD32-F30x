@@ -10,9 +10,10 @@
  */
 
 #include "basicApp.h"
-#include "i2c.h"
 #include "eeprom.h"
+#include "i2c.h"
 #include <math.h>
+
 
 extern const SoftwareI2C ovp921_i2c;
 extern const dac_t laser_dac;
@@ -30,7 +31,7 @@ const ntc_t NCP18WB473F10RB = {
  * @param ntc object
  * @param Voltage 0~3.3V
  */
-float get_ntc_temperature(const ntc_t *ntc, float Voltage)
+float get_ntc_temperature(const ntc_t* ntc, float Voltage)
 {
     float ntc_R;
     if (ntc->is_pull_up == false)
@@ -86,18 +87,13 @@ float get_current_value(uint8_t idu)
 bool laser_set(int idx, float current)
 {
     uint8_t digital_value = get_idu_value(current);
-    if (digital_value > 127 || digital_value < 21)
-    {
+    if (digital_value > 127 || digital_value < 21) {
         debug_printf("%s param current value error!\n", __func__);
         return false;
-    }
-    else if (idx > 3 || idx < 0)
-    {
+    } else if (idx > 3 || idx < 0) {
         debug_printf("%s param idx error!\n", __func__);
         return false;
-    }
-    else
-    {
+    } else {
         xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
         ISoftwareI2CRegWrite(&ovp921_i2c, 0x66, (uint8_t)idx, REG_ADDR_1BYTE, &digital_value, 1, 5);
         xSemaphoreGive(i2c_Semaphore);
@@ -112,35 +108,26 @@ void reload_idu_current(void)
     uint8_t green_idu_value = eeprom.green;
     uint8_t blue_idu_value = eeprom.blue;
 
-    if (red_idu_value <= 127 && red_idu_value >= 21)
-    {
+    if (red_idu_value <= 127 && red_idu_value >= 21) {
         laser_set(RED, get_current_value(red_idu_value));
         debug_printf("RED: %f A\r\n", get_current_value(red_idu_value));
-    }
-    else
-    {
+    } else {
         laser_set(RED, 1.0);
         debug_printf("laser_set RED is %f A\r\n", 1.0);
     }
 
-    if (green_idu_value <= 127 && green_idu_value >= 21)
-    {
+    if (green_idu_value <= 127 && green_idu_value >= 21) {
         laser_set(GREEN, get_current_value(green_idu_value));
         debug_printf("GREEN: %f A\r\n", get_current_value(green_idu_value));
-    }
-    else
-    {
+    } else {
         laser_set(GREEN, 0.8);
         debug_printf("laser_set GREEN is %f A\r\n", 0.8);
     }
 
-    if (blue_idu_value <= 127 && blue_idu_value >= 21)
-    {
+    if (blue_idu_value <= 127 && blue_idu_value >= 21) {
         laser_set(BLUE, get_current_value(blue_idu_value));
         debug_printf("BLUE: %f A\r\n", get_current_value(blue_idu_value));
-    }
-    else
-    {
+    } else {
         laser_set(BLUE, 0.623);
         debug_printf("laser_set BLUE is %f A\r\n", 0.623);
     }
@@ -202,8 +189,7 @@ color_t color_index[color_num] = {
 
 void spoke(color_t last_color, color_t next_color)
 {
-    switch (last_color)
-    {
+    switch (last_color) {
     case RED:
         if (next_color == GREEN)
             R_to_G();
@@ -230,21 +216,18 @@ void spoke(color_t last_color, color_t next_color)
 
 void color_EN_EXIT_IRQ(color_t color)
 {
-    static uint8_t cnt[color_num] = {0};
+    static uint8_t cnt[color_num] = { 0 };
     cnt[color]++;
 
     uint8_t x = (color + 1) % color_num;
     uint8_t y = (color + 2) % color_num;
-    if (cnt[x] == 0 && cnt[y] == 0)
-    {
+    if (cnt[x] == 0 && cnt[y] == 0) {
         if (cnt[color] == 2) // It is time to switch different colors and change the current value of different colors
         {
             spoke(color, color_index[color]);
             cnt[color] = 0;
         }
-    }
-    else
-    { // Two red, green and blue pulses appear at the same time, abnormal, clear the count value
+    } else { // Two red, green and blue pulses appear at the same time, abnormal, clear the count value
         cnt[x] = 0;
         cnt[y] = 0;
         cnt[color] = 1;
@@ -252,11 +235,10 @@ void color_EN_EXIT_IRQ(color_t color)
     }
 }
 
-char *get_sn(int number, char *buff)
+char* get_sn(int number, char* buff)
 {
-    char *tmp = NULL;
-    switch (number)
-    {
+    char* tmp = NULL;
+    switch (number) {
     case 0:
         tmp = eeprom.Sn_LightEngine;
         break;
@@ -271,7 +253,7 @@ char *get_sn(int number, char *buff)
         break;
     }
 
-    if (*((uint32_t *)tmp) != 0xffffffff && *((uint32_t *)tmp) != 0)
+    if (*((uint32_t*)tmp) != 0xffffffff && *((uint32_t*)tmp) != 0)
         strcpy(buff, tmp);
     else
         strcpy(buff, "NULL");
@@ -279,7 +261,7 @@ char *get_sn(int number, char *buff)
     return buff;
 }
 
-uint32_t get_MSB_array_crc(uint8_t *array, size_t size)
+uint32_t get_MSB_array_crc(uint8_t* array, size_t size)
 {
     E_assert(size % sizeof(uint32_t) == 0);
     rcu_periph_clock_enable(RCU_CRC);
@@ -287,16 +269,15 @@ uint32_t get_MSB_array_crc(uint8_t *array, size_t size)
     crc_data_register_reset();
 
     uint32_t valcrc = 0;
-    uint32_t *pval32 = (uint32_t *)array;
-    for (size_t i = 0; i < size / sizeof(uint32_t); i++)
-    {
+    uint32_t* pval32 = (uint32_t*)array;
+    for (size_t i = 0; i < size / sizeof(uint32_t); i++) {
         valcrc = crc_single_data_calculate(BSWAP_32(*(pval32 + i)));
     }
     debug_printf("valcrc %#x\n", valcrc);
     return valcrc;
 }
 
-uint32_t get_LSB_array_crc(uint8_t *array, size_t size)
+uint32_t get_LSB_array_crc(uint8_t* array, size_t size)
 {
     E_assert(size % sizeof(uint32_t) == 0);
     rcu_periph_clock_enable(RCU_CRC);
@@ -304,9 +285,8 @@ uint32_t get_LSB_array_crc(uint8_t *array, size_t size)
     crc_data_register_reset();
 
     uint32_t valcrc = 0;
-    uint32_t *pval32 = (uint32_t *)array;
-    for (size_t i = 0; i < size / sizeof(uint32_t); i++)
-    {
+    uint32_t* pval32 = (uint32_t*)array;
+    for (size_t i = 0; i < size / sizeof(uint32_t); i++) {
         valcrc = crc_single_data_calculate(*(pval32 + i));
     }
     return valcrc;

@@ -5,7 +5,6 @@ add_library(
   BoardInit.c
   cmd.c
   ovp921.c
-  ovp921_flash.c
   ThreadFirstConsumer.c
   ThreadSecondConsumer.c
   ThreadUartEvent.c)

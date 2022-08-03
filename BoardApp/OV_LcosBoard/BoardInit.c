@@ -9,15 +9,16 @@
  *
  */
 
-#include "main.h"
-#include "gd32f30x.h"
-#include "gd32f307c_eval.h"
 #include "BoardInit.h"
 #include "Common.h"
-#include "i2c.h"
-#include "eeprom.h"
-#include "ovp921.h"
 #include "basicApp.h"
+#include "eeprom.h"
+#include "gd32f307c_eval.h"
+#include "gd32f30x.h"
+#include "i2c.h"
+#include "main.h"
+#include "ovp921.h"
+
 
 /**
  * @brief -We
@@ -27,10 +28,10 @@
 
 #pragma diag_suppress 1296 // Suppress warning message: extended constant initialiser used
 
-static UartBuffer uart0_rx_buffer = {0};
-static UartBuffer uart1_rx_buffer = {0};
+static UartBuffer uart0_rx_buffer = { 0 };
+static UartBuffer uart1_rx_buffer = { 0 };
 
-static timer_capture_calc_t cw_wheel_fg_calc = {0};
+static timer_capture_calc_t cw_wheel_fg_calc = { 0 };
 
 const Uarter uart0_output = {
     .uart_periph = RCU_USART0,
@@ -207,21 +208,21 @@ const exti_gpio_t B_pwm_led = {
 
 gpio_config_t gpio_config_table[] = {
     // output
-    {LD_EN_H_PORT, LD_EN_H_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {LD_EN_L_PORT, LD_EN_L_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {DISCHARGE_PORT, DISCHARGE_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {DISCHARGE2_PORT, DISCHARGE2_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {SYS_12V_ON_PORT, SYS_12V_ON_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET},
-    {OVP921_RESET_PORT, OVP921_RESET_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET},
-    {MCU_GPIO_INT_PORT, MCU_GPIO_INT_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+    { LD_EN_H_PORT, LD_EN_H_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
+    { LD_EN_L_PORT, LD_EN_L_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
+    { DISCHARGE_PORT, DISCHARGE_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
+    { DISCHARGE2_PORT, DISCHARGE2_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
+    { SYS_12V_ON_PORT, SYS_12V_ON_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET },
+    { OVP921_RESET_PORT, OVP921_RESET_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET },
+    { MCU_GPIO_INT_PORT, MCU_GPIO_INT_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
 
     // input
-    {HW_VER0_PORT, HW_VER0_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
-    {HW_VER1_PORT, HW_VER1_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET},
+    { HW_VER0_PORT, HW_VER0_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET },
+    { HW_VER1_PORT, HW_VER1_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET },
 
-    {RESERVERD_1_PORT, RESERVERD_1_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {RESERVERD_2_PORT, RESERVERD_2_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
-    {EE_WP_PORT, EE_WP_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET},
+    { RESERVERD_1_PORT, RESERVERD_1_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
+    { RESERVERD_2_PORT, RESERVERD_2_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
+    { EE_WP_PORT, EE_WP_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
 
 };
 
@@ -315,26 +316,23 @@ void TIMER0_Channel_IRQHandler(void)
 void EXTI5_9_IRQHandler(void)
 {
 
-    if (RESET != exti_interrupt_flag_get(EXTI_6))
-    {
+    if (RESET != exti_interrupt_flag_get(EXTI_6)) {
         color_EN_EXIT_IRQ(GREEN);
         exti_interrupt_flag_clear(EXTI_6);
     }
-    if (RESET != exti_interrupt_flag_get(EXTI_7))
-    {
+    if (RESET != exti_interrupt_flag_get(EXTI_7)) {
         color_EN_EXIT_IRQ(BLUE);
         exti_interrupt_flag_clear(EXTI_7);
     }
-    if (RESET != exti_interrupt_flag_get(EXTI_8))
-    {
+    if (RESET != exti_interrupt_flag_get(EXTI_8)) {
         color_EN_EXIT_IRQ(RED);
         exti_interrupt_flag_clear(EXTI_8);
     }
 }
 
-void output_printf(const char *fmt, ...)
+void output_printf(const char* fmt, ...)
 {
-    char buf[256] = {0};
+    char buf[256] = { 0 };
 
     va_list args;
     va_start(args, fmt);
