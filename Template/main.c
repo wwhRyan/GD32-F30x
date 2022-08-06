@@ -9,10 +9,10 @@
  *
  */
 
+#include "main.h"
 #include "Common.h"
 #include "gd32f30x.h"
 #include "systick.h"
-#include "main.h"
 #include "timers.h"
 #include "ulog.h"
 
@@ -61,7 +61,7 @@ int main(void)
 #if 1 /* 优先级为4，最高 */
 void TimerCallFunc(TimerHandle_t xTimer)
 {
-#if 1
+#if 0
     ULOG_DEBUG("ThreadUartEvent min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(ThreadUartEventHandle));
     ULOG_DEBUG("ThreadFirstConsumer min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(ThreadFirstConsumerHandle));
     ULOG_DEBUG("ThreadSecondConsumer min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(ThreadSecondConsumerHandle));

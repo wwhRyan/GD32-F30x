@@ -20,7 +20,7 @@
 @echo ...
 
 :: -t"%1"
-D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -b -j0 -t"AthenaOVLcos" .\Template\Keil_project\Project.uvprojx -o .\..\..\log.txt
+D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -b -j0 -t"AthenaRaontechLcos" .\Template\Keil_project\Project.uvprojx -o .\..\..\log.txt
 if not %ERRORLEVEL% == 0 goto ERROR
 
 @REM if not %ERRORLEVEL% == 0 goto ERROR
@@ -33,7 +33,7 @@ if not %ERRORLEVEL% == 0 goto ERROR
 @echo #####   ####  #    # #    # ######  ####  #    # #####  
 @echo ...
 
-D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -f -j0 -t"AthenaOVLcos" .\Template\Keil_project\Project.uvprojx -o .\..\..\log.txt
+D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -f -j0 -t"AthenaRaontechLcos" .\Template\Keil_project\Project.uvprojx -o .\..\..\log.txt
 
 if %ERRORLEVEL% == 0 goto SUCCESS
 if not %ERRORLEVEL% == 0 goto ERROR

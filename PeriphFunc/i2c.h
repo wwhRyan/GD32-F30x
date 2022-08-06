@@ -14,6 +14,8 @@
 #define REG_ADDR_1BYTE 1
 #define REG_ADDR_2BYTE 2
 
+#define I2C_DELAY_TIME 5
+
 typedef struct __SoftwareI2C
 {
     uint32_t sda_port;
