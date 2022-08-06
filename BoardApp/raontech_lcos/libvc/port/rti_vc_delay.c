@@ -19,6 +19,7 @@
 ******************************************************************************/
 
 #include "rti_vc_api.h"
+#include "i2c.h"
 #if defined(__APPLE__)
 #include <unistd.h>
 #endif
@@ -38,7 +39,7 @@ void rtiVC_DelayUs(U32_T microseconds)
 	Sleep(cnt);
 	
 #else
-	#error "Code not present"
+	DelayUs(microseconds);	
 #endif
 }
 

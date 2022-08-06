@@ -17,6 +17,8 @@
 #include "i2c.h"
 #include "main.h"
 
+#define RDC200A_ADDR 0x4A
+
 #define R_CURRENT (2.5 + 0.3)
 #define G_CURRENT (4.6 + 0.5)
 #define B_CURRENT (4.6 + 0.5)

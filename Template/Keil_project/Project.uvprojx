@@ -1078,6 +1078,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdp250h\rdp250h.c</FilePath>
             </File>
+            <File>
+              <FileName>rti_vc_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\port\rti_vc_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_devif.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\port\rti_vc_devif.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -2103,6 +2113,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdp250h\rdp250h.c</FilePath>
             </File>
+            <File>
+              <FileName>rti_vc_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\port\rti_vc_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_devif.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\port\rti_vc_devif.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>
@@ -2150,7 +2170,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\output\</OutputDirectory>
-          <OutputName>AthenaOVLcos</OutputName>
+          <OutputName>AthenaRaontechlcos</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -3247,6 +3267,16 @@
               <FileName>rdp250h.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdp250h\rdp250h.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\port\rti_vc_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_devif.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\port\rti_vc_devif.c</FilePath>
             </File>
           </Files>
         </Group>

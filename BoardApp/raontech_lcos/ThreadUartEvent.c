@@ -12,9 +12,11 @@
 #include "AtProtocol.h"
 #include "BoardInit.h"
 #include "CmdLine.h"
+#include "Common.h"
 #include "basicApp.h"
 #include "gd32f30x.h"
 #include "main.h"
+#include "rti_vc_api.h"
 
 asAtProtocol at_obj;
 extern const Uarter uart0_output;
@@ -24,6 +26,18 @@ void ThreadUartEvent(void* pvParameters)
 {
     ULOG_DEBUG("%s\n", __func__);
     reload_idu_current();
+
+    int ret;
+    ret = rtiVC_Initialize(RDC200A_ADDR);
+    if (ret != 0) {
+        printf("VC init error (%d)\n", ret);
+        E_assert(0);
+    }
+
+    // Open device
+    ret = rtiVC_OpenDevice();
+    if (ret)
+        E_assert(0);
 
     IInitAtLib(&at_obj, kAtNormalMode, NULL, debug_printf);
 

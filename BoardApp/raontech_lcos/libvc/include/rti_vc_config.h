@@ -89,11 +89,11 @@
 #else
 	// TODO
 	#define VC_MUTEX_DECLARE(lock)
-	#define VC_MUTEX_INIT(lock)		((void)0)
-	#define VC_MUTEX_LOCK(lock)		((void)0)
-	#define VC_MUTEX_FREE(lock)		((void)0)
-	#define VC_MUTEX_DEINIT(lock)	((void)0)
-	#define VC_MUTEX_EXTERN(lock)	((void)0)
+	#define VC_MUTEX_INIT(lock)	 
+	#define VC_MUTEX_LOCK(lock)	 
+	#define VC_MUTEX_FREE(lock)	 
+	#define VC_MUTEX_DEINIT(lock) 
+	#define VC_MUTEX_EXTERN(lock) 
 #endif
 
 /**
