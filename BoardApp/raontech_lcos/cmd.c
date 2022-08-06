@@ -26,6 +26,7 @@ void lcos(char argc, char* argv)
     }*/
     float temperature;
     int ret = 0;
+    VC_PANEL_TEMPERATURE_INFO_T tinfo[MAX_NUM_VC_PANEL_PORT] = { 0 };
 
     ret = rtiVC_GetTemperature(0, tinfo);
 

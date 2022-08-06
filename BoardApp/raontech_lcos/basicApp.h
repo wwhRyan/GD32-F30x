@@ -35,6 +35,11 @@ typedef struct ntc_t {
     bool is_pull_up; // true: divided_voltage_R pull up, false: divided_voltage_R pull down
 } ntc_t;
 
+uint8_t get_reg(uint8_t dev_addr, uint16_t reg_addr);
+bool set_reg(uint8_t dev_addr, uint16_t reg_addr, uint8_t reg_val);
+bool get_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t size);
+bool set_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t size);
+
 void laser_on(void);
 void laser_off(void);
 bool laser_set(int idx, float current);
