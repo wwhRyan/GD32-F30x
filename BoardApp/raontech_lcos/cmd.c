@@ -12,6 +12,7 @@
 #include "Cmdline.h"
 #include "basicApp.h"
 #include "main.h"
+#include "rti_vc_api.h"
 
 void lcos(char argc, char* argv)
 {
@@ -24,6 +25,9 @@ void lcos(char argc, char* argv)
         }
     }*/
     float temperature;
+    int ret = 0;
+
+    ret = rtiVC_GetTemperature(0, tinfo);
 
     cmd_printf("lcos-temprature=%f\r\n", temperature);
 }

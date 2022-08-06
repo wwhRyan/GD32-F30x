@@ -24,6 +24,9 @@ include_directories(${PROJECT_SOURCE_DIR}/easy-mcu/AtProtocol/Src/At_HashTable)
 include_directories(${PROJECT_SOURCE_DIR}/easy-mcu/AtProtocol/Src/At_internal)
 include_directories(${PROJECT_SOURCE_DIR}/BoardApp/OV_LcosBoard)
 include_directories(${PROJECT_SOURCE_DIR}/Utilities)
+include_directories(${PROJECT_SOURCE_DIR}/BoardApp/raontech_lcos/libvc/core)
+include_directories(${PROJECT_SOURCE_DIR}/BoardApp/raontech_lcos/libvc/include)
+include_directories(${PROJECT_SOURCE_DIR}/BoardApp/raontech_lcos/libvc/rdc200a)
 
 add_executable(${EXEC_NAME} gd32f30x_it.c main.c systick.c ${FreeRTOSSrc})
 

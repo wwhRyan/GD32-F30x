@@ -1,3 +1,5 @@
+add_subdirectory(libvc)
+
 add_library(
   ${EXEC_NAME}_raontech_lcos EXCLUDE_FROM_ALL
   basicApp.c BoardInit.c ThreadFirstConsumer.c ThreadSecondConsumer.c

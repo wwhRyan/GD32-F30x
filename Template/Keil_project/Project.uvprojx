@@ -1035,6 +1035,51 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>VistaCode</GroupName>
+          <Files>
+            <File>
+              <FileName>rti_vc_dload.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_dload.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_panel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_panel.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_rdc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_rdc.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_regio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_regio.c</FilePath>
+            </File>
+            <File>
+              <FileName>rdc200a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdc200a\rdc200a.c</FilePath>
+            </File>
+            <File>
+              <FileName>rdc200a_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdc200a\rdc200a_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>rdp250h.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdp250h\rdp250h.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -2015,6 +2060,51 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>VistaCode</GroupName>
+          <Files>
+            <File>
+              <FileName>rti_vc_dload.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_dload.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_panel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_panel.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_rdc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_rdc.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_regio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_regio.c</FilePath>
+            </File>
+            <File>
+              <FileName>rdc200a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdc200a\rdc200a.c</FilePath>
+            </File>
+            <File>
+              <FileName>rdc200a_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdc200a\rdc200a_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>rdp250h.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdp250h\rdp250h.c</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -2349,7 +2439,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,GD32F30X_HD,DEBUG,ATHENA_OV_LCOS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS;..\..\easy-mcu\AtProtocol;..\..\easy-mcu\AtProtocol\Src\At_internal;..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine;..\..\easy-mcu\AtProtocol\Src\At_HashTable;..\..\easy-mcu\utils\AsciiConvert;..\..\easy-mcu\CmdProtocol;..\..\easy-mcu\Include;..\..\BoardApp\raontech_lcos;..\..\PeriphFunc;..\..\ulog\src</IncludePath>
+              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS;..\..\easy-mcu\AtProtocol;..\..\easy-mcu\AtProtocol\Src\At_internal;..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine;..\..\easy-mcu\AtProtocol\Src\At_HashTable;..\..\easy-mcu\utils\AsciiConvert;..\..\easy-mcu\CmdProtocol;..\..\easy-mcu\Include;..\..\BoardApp\raontech_lcos;..\..\PeriphFunc;..\..\ulog\src;..\..\BoardApp\raontech_lcos\libvc\core\rdc200a;..\..\BoardApp\raontech_lcos\libvc\include;..\..\BoardApp\raontech_lcos\libvc\core</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -3112,6 +3202,51 @@
               <FileName>ThreadUartEvent.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\raontech_lcos\ThreadUartEvent.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>VistaCode</GroupName>
+          <Files>
+            <File>
+              <FileName>rti_vc_dload.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_dload.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_main.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_panel.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_panel.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_rdc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_rdc.c</FilePath>
+            </File>
+            <File>
+              <FileName>rti_vc_regio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rti_vc_regio.c</FilePath>
+            </File>
+            <File>
+              <FileName>rdc200a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdc200a\rdc200a.c</FilePath>
+            </File>
+            <File>
+              <FileName>rdc200a_flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdc200a\rdc200a_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>rdp250h.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\libvc\core\rdp250h\rdp250h.c</FilePath>
             </File>
           </Files>
         </Group>
