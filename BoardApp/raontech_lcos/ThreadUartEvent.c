@@ -25,7 +25,7 @@ extern const Uarter uart1_debug;
 void ThreadUartEvent(void* pvParameters)
 {
     ULOG_DEBUG("%s\n", __func__);
-    reload_idu_current();
+    // reload_idu_current();
 
     int ret;
     ret = rtiVC_Initialize(RDC200A_ADDR);

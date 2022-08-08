@@ -25,6 +25,7 @@
 
 int rtiVC_OpenDevice(void)
 {
+    return 0;
 }
 
 void rtiVC_DeinitDevice(void)
@@ -49,9 +50,11 @@ int rtiVC_ReadBurstDeviceExt(E_VC_DEVICE_CH_T dev_ch, U8_T dev_slave_addr,
     U8_T* w_buf, U16_T w_size,
     U8_T* r_buf, U16_T r_size)
 {
+    return -1;
 }
 
 int rtiVC_WriteBurstDeviceExt(E_VC_DEVICE_CH_T dev_ch, U8_T dev_slave_addr,
     U8_T* buf, U16_T size)
 {
+    return -1;
 }
