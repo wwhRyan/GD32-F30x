@@ -13,9 +13,7 @@
 #define _EEPROM_H_
 
 #include "i2c.h"
-#include "main.h"
 #include "gd32f30x.h"
-#include "BoardInit.h"
 #include "Common.h"
 
 #define EEPROM_ADDRESS 0xA0 // 8'h 0xA0

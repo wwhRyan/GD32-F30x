@@ -107,7 +107,7 @@ void uarter_init(const Uarter *pUarter)
     memset(pUarter->p_rx_buffer->buffer, 0, DMA_BUFFER_SIZE * BUFF_CACHE_SIZE * sizeof(uint8_t));
 }
 
-//TODO: fix the bug if data is larger than the buffer size 255.
+// FIXME: fix the bug if data is larger than the buffer size 255.
 void uarter_IRQ(const Uarter *pUarter)
 {
     E_assert(pUarter != NULL);

@@ -289,8 +289,6 @@ void application_init()
     printf("CK_AHB is %d\n", rcu_clock_freq_get(CK_AHB));
     printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
     printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
-
-    // init_eeprom(&BL24C64A);
 }
 
 void USART0_IRQHandler(void)

@@ -61,6 +61,7 @@ Template/Keil_project/output
 Template/Keil_project/list
 Template/Keil_project/Project.uvg*
 Template/Keil_project/Project.uvo*
+Template/Keil_project/*.scvd
 
 Template/My_Keil_project/Objects
 Template/My_Keil_project/Listings
