@@ -15,8 +15,8 @@
 #include "gd32f30x.h"
 #include "ulog.h"
 #include "event_groups.h"
+#include "file.h"
 
-#define GET_SysTick (uint32_t)(SysTick->VAL)
 // #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)   //获取文件名 linux下
 // #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__) //获取文件名 windows下
 
@@ -27,12 +27,11 @@
  *
  */
 #define GET_TIME(func, ...)                                                  \
-    do                                                                       \
-    {                                                                        \
+    do {                                                                     \
         uint32_t start = 0, end = 0;                                         \
-        start = GET_SysTick;                                                 \
+        start = (uint32_t)(SysTick->VAL);                                                 \
         func(__VA_ARGS__);                                                   \
-        end = GET_SysTick;                                                   \
+        end = (uint32_t)(SysTick->VAL);                                                   \
         printf("%s-->%s-->%dUs\r\n", __FILENAME__, #func, abs(end - start)); \
     } while (0)
 #else
@@ -43,21 +42,20 @@
 #ifdef DEBUG
 // 1Us
 #define GET_NOP_TIME                                                         \
-    do                                                                       \
-    {                                                                        \
+    do {                                                                     \
         uint32_t start = 0, end = 0;                                         \
-        start = GET_SysTick;                                                 \
-        end = GET_SysTick;                                                   \
+        start = (uint32_t)(SysTick->VAL);                                                 \
+        end = (uint32_t)(SysTick->VAL);                                                   \
         printf("%s-->%s-->%dUs\r\n", __FILENAME__, "NOP", abs(end - start)); \
     } while (0)
 #else
 #define GET_NOP_TIME
 #endif
 
-void debug_printf(const char *fmt, ...);
+void debug_printf(const char* fmt, ...);
 bool get_sig(EventGroupHandle_t pEventGroup, int BitInx);
 void set_sig(EventGroupHandle_t pEventGroup, int BitInx, bool status);
 void clear_sig(EventGroupHandle_t pEventGroup, int BitInx);
-void log_init(void);
+void log_init(file_t* pfile);
 
 #endif

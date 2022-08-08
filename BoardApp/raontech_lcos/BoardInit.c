@@ -13,6 +13,7 @@
 #include "Common.h"
 #include "basicApp.h"
 #include "eeprom.h"
+#include "file.h"
 #include "gd32f307c_eval.h"
 #include "gd32f30x.h"
 #include "i2c.h"
@@ -28,8 +29,9 @@
 
 static UartBuffer uart0_rx_buffer = { 0 };
 static UartBuffer uart1_rx_buffer = { 0 };
-
 static timer_capture_calc_t cw_wheel_fg_calc = { 0 };
+
+file_t eeprom_log = { 0 };
 
 const Uarter uart0_output = {
     .uart_periph = RCU_USART0,
@@ -255,7 +257,7 @@ void application_init()
     uarter_init(&uart0_output);
     uarter_init(&uart1_debug);
 
-    log_init();
+    log_init(&eeprom_log);
 
     /* GPIO remap */
     rcu_periph_clock_enable(RCU_AF);

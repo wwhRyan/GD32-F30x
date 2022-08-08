@@ -10,9 +10,11 @@
  */
 
 #include "utils.h"
-#include "semphr.h"
-#include "gd32f307c_eval.h"
 #include "Boardinit.h"
+#include "file.h"
+#include "gd32f307c_eval.h"
+#include "semphr.h"
+#include <string.h>
 
 extern eeprom_t eeprom;
 
@@ -22,7 +24,7 @@ extern eeprom_t eeprom;
  * @param fmt
  * @param ...
  */
-void debug_printf(const char *fmt, ...)
+void debug_printf(const char* fmt, ...)
 {
     va_list args;
     if (xSemaphoreTake(uart_Semaphore, (TickType_t)0xFFFF) == pdFALSE)
@@ -35,7 +37,7 @@ void debug_printf(const char *fmt, ...)
 
 /* printf is not thread safety, but can output freeRTOS bug. */
 /* retarget the C library printf function to the USART */
-int fputc(int ch, FILE *f)
+int fputc(int ch, FILE* f)
 {
     usart_data_transmit(EVAL_COM1, (uint8_t)ch);
     while (RESET == usart_flag_get(EVAL_COM1, USART_FLAG_TBE))
@@ -44,7 +46,7 @@ int fputc(int ch, FILE *f)
     return ch;
 }
 
-int fgetc(FILE *f)
+int fgetc(FILE* f)
 {
     while (RESET == usart_flag_get(EVAL_COM1, USART_FLAG_RBNE))
         ;
@@ -55,12 +57,9 @@ bool get_sig(EventGroupHandle_t pEventGroup, int BitInx)
 {
     int EventGroup = xEventGroupGetBits(pEventGroup);
 
-    if (EventGroup & (0x00000001 << BitInx))
-    {
+    if (EventGroup & (0x00000001 << BitInx)) {
         return true;
-    }
-    else
-    {
+    } else {
         return false;
     }
 }
@@ -78,21 +77,44 @@ void clear_sig(EventGroupHandle_t pEventGroup, int BitInx)
     xEventGroupClearBits(pEventGroup, (0x00000001 << BitInx));
 }
 
-void my_console_logger(ulog_level_t severity, char *msg)
+void char_replace(char* str, char dest, char new_char)
+{
+    int len = strlen(str);
+    for (int i = 0; i < len; i++) {
+        if (str[i] == dest)
+            str[i] = new_char;
+    }
+}
+void my_console_logger(ulog_level_t severity, char* msg)
 {
     debug_printf("%s.%s", ulog_level_name(severity), msg);
 }
 
-void my_file_logger(ulog_level_t severity, char *msg)
+void my_file_logger(ulog_level_t severity, char* msg)
 {
-    // debug_printf("%s.%s", ulog_level_name(severity), msg);
-    if (get_sig(sys_sig, sig_slient_async_msg) == false)
-        debug_printf("%s.%d-%02d-%02d.%s", ulog_level_name(severity), eeprom.light_source_time / 60 / 60, (eeprom.light_source_time / 60) % 60, eeprom.light_source_time % 60, msg);
+    line_t new_line;
+    new_line.level = severity;
+    new_line.time = eeprom.light_source_time;
+
+    char_replace(msg, ' ', '_');
+    char_replace(msg, ',', '_');
+    strncpy(new_line.text, msg, TEXT_NUMBER);
+    file_append_line(&eeprom_log, &new_line);
 }
 
-void log_init()
+void log_read(void* pdata, size_t size, uint32_t addr)
+{
+    eeprom_block_read(&AT24C02D, addr, pdata, size);
+}
+void log_write(void* pdata, size_t size, uint32_t addr)
+{
+    eeprom_block_write(&AT24C02D, addr, pdata, size);
+}
+
+void log_init(file_t* pfile)
 {
     ULOG_INIT();
+    file_init(pfile, LOG_START_ADDR, 1024, log_read, log_write, get_LSB_array_crc);
     ULOG_SUBSCRIBE(my_console_logger, ULOG_DEBUG_LEVEL);
     ULOG_SUBSCRIBE(my_file_logger, ULOG_WARNING_LEVEL);
     ULOG_INFO("ULOG init\n"); // logs to file and console

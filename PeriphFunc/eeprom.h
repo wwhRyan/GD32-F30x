@@ -24,9 +24,6 @@
 #define UNLOCK false
 #define LOCK true
 
-#define CONFIG_START_ADDR 0x00
-#define LOG_START_ADDR 0x4096
-
 typedef struct eeprom_model_t
 {
     uint16_t i2c_addr; // 8'h

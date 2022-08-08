@@ -12,6 +12,7 @@
 #ifndef EXECTHREAD_H
 #define EXECTHREAD_H
 
+#include "file.h"
 #define MCU_VERSION "V1.0"
 
 #include "adc_mcu.h"
@@ -34,6 +35,8 @@
 #define THREAD_UART_EVENT_STACK_SIZE (1024 * 2)
 #define THREAD_FIRST_CONSUMER_STACK_SIZE (1024 * 2)
 #define THREAD_SECOND_CONSUMER_STACK_SIZE 512
+#define CONFIG_START_ADDR 0x00
+#define LOG_START_ADDR 0x1024
 
 void ThreadFirstConsumer(void* pvParameters);
 void ThreadUartEvent(void* pvParameters);
@@ -48,9 +51,10 @@ extern SemaphoreHandle_t i2c_Semaphore;
 extern QueueHandle_t xQueue_eeprom;
 // extern SoftwareI2C raontech_i2c;
 
-extern const eeprom_model_t BL24C64A;
-extern const eeprom_model_t AT24C02D;
+extern const eeprom_model_t BL24C64A; /* 8K bytes page=32 */
+extern const eeprom_model_t AT24C02D; /* 2K bytes page=8*/
 extern const fan_timer_config_t cw_wheel_fg;
+extern file_t eeprom_log;
 
 typedef enum sys_sig_t {
     sig_lightsource,
