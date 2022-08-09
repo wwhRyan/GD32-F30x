@@ -29,5 +29,4 @@ endif()
 add_definitions(-DDEBUG)
 add_definitions(-DGD32F30X_HD)
 
-add_subdirectory(easy-mcu)
 add_subdirectory(Template)

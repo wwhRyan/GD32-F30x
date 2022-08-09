@@ -87,7 +87,6 @@
 	#define VC_MUTEX_EXTERN(lock)	extern CRITICAL_SECTION lock
 
 #else
-	// TODO
 	#define VC_MUTEX_DECLARE(lock)
 	#define VC_MUTEX_INIT(lock)	 
 	#define VC_MUTEX_LOCK(lock)	 

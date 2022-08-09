@@ -543,7 +543,7 @@ bool update_firmware(const uint8_t* p_data, int size)
         }
 
         /* Temporarily set to the firmware size */
-        // TODO: update the size.
+        // the size not using.
         uint16_t check_data = BSWAP_16(0x4000);
         ovp921_write(0x7ffe, (uint8_t*)&check_data, 2);
 
