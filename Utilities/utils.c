@@ -13,10 +13,39 @@
 #include "Boardinit.h"
 #include "file.h"
 #include "gd32f307c_eval.h"
-#include "semphr.h"
 #include <string.h>
 
+#define EEPROM_W_QUEUE_LENGTH 5
+
 extern eeprom_t eeprom;
+SemaphoreHandle_t uart_Semaphore = NULL;
+SemaphoreHandle_t i2c_Semaphore = NULL;
+EventGroupHandle_t sys_sig = NULL;
+QueueHandle_t xQueue_eeprom = NULL;
+
+void system_ipc_init(void)
+{
+    uart_Semaphore = xSemaphoreCreateMutex();
+    E_assert(uart_Semaphore != NULL);
+    i2c_Semaphore = xSemaphoreCreateMutex();
+    E_assert(i2c_Semaphore != NULL);
+
+    // Attempt to create the event group.
+    sys_sig = xEventGroupCreate();
+    E_assert(sys_sig != NULL);
+    clear_sig(sys_sig, sig_ovp921_status);
+    set_sig(sys_sig, sig_lightsource, true);
+    set_sig(sys_sig, sig_system, true);
+    clear_sig(sys_sig, sig_light_status);
+    clear_sig(sys_sig, sig_update_anf);
+    clear_sig(sys_sig, sig_update_firmware);
+    clear_sig(sys_sig, sig_eeprom_write);
+    set_sig(sys_sig, sig_slient_async_msg, false);
+
+    xQueue_eeprom = xQueueCreate(EEPROM_W_QUEUE_LENGTH, sizeof(msg_t));
+    E_assert(xQueue_eeprom);
+    ULOG_INFO("xQueue_eeprom create\n");
+}
 
 /**
  * @brief debug_printf is Thread safety printf function

@@ -18,6 +18,7 @@ extern const Uarter uart0_output;
 
 void ThreadSecondConsumer(void* pvParameters)
 {
+    xEventGroupWaitBits(sys_sig, (0x00000001 << sig_mcu_init_ok), pdFALSE, pdTRUE, 0xFFFF);
     ULOG_DEBUG("%s\n", __func__);
 
     // msg_t xQueue_eeprom_recv = { 0 };

@@ -226,38 +226,15 @@ gpio_config_t gpio_config_table[] = {
 
 };
 
-SemaphoreHandle_t uart_Semaphore = NULL;
-SemaphoreHandle_t i2c_Semaphore = NULL;
 
-// Declare a variable to hold the created event group.
-EventGroupHandle_t sys_sig;
-
-void system_ipc_init(void)
-{
-    uart_Semaphore = xSemaphoreCreateMutex();
-    E_assert(uart_Semaphore != NULL);
-    i2c_Semaphore = xSemaphoreCreateMutex();
-    E_assert(i2c_Semaphore != NULL);
-
-    // Attempt to create the event group.
-    sys_sig = xEventGroupCreate();
-    E_assert(sys_sig != NULL);
-    set_sig(sys_sig, sig_lightsource, true);
-    clear_sig(sys_sig, sig_ovp921_status);
-    clear_sig(sys_sig, sig_lightsource);
-}
 
 void application_init()
 {
     /* initilize the LEDs, USART and key */
-    system_ipc_init();
-    // rcu_periph_clock_enable(RCU_CRC);
 
     /* initilize the USART */
     uarter_init(&uart0_output);
     uarter_init(&uart1_debug);
-
-    log_init(&eeprom_log);
 
     /* GPIO remap */
     rcu_periph_clock_enable(RCU_AF);

@@ -18,29 +18,6 @@
 #include "rti_vc_regio.h"
 #include <stdint.h>
 
-void lcos(char argc, char* argv)
-{
-    /*
-    if (argc == 1 + 1)
-    {
-        if (!strcmp("-h", &argv[argv[1]]))
-        {
-            cmd_printf("useage: %s get lcos temprature\r\n", __func__);
-        }
-    }*/
-    float temperature;
-    int ret = 0;
-    VC_PANEL_TEMPERATURE_INFO_T tinfo[MAX_NUM_VC_PANEL_PORT] = { 0 };
-    ret = rtiVC_GetTemperature(VC_PANEL_CTRL_PORT_0, tinfo);
-    if (ret == 0) {
-        temperature = (float)tinfo[0].temperature / (float)VC_TEMPERATURE_DEGREE_DIV;
-
-        cmd_printf("lcos-temprature=%f\r\n", temperature);
-    } else {
-        cmd_printf("Failed.\n");
-    }
-}
-
 static int rdp250h_get_device_id(E_VC_PANEL_PORT_T port, U16_T* chip_id, U16_T* rev_num)
 {
     U8_T reg0x00, reg0x01;
@@ -79,9 +56,93 @@ void test(char argc, char* argv)
     id = get_reg(0x4A << 1, 0x0000);
     cmd_printf("test %#X\n", id);
 
-    cmd_printf("SDA IO = %d", gpio_input_bit_get(SCCB_SDA_PORT, SCCB_SDA_PIN));
+    cmd_printf("SDA IO = %d\n", gpio_input_bit_get(SCCB_SDA_PORT, SCCB_SDA_PIN));
+}
+
+void lcos(char argc, char* argv)
+{
+    /*
+    if (argc == 1 + 1)
+    {
+        if (!strcmp("-h", &argv[argv[1]]))
+        {
+            cmd_printf("useage: %s get lcos temprature\r\n", __func__);
+        }
+    }*/
+
+    /* make sure the first read right. */
+    float temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
+    static float old_temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
+
+    uint16_t id;
+    uint16_t rev;
+
+    // rdp250h_get_device_id(VC_PANEL_PORT_0, &id, &rev);
+    // if (id != 0x250)
+    //     return;
+
+    rtiVC_prepare_panel();
+
+    VC_PANEL_TEMPERATURE_INFO_T tinfo[MAX_NUM_VC_PANEL_PORT] = { 0 };
+    rtiVC_GetTemperature(VC_PANEL_CTRL_PORT_ALL, tinfo);
+    temperature[0] = (float)(tinfo[0].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+    temperature[1] = (float)(tinfo[1].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+
+    if (old_temperature[0] == 0 && old_temperature[1] == 0) {
+        old_temperature[0] = temperature[0];
+        old_temperature[1] = temperature[1];
+    } else {
+
+        for (int i = 0; i < 2; i++) {
+            /* 只有温度在绝对值5以内，才会更新old_temperature */
+            if (fabs(temperature[i] - old_temperature[i]) <= 5) {
+                old_temperature[i] = temperature[i];
+            }
+        }
+    }
+
+    cmd_printf("lcos1=%f,lcos2=%f\r\n", old_temperature[0], old_temperature[1]);
+    return;
+}
+
+void lcos_interrupt(char argc, char* argv)
+{
+    float temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
+    static float old_temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
+    static bool interrupt = false;
+
+    uint16_t id;
+    uint16_t rev;
+
+    rdp250h_get_device_id(VC_PANEL_PORT_0, &id, &rev);
+    if (id != 0x250) {
+        if (interrupt == false) {
+            old_temperature[0] = 0;
+            old_temperature[1] = 0;
+            cmd_printf("lcos1=%f,lcos2=%f\r\n", old_temperature[0], old_temperature[1]);
+        }
+        interrupt = true;
+        return;
+    }
+
+    interrupt = false;
+    rtiVC_prepare_panel();
+
+    VC_PANEL_TEMPERATURE_INFO_T tinfo[MAX_NUM_VC_PANEL_PORT] = { 0 };
+    rtiVC_GetTemperature(VC_PANEL_CTRL_PORT_ALL, tinfo);
+    temperature[0] = (float)(tinfo[0].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+    temperature[1] = (float)(tinfo[1].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+
+    if (old_temperature[0] == 0 && old_temperature[1] == 0) {
+        old_temperature[0] = temperature[0];
+        old_temperature[1] = temperature[1];
+        cmd_printf("lcos1=%f,lcos2=%f\r\n", old_temperature[0], old_temperature[1]);
+    }
+
+    return;
 }
 
 ICmdRegister("test", test);
 ICmdRegister("lcos", lcos);
+ICmdRegister("lcos_interrupt", lcos_interrupt);
 ICmdRegister("chipid", chipid);

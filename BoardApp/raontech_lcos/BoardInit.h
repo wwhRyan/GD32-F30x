@@ -65,6 +65,7 @@ typedef enum sys_sig_t {
     sig_update_anf,
     sig_update_firmware,
     sig_eeprom_write,
+    sig_mcu_init_ok,
 } sys_sig_t;
 
 typedef struct msg_t {

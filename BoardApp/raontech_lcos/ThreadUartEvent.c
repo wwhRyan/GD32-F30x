@@ -24,10 +24,11 @@ extern const Uarter uart1_debug;
 
 void ThreadUartEvent(void* pvParameters)
 {
+    system_ipc_init();
+    init_eeprom(&BL24C64A);
+    log_init(&eeprom_log);
     ULOG_DEBUG("%s\n", __func__);
     // reload_idu_current();
-
-    init_eeprom(&BL24C64A);
 
     int ret;
     ret = rtiVC_Initialize(RDC200A_ADDR);
@@ -42,7 +43,7 @@ void ThreadUartEvent(void* pvParameters)
         E_assert(0);
 
     IInitAtLib(&at_obj, kAtNormalMode, NULL, debug_printf);
-
+    set_sig(sys_sig, sig_mcu_init_ok, true);
     while (1) {
 #if 0
         if (0 != GetRxlen(&uart0_output)) {

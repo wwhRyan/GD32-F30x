@@ -9,6 +9,7 @@
  *
  */
 
+#include "BoardInit.h"
 #include "basicApp.h"
 #include "gd32f30x.h"
 #include "main.h"
@@ -16,24 +17,11 @@
 extern const SoftwareI2C raontech_i2c;
 extern const mem_t eeprom_mem[];
 
-#define EEPROM_W_QUEUE_LENGTH 5
-QueueHandle_t xQueue_eeprom = NULL;
-
 void ThreadFirstConsumer(void* pvParameters)
 {
+    xEventGroupWaitBits(sys_sig, (0x00000001 << sig_mcu_init_ok), pdFALSE, pdTRUE, 0xFFFF);
     ULOG_DEBUG("%s\n", __func__);
-    set_sig(sys_sig, sig_lightsource, true);
-    set_sig(sys_sig, sig_system, true);
-    set_sig(sys_sig, sig_light_status, false);
-    set_sig(sys_sig, sig_ovp921_status, false);
-    clear_sig(sys_sig, sig_update_anf);
-    clear_sig(sys_sig, sig_update_firmware);
-    clear_sig(sys_sig, sig_eeprom_write);
-    set_sig(sys_sig, sig_slient_async_msg, false);
 
-    xQueue_eeprom = xQueueCreate(EEPROM_W_QUEUE_LENGTH, sizeof(msg_t));
-    E_assert(xQueue_eeprom);
-    ULOG_INFO("xQueue_eeprom create\n");
     while (1) {
 #if 0
         // ULOG_DEBUG("ThreadFirstConsumer\r\n");
