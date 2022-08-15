@@ -74,8 +74,8 @@ void lcos(char argc, char* argv)
     float temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
     static float old_temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
 
-    uint16_t id;
-    uint16_t rev;
+    // uint16_t id;
+    // uint16_t rev;
 
     // rdp250h_get_device_id(VC_PANEL_PORT_0, &id, &rev);
     // if (id != 0x250)

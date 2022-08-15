@@ -15,7 +15,7 @@ target_include_directories(${EXEC_NAME}_periph_func PRIVATE .)
 target_include_directories(ATProtocol PRIVATE .)
 target_include_directories(CmdProtocol PRIVATE .)
 target_include_directories(simple_file PRIVATE .)
-target_include_directories(AsciiConvert PRIVATE .)
+target_include_directories(utils PRIVATE .)
 
 target_link_libraries(
   ${EXEC_NAME}
@@ -28,5 +28,5 @@ target_link_libraries(
   ATProtocol
   CmdProtocol
   simple_file
-  AsciiConvert
+  utils
   ulog)
