@@ -12,8 +12,12 @@
 #include "basicApp.h"
 #include "eeprom.h"
 #include "i2c.h"
+#include "rti_vc_api.h"
+#include "rti_vc_regio.h"
+#include "utils.h"
 #include <math.h>
 #include <stdint.h>
+#include <stdio.h>
 
 extern const SoftwareI2C raontech_i2c;
 extern const dac_t laser_dac;
@@ -334,4 +338,32 @@ uint32_t get_LSB_array_crc(uint8_t* array, size_t size)
         valcrc = crc_single_data_calculate(*(pval32 + i));
     }
     return valcrc;
+}
+
+void printf_temperature(){
+
+    float temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
+    static float old_temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
+
+    rtiVC_prepare_panel();
+
+    VC_PANEL_TEMPERATURE_INFO_T tinfo[MAX_NUM_VC_PANEL_PORT] = { 0 };
+    rtiVC_GetTemperature(VC_PANEL_CTRL_PORT_ALL, tinfo);
+    temperature[0] = (float)(tinfo[0].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+    temperature[1] = (float)(tinfo[1].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+
+    if (old_temperature[0] == 0 && old_temperature[1] == 0) {
+        old_temperature[0] = temperature[0];
+        old_temperature[1] = temperature[1];
+    } else {
+
+        for (int i = 0; i < 2; i++) {
+            /* 只有温度在绝对值5以内，才会更新old_temperature */
+            if (fabs(temperature[i] - old_temperature[i]) <= 5) {
+                old_temperature[i] = temperature[i];
+            }
+        }
+    }
+
+    debug_printf("lcos1=%f,lcos2=%f\r\n", old_temperature[0], old_temperature[1]);
 }

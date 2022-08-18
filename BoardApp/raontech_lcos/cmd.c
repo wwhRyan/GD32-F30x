@@ -17,6 +17,7 @@
 #include "rti_vc_api.h"
 #include "rti_vc_regio.h"
 #include <stdint.h>
+#include <stdio.h>
 
 static int rdp250h_get_device_id(E_VC_PANEL_PORT_T port, U16_T* chip_id, U16_T* rev_num)
 {
@@ -142,7 +143,22 @@ void lcos_interrupt(char argc, char* argv)
     return;
 }
 
+uint16_t interval = 0;
+
+void set_interval(char argc, char* argv)
+{
+    if (argc == 1 + 1) {
+        if (!strcmp("-h", &argv[argv[1]])) {
+            cmd_printf("useage: %s get lcos temprature\r\n", __func__);
+        } else {
+            sscanf((const char*)&(argv[argv[1]]), "%d", &interval);
+            cmd_printf("%d s to feedback temperature!\n", interval);
+        }
+    }
+}
+
 ICmdRegister("test", test);
 ICmdRegister("lcos", lcos);
 ICmdRegister("lcos_interrupt", lcos_interrupt);
 ICmdRegister("chipid", chipid);
+ICmdRegister("set_interval", set_interval);

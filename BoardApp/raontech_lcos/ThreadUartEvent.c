@@ -62,6 +62,6 @@ void ThreadUartEvent(void* pvParameters)
 #endif
             ClearRxData(&uart1_debug);
         }
-        vTaskDelay(5);
+        vTaskDelay(20);
     }
 }

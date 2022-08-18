@@ -13,6 +13,7 @@
 #include "basicApp.h"
 #include "gd32f30x.h"
 #include "main.h"
+#include <stdint.h>
 
 extern const SoftwareI2C raontech_i2c;
 extern const mem_t eeprom_mem[];
@@ -50,6 +51,13 @@ void ThreadFirstConsumer(void* pvParameters)
             vTaskDelay(500);
         }
 #endif
-        vTaskDelay(5000);
+        vTaskDelay(100);
+        extern uint16_t interval;
+        if (is_one_second() == true) {
+            eeprom.light_source_time += 1;
+            if (eeprom.light_source_time % interval == 0 && interval != 0) {
+                printf_temperature();
+            }
+        }
     }
 }

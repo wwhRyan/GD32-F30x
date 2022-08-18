@@ -13,6 +13,7 @@ target_link_libraries(
           ${EXEC_NAME}_CMSIS
           ${EXEC_NAME}_periph_func
           ${EXEC_NAME}_vista_code
+          ${EXEC_NAME}_utils
           ATProtocol
           CmdProtocol
           simple_file

@@ -116,61 +116,122 @@ int rdp250h_set_horizontal_pixel_shift(int panel_port, int shift_val)
 
 int rdp250h_get_otp_summary(int port, char *summary_buf)
 {
-	int i, otp_sel_idx = 0;
-	U8_T apply_temperature_otp, lot[8], otp_sel[31];
-	U32_T otp_sel_bits = 0x0;
-	U16_T otp_base_addr = 0x0320;
+	U8_T buf[16];
+	int i, die_id, cp_applied;
+	int cp_year, cp_month, cp_day, cp_rev;
+	int ft_year, ft_month, ft_monthly_input_count;
+	char cp_die_id_x_char, cp_die_id_y_char, cp_lot_str[9];
+	char product_code_char, ft_die_id_x_char, ft_die_id_y_char;	
+	const char *cp_month_str, *ft_month_str;
+	static const char *month_str[12] = {
+		"Jan",	"Feb",	"Mar",	"Apr",	"May",	"Jun",
+		"Jul",	"Aug",	"Sep",	"Oct",	"Nov",	"Dec"
+	};
+	U16_T otp_base_addr = 0x0300;
 
 	if (summary_buf == NULL) {
 		EMSG("[RDP250H] Buffer is NULL!\n");
 		return -1;
 	}
 
-	for (i = 0; i < 8; i++)
-		lot[i] = RDP_REG_GET(port, 0x0300 + i);
+	buf[0] = RDP_REG_GET(port, otp_base_addr + 0x77);
+	switch (buf[0]) {
+	case 0x33:
+		product_code_char = 'X';
+		break;
+	case 0x27:
+		product_code_char = 'R';
+		break;
+	default:
+		product_code_char = '0'; /* No written */
+		break;
+	}	
 
-	for (i = 0; i < 4; i++)
-		otp_sel[otp_sel_idx++] = RDP_REG_GET(port, 0x0310 + i);
+	cp_applied = RDP_REG_GET(port, otp_base_addr + 0x7F);
+	if (cp_applied == 0xFF) { /* CP */		
+		for (i = 0; i < 16; i++)
+			buf[i] = RDP_REG_GET(port, otp_base_addr + 0x00 + i);
 
-	otp_sel[otp_sel_idx++] = RDP_REG_GET(port, 0x0316);
+		sprintf(cp_lot_str, "%c%c%c%c%c%c.%d",
+				buf[0], buf[1], buf[2], buf[3],
+				buf[4], buf[5], ((int)buf[6] << 8) | buf[7]);
 
-	for (i = 0; i < 3; i++)
-		otp_sel[otp_sel_idx++] = RDP_REG_GET(port, 0x0318 + i);
+		cp_month = buf[8] & 0xF;
+		if (cp_month <= 12)
+			cp_month_str = month_str[cp_month - 1];
+		else
+			cp_month_str = "000";
 
-	for (i = 0; i < 4; i++)
-		otp_sel[otp_sel_idx++] = RDP_REG_GET(port, 0x0320 + i);
+		cp_day = buf[9];
+		cp_year = 2000 + (((buf[0xA] >> 4) & 0xF) * 10) + (buf[0xA] & 0xF);
+		cp_rev = buf[0xB];
+	
+		die_id = ((int)buf[0xC] << 8) | buf[0xD];
+		if (die_id <= 9)
+			cp_die_id_x_char = '0' + die_id;
+		else
+			cp_die_id_x_char = (die_id - 10) + 'A';
 
-	for (i = 0; i < 2; i++)
-		otp_sel[otp_sel_idx++] = RDP_REG_GET(port, 0x0325 + i);
-
-	for (i = 0; i < 4; i++)
-		otp_sel[otp_sel_idx++] = RDP_REG_GET(port, 0x0328 + i);
-
-	for (i = 0; i < 4; i++) {
-		otp_sel[otp_sel_idx++] = RDP_REG_GET(port, 0x0330 + i);
-		otp_sel[otp_sel_idx] = otp_sel[otp_sel_idx - 1] << 4;
-		otp_sel_idx++;
+		die_id = ((int)buf[0xE] << 8) | buf[0xF];
+		if (die_id <= 9)
+			cp_die_id_y_char = '0' + die_id;
+		else
+			cp_die_id_y_char = (die_id - 10) + 'A';
+	} else {
+		sprintf(cp_lot_str, "000000.0");
+		cp_year = 0;
+		cp_month_str = "000";
+		cp_day = 0;
+		cp_rev = 0;
+		cp_die_id_x_char = '0';
+		cp_die_id_y_char = '0';
 	}
 
-	otp_sel[otp_sel_idx++] = RDP_REG_GET(port, 0x0334);
+	for (i = 0; i < 5; i++)
+		buf[i] = RDP_REG_GET(port, otp_base_addr + 0x78 + i);
 
-	for (i = 0; i < 4; i++)
-		otp_sel[otp_sel_idx++] = RDP_REG_GET(port, 0x033C + i);
+	if (buf[0] != 0) { /* FT */
+		ft_year = 2000 + (((buf[0] >> 4) & 0xF) * 10) + (buf[0] & 0xF);
 
-	for (i = 0; i < sizeof(otp_sel); i++) {
-		if (otp_sel[i] & 0x80)
-			otp_sel_bits |= (0x1 << i);
+		ft_month = buf[1] & 0xF;
+		if (ft_month <= 12)
+			ft_month_str = month_str[ft_month - 1];
+		else
+			ft_month_str = "000";
+
+		ft_monthly_input_count = buf[2];
+
+		die_id = buf[3];
+		if (die_id <= 9)
+			ft_die_id_x_char = '0' + die_id;
+		else
+			ft_die_id_x_char = (die_id - 10) + 'A';
+		
+		die_id = buf[4];
+		if (die_id <= 9)
+			ft_die_id_y_char = '0' + die_id;
+		else
+			ft_die_id_y_char = (die_id - 10) + 'A';
+	} else {
+		ft_year = 0;
+		ft_month_str = "000";
+		ft_monthly_input_count = 0;
+		ft_die_id_x_char = '0';
+		ft_die_id_y_char = '0';
 	}
 
-	apply_temperature_otp = RDP_REG_GET(port, otp_base_addr + 0x7F);
-	if (apply_temperature_otp == 0xFF)
-		apply_temperature_otp = 1;
-	else
-		apply_temperature_otp = 0;
+#if 1
+	sprintf(summary_buf, "%c-%04d.%s-%03d-%c.%c",
+			product_code_char, ft_year, ft_month_str, ft_monthly_input_count,
+			ft_die_id_x_char, ft_die_id_y_char);
 
-	sprintf(summary_buf, "%02X%02X%02X%02X%02X%02X%02X%02X.%08X.%d",
-			lot[0], lot[1], lot[2], lot[3], lot[4], lot[5], lot[6], lot[7],
-			otp_sel_bits, apply_temperature_otp);
+#else // Extra OTP info
+	sprintf(summary_buf, "%c-%04d.%s-%03d-%c.%c %s-%s.%02d.%04d-Rev%d-%c.%c",
+			product_code_char, ft_year, ft_month_str, ft_monthly_input_count,
+			ft_die_id_x_char, ft_die_id_y_char,
+			cp_lot_str, cp_month_str, cp_day, cp_year,
+			cp_rev,	cp_die_id_x_char, cp_die_id_y_char);
+#endif
 
 	return 0;
 }

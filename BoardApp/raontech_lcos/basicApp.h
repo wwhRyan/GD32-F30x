@@ -60,5 +60,6 @@ uint32_t get_MSB_array_crc(uint8_t* array, size_t size);
 uint32_t get_LSB_array_crc(uint8_t* array, size_t size);
 
 void rtiVC_prepare_panel(void);
+void printf_temperature(void);
 
 #endif
