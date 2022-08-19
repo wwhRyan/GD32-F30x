@@ -52,11 +52,15 @@ void ThreadFirstConsumer(void* pvParameters)
         }
 #endif
         vTaskDelay(100);
-        extern uint16_t interval;
+        extern uint32_t interval;
+        extern uint32_t no_power_interval;
         if (is_one_second() == true) {
             eeprom.light_source_time += 1;
-            if (eeprom.light_source_time % interval == 0 && interval != 0) {
-                printf_temperature();
+            if (eeprom.light_source_time % interval == 0 ) {
+                printf_temperature(interval);
+            }
+            if(eeprom.light_source_time % no_power_interval == 0){
+                printf_on_power_temperature(no_power_interval);
             }
         }
     }

@@ -13,6 +13,7 @@
 #include "eeprom.h"
 #include "i2c.h"
 #include "rti_vc_api.h"
+#include "rti_vc_rdc.h"
 #include "rti_vc_regio.h"
 #include "utils.h"
 #include <math.h>
@@ -340,10 +341,51 @@ uint32_t get_LSB_array_crc(uint8_t* array, size_t size)
     return valcrc;
 }
 
-void printf_temperature(){
+void printf_temperature(uint32_t interval)
+{
+
+    if (interval == 0)
+        return;
 
     float temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
     static float old_temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
+
+    // rtiVC_prepare_panel();
+
+    VC_PANEL_TEMPERATURE_INFO_T tinfo[MAX_NUM_VC_PANEL_PORT] = { 0 };
+    rtiVC_GetTemperature(VC_PANEL_CTRL_PORT_ALL, tinfo);
+    temperature[0] = (float)(tinfo[0].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+    temperature[1] = (float)(tinfo[1].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+
+    if (old_temperature[0] == 0 && old_temperature[1] == 0) {
+        old_temperature[0] = temperature[0];
+        old_temperature[1] = temperature[1];
+    } else {
+
+        for (int i = 0; i < 2; i++) {
+            /* 只有温度在绝对值5以内，才会更新old_temperature */
+            if (fabs(temperature[i] - old_temperature[i]) <= 5) {
+                old_temperature[i] = temperature[i];
+            }
+        }
+    }
+
+    debug_printf("lcos1=%f,lcos2=%f\r\n", old_temperature[0], old_temperature[1]);
+}
+
+void printf_on_power_temperature(uint32_t interval)
+{
+
+    if (interval == 0)
+        return;
+
+    float temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
+    static float old_temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
+
+    extern VC_RDC_CB_T vc_rdc_cb;
+    VC_RDC_DEV_INFO_T* dev = &vc_rdc_cb.dev;
+    dev->poweron_panel(TRUE);
+    vTaskDelay(100);
 
     rtiVC_prepare_panel();
 
@@ -351,6 +393,9 @@ void printf_temperature(){
     rtiVC_GetTemperature(VC_PANEL_CTRL_PORT_ALL, tinfo);
     temperature[0] = (float)(tinfo[0].temperature) / VC_TEMPERATURE_DEGREE_DIV;
     temperature[1] = (float)(tinfo[1].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+
+    dev->poweron_panel(FALSE);
+    vTaskDelay(10);
 
     if (old_temperature[0] == 0 && old_temperature[1] == 0) {
         old_temperature[0] = temperature[0];

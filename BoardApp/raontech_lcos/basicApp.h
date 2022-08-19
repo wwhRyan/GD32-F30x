@@ -16,6 +16,7 @@
 #include "gd32f30x.h"
 #include "i2c.h"
 #include "main.h"
+#include <stdint.h>
 
 #define RDC200A_ADDR (0x4A << 1)
 
@@ -59,7 +60,7 @@ char* get_sn(int number, char* buff);
 uint32_t get_MSB_array_crc(uint8_t* array, size_t size);
 uint32_t get_LSB_array_crc(uint8_t* array, size_t size);
 
-void rtiVC_prepare_panel(void);
-void printf_temperature(void);
+void printf_temperature(uint32_t interval);
+void printf_on_power_temperature(uint32_t interval);
 
 #endif

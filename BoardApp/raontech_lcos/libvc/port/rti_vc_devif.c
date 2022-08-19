@@ -21,10 +21,51 @@
 /* Device interface for RDC and RDP. */
 
 #include "rti_vc_devif.h"
+#include "rti_vc_rdc.h"
 #include "basicApp.h"
+
+#if (!defined(ECLIPSE_RCP) && !defined(__KERNEL__) && defined(__linux__) /* Linux application */)
+	U8_T vc_i2c_bus_number[MAX_NUM_VC_DEVICE_CH] = {
+		_CFG_I2C_BUS_NR_RDC_RDP0, /* VC_DEVICE_CH_RDC_RDP0 */
+		_CFG_I2C_BUS_NR_RDC_RDP1  /* VC_DEVICE_CH_RDP1 */
+	};
+
+	#ifdef _CFG_USE_RTIMD_KERNEL_DRIVER
+	static int rtimd_dev_fd;
+	#else
+	static int vc_dev_fd[MAX_NUM_VC_DEVICE_CH];
+	#endif // _CFG_USE_RTIMD_KERNEL_DRIVER
+#else
+    U8_T vc_i2c_bus_number[MAX_NUM_VC_DEVICE_CH] = {
+        VC_DEVICE_CH_RDC_RDP0, /* VC_DEVICE_CH_RDC_RDP0 */
+        VC_DEVICE_CH_RDP1  /* VC_DEVICE_CH_RDP1 */
+	};
+#endif /* #ifdef _CFG_USE_RTI_MD_LINUX_KERNEL_I2C_DRIVER */
+
+/**
+* External functions
+*/
+#ifndef ECLIPSE_RCP
+#ifdef __cplusplus
+extern "C"{
+#endif
+#endif
+int rtiVC_prepare_controller(void);
+int rtiVC_prepare_panel(void);
+#ifndef ECLIPSE_RCP
+#ifdef __cplusplus
+}
+#endif
+#endif
 
 int rtiVC_OpenDevice(void)
 {
+#if !defined(ECLIPSE_RCP)
+    if (rtiVC_prepare_controller() < 0)
+        return -1;
+    if (rtiVC_prepare_panel() < 0)
+        return -1;
+#endif
     return 0;
 }
 

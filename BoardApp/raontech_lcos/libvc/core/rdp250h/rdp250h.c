@@ -21,6 +21,8 @@
 #include <math.h>
 #include "./../rti_vc_panel.h"
 
+#define _CFG_RDP_ATTACHED_TO_PORT_1
+#define _CFG_RDP_ATTACHED_TO_PORT_0
 #ifdef CFG_PANEL_RDP250H
 
 #define RDP250H_DEFAULT_CP_TEMPERATURE		(25 * 1000/*To avoid floating*/)
@@ -64,8 +66,11 @@ static int rdp250h_get_temperature(int panel_port, int *tcode, S32_T *temperatur
 
 	*tcode = raw_code;
 
-//	DMSG("P%d: ref_temperature(%d) raw_code(%d) => temperature(%d)]\n",
-//			panel_port, otp->ref_temperature, raw_code, *temperature);
+    DMSG("%s\n", __func__);
+    // DMSG("P%d: ref_temperature(%d) raw_code(%d) => temperature(%d)]\n",
+    // 		panel_port, otp->ref_temperature, raw_code, *temperature);
+    DMSG("P%d: cp_temperature(%d) ref_temperature(0x%X) raw_code(0x%X) temperature(%d)]\n",
+        panel_port, otp->cp_temperature, otp->ref_temperature, raw_code, *temperature);
 
 	return 0;
 }
@@ -265,6 +270,9 @@ static int rdp250h_apply_tempsensor_otp(U8_T port)
 								| (U16_T)TEMP_REF_lsb;
 
 		otp->cp_temperature = RDP_REG_GET(port, 0x031E);
+        if (otp->cp_temperature == 0) {
+            otp->cp_temperature = 30;
+        }
 		otp->cp_temperature *= 1000;
 	} else {
 		otp->apply_temperature_otp = FALSE;
@@ -273,13 +281,16 @@ static int rdp250h_apply_tempsensor_otp(U8_T port)
 		otp->cp_temperature = RDP250H_DEFAULT_CP_TEMPERATURE;
 	}
 
-	//DMSG("temp: 0x%X\n", (U16_T)otp->ref_temperature);
+    DMSG("temp: 0x%X\n", (U16_T)otp->ref_temperature);
+    DMSG("%s\n", __func__);
 
 	return 0;
 }
 
 static int rdp250h_prepare_otp(U8_T panel_port)
 {
+	DMSG("%s\n", __func__);
+
 	rdp250h_apply_tempsensor_otp(panel_port);
 
 	return 0;
@@ -296,11 +307,15 @@ static int rdp250h_prepare_temperature(VC_PANEL_DEV_INFO_T *dev, U8_T panel_port
 
 	temp_status->otp_applied = rdp250h_otp[panel_port].apply_temperature_otp;
 
+	DMSG("%s\n", __func__);
+	
 	return 0;
 }
 
 static int rdp250h_prepare_panel(VC_PANEL_DEV_INFO_T *dev)
 {
+	DMSG("%s\n", __func__);
+
 #ifdef _CFG_RDP_ATTACHED_TO_PORT_0
 	rdp250h_prepare_otp(VC_PANEL_PORT_0);
 
