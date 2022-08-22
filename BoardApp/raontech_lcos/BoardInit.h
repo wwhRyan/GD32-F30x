@@ -59,7 +59,7 @@ extern file_t eeprom_log;
 typedef enum sys_sig_t {
     sig_lightsource,
     sig_system,
-    sig_ovp921_status,
+    sig_rdc200a_status,
     sig_light_status,
     sig_slient_async_msg,
     sig_update_anf,
@@ -115,8 +115,8 @@ typedef struct msg_t {
 #define FAN_PWM_PORT GPIOB
 #define FAN_PWM_PIN GPIO_PIN_11
 
-#define OVP921_RESET_PORT GPIOB
-#define OVP921_RESET_PIN GPIO_PIN_12
+#define RDC200A_RESET_PORT GPIOB
+#define RDC200A_RESET_PIN GPIO_PIN_12
 
 #define MCU_GPIO_INT_PORT GPIOB
 #define MCU_GPIO_INT_PIN GPIO_PIN_13

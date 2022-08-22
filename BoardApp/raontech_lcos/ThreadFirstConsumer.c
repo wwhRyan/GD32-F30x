@@ -29,14 +29,14 @@ void ThreadFirstConsumer(void* pvParameters)
         // ULOG_DEBUG("ThreadFirstConsumer min free stack size %d\r\n",(int)uxTaskGetStackHighWaterMark(NULL));
         vTaskDelay(500);
         if (get_sig(sys_sig, sig_system))
-            set_sig(sys_sig, sig_ovp921_status, get_ovp921_status());
+            set_sig(sys_sig, sig_rdc200a_status, get_ovp921_status());
 
         set_sig(sys_sig, sig_light_status, gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN));
 
-        if (get_sig(sys_sig, sig_ovp921_status) == true && get_sig(sys_sig, sig_lightsource) && !get_sig(sys_sig, sig_light_status)) {
+        if (get_sig(sys_sig, sig_rdc200a_status) == true && get_sig(sys_sig, sig_lightsource) && !get_sig(sys_sig, sig_light_status)) {
             laser_on();
             ULOG_INFO("laser on\r\n");
-        } else if ((get_sig(sys_sig, sig_ovp921_status) == false || !get_sig(sys_sig, sig_lightsource)) && get_sig(sys_sig, sig_light_status)) {
+        } else if ((get_sig(sys_sig, sig_rdc200a_status) == false || !get_sig(sys_sig, sig_lightsource)) && get_sig(sys_sig, sig_light_status)) {
             laser_off();
             ULOG_INFO("laser off\r\n");
         }
@@ -51,17 +51,5 @@ void ThreadFirstConsumer(void* pvParameters)
             vTaskDelay(500);
         }
 #endif
-        vTaskDelay(100);
-        extern uint32_t interval;
-        extern uint32_t no_power_interval;
-        if (is_one_second() == true) {
-            eeprom.light_source_time += 1;
-            if (eeprom.light_source_time % interval == 0 ) {
-                printf_temperature(interval);
-            }
-            if(eeprom.light_source_time % no_power_interval == 0){
-                printf_on_power_temperature(no_power_interval);
-            }
-        }
     }
 }

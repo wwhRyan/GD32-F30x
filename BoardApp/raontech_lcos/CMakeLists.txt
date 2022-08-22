@@ -2,10 +2,16 @@ add_subdirectory(libvc)
 
 add_library(
   ${EXEC_NAME}_raontech_lcos EXCLUDE_FROM_ALL
-  basicApp.c BoardInit.c ThreadFirstConsumer.c ThreadSecondConsumer.c
-  ThreadUartEvent.c)
+  basicApp.c
+  BoardInit.c
+  ThreadFirstConsumer.c
+  ThreadSecondConsumer.c
+  ThreadUartEvent.c
+  at.c
+  at_cmd/AtCmdHashTable.c
+  at_cmd/AtKeyHashTable.c)
 
-target_include_directories(${EXEC_NAME}_raontech_lcos PUBLIC .)
+target_include_directories(${EXEC_NAME}_raontech_lcos PUBLIC . ./at_cmd)
 
 target_link_libraries(
   ${EXEC_NAME}_raontech_lcos

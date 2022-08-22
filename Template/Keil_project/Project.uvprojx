@@ -724,16 +724,6 @@
               <FilePath>..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine\stateMachine.c</FilePath>
             </File>
             <File>
-              <FileName>AtCmdHashTable.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\easy-mcu\AtProtocol\Src\At_HashTable\AtCmdHashTable.c</FilePath>
-            </File>
-            <File>
-              <FileName>AtKeyHashTable.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\easy-mcu\AtProtocol\Src\At_HashTable\AtKeyHashTable.c</FilePath>
-            </File>
-            <File>
               <FileName>CmdLine.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\easy-mcu\CmdProtocol\CmdLine.c</FilePath>
@@ -1042,6 +1032,16 @@
               <FileName>ThreadUartEvent.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\raontech_lcos\ThreadUartEvent.c</FilePath>
+            </File>
+            <File>
+              <FileName>AtCmdHashTable.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\at_cmd\AtCmdHashTable.c</FilePath>
+            </File>
+            <File>
+              <FileName>AtKeyHashTable.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\at_cmd\AtKeyHashTable.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1820,16 +1820,6 @@
               <FilePath>..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine\stateMachine.c</FilePath>
             </File>
             <File>
-              <FileName>AtCmdHashTable.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\easy-mcu\AtProtocol\Src\At_HashTable\AtCmdHashTable.c</FilePath>
-            </File>
-            <File>
-              <FileName>AtKeyHashTable.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\easy-mcu\AtProtocol\Src\At_HashTable\AtKeyHashTable.c</FilePath>
-            </File>
-            <File>
               <FileName>CmdLine.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\easy-mcu\CmdProtocol\CmdLine.c</FilePath>
@@ -2087,6 +2077,16 @@
               <FileName>ThreadUartEvent.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\raontech_lcos\ThreadUartEvent.c</FilePath>
+            </File>
+            <File>
+              <FileName>AtCmdHashTable.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\at_cmd\AtCmdHashTable.c</FilePath>
+            </File>
+            <File>
+              <FileName>AtKeyHashTable.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\at_cmd\AtKeyHashTable.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2479,7 +2479,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,GD32F30X_HD,DEBUG,ATHENA_OV_LCOS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS;..\..\easy-mcu\AtProtocol;..\..\easy-mcu\AtProtocol\Src\At_internal;..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine;..\..\easy-mcu\AtProtocol\Src\At_HashTable;..\..\easy-mcu\utils;..\..\easy-mcu\CmdProtocol;..\..\easy-mcu\Include;..\..\BoardApp\raontech_lcos;..\..\PeriphFunc;..\..\ulog\src;..\..\BoardApp\raontech_lcos\libvc\core\rdc200a;..\..\BoardApp\raontech_lcos\libvc\include;..\..\BoardApp\raontech_lcos\libvc\core;..\..\easy-mcu\simple_file</IncludePath>
+              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS;..\..\easy-mcu\AtProtocol;..\..\easy-mcu\AtProtocol\Src\At_internal;..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine;..\..\easy-mcu\utils;..\..\easy-mcu\CmdProtocol;..\..\easy-mcu\Include;..\..\BoardApp\raontech_lcos;..\..\PeriphFunc;..\..\ulog\src;..\..\BoardApp\raontech_lcos\libvc\core\rdc200a;..\..\BoardApp\raontech_lcos\libvc\include;..\..\BoardApp\raontech_lcos\libvc\core;..\..\easy-mcu\simple_file;..\..\BoardApp\raontech_lcos\at_cmd</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2865,16 +2865,6 @@
               <FilePath>..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine\stateMachine.c</FilePath>
             </File>
             <File>
-              <FileName>AtCmdHashTable.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\easy-mcu\AtProtocol\Src\At_HashTable\AtCmdHashTable.c</FilePath>
-            </File>
-            <File>
-              <FileName>AtKeyHashTable.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\easy-mcu\AtProtocol\Src\At_HashTable\AtKeyHashTable.c</FilePath>
-            </File>
-            <File>
               <FileName>CmdLine.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\easy-mcu\CmdProtocol\CmdLine.c</FilePath>
@@ -3252,6 +3242,16 @@
               <FileName>ThreadUartEvent.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\BoardApp\raontech_lcos\ThreadUartEvent.c</FilePath>
+            </File>
+            <File>
+              <FileName>AtCmdHashTable.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\at_cmd\AtCmdHashTable.c</FilePath>
+            </File>
+            <File>
+              <FileName>AtKeyHashTable.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\raontech_lcos\at_cmd\AtKeyHashTable.c</FilePath>
             </File>
           </Files>
         </Group>

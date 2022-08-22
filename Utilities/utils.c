@@ -33,7 +33,7 @@ void system_ipc_init(void)
     // Attempt to create the event group.
     sys_sig = xEventGroupCreate();
     E_assert(sys_sig != NULL);
-    clear_sig(sys_sig, sig_ovp921_status);
+    clear_sig(sys_sig, sig_rdc200a_status);
     set_sig(sys_sig, sig_lightsource, true);
     set_sig(sys_sig, sig_system, true);
     clear_sig(sys_sig, sig_light_status);
