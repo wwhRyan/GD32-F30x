@@ -127,6 +127,7 @@ void my_file_logger(ulog_level_t severity, char* msg)
 
     char_replace(msg, ' ', '_');
     char_replace(msg, ',', '_');
+    char_replace(new_line.text, '\n', '\0');
     strncpy(new_line.text, msg, TEXT_NUMBER);
     file_append_line(&eeprom_log, &new_line);
 }

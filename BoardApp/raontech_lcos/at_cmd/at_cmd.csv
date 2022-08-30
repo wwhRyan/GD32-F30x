@@ -7,6 +7,8 @@ LightSource,Status,enum,On
 ,,enum,Off
 ,,enum,Ok
 Version,Mcu,string,Empty
+,Rdc200a,string,Empty
+,Rdp250h,string,Empty
 ,Ovp921,string,Empty
 ,Eeprom,string,Empty
 ,LightEngineBoard,string,Empty
@@ -69,5 +71,17 @@ Eeprom,Addr,string,Empty
 ,Data,string,Empty
 ,Clear,string,Empty
 SilentAsyncMessages,Status,enum,On
+,,enum,Off
+,,enum,Ok
+Rdc200a,Addr,string,Empty
+,Size,string,Empty
+,Data,string,Empty
+Rdp250h,Addr,string,Empty
+,Size,string,Empty
+,Data,string,Empty
+SpiFlash,Addr,string,Empty
+,Crc,string,Empty
+,Data,string,Empty
+FlashBootb,Status,enum,On
 ,,enum,Off
 ,,enum,Ok
