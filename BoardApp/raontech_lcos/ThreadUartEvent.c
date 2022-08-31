@@ -25,9 +25,13 @@ extern const Uarter uart1_debug;
 void ThreadUartEvent(void* pvParameters)
 {
     system_ipc_init();
+    
+    vTaskDelay(1);
+    gpio_bit_set(RDC200A_RESET_PORT,RDC200A_RESET_PIN);
+
+    ULOG_DEBUG("%s\n", __func__);
     init_eeprom(&BL24C64A);
     log_init(&eeprom_log);
-    ULOG_DEBUG("%s\n", __func__);
     // reload_idu_current();
 
     int ret;

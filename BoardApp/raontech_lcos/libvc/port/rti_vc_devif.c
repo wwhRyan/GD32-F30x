@@ -21,33 +21,34 @@
 /* Device interface for RDC and RDP. */
 
 #include "rti_vc_devif.h"
-#include "rti_vc_rdc.h"
 #include "basicApp.h"
+#include "rti_vc_rdc.h"
+#include <stdint.h>
 
 #if (!defined(ECLIPSE_RCP) && !defined(__KERNEL__) && defined(__linux__) /* Linux application */)
-	U8_T vc_i2c_bus_number[MAX_NUM_VC_DEVICE_CH] = {
-		_CFG_I2C_BUS_NR_RDC_RDP0, /* VC_DEVICE_CH_RDC_RDP0 */
-		_CFG_I2C_BUS_NR_RDC_RDP1  /* VC_DEVICE_CH_RDP1 */
-	};
+U8_T vc_i2c_bus_number[MAX_NUM_VC_DEVICE_CH] = {
+    _CFG_I2C_BUS_NR_RDC_RDP0, /* VC_DEVICE_CH_RDC_RDP0 */
+    _CFG_I2C_BUS_NR_RDC_RDP1 /* VC_DEVICE_CH_RDP1 */
+};
 
-	#ifdef _CFG_USE_RTIMD_KERNEL_DRIVER
-	static int rtimd_dev_fd;
-	#else
-	static int vc_dev_fd[MAX_NUM_VC_DEVICE_CH];
-	#endif // _CFG_USE_RTIMD_KERNEL_DRIVER
+#ifdef _CFG_USE_RTIMD_KERNEL_DRIVER
+static int rtimd_dev_fd;
 #else
-    U8_T vc_i2c_bus_number[MAX_NUM_VC_DEVICE_CH] = {
-        VC_DEVICE_CH_RDC_RDP0, /* VC_DEVICE_CH_RDC_RDP0 */
-        VC_DEVICE_CH_RDP1  /* VC_DEVICE_CH_RDP1 */
-	};
+static int vc_dev_fd[MAX_NUM_VC_DEVICE_CH];
+#endif // _CFG_USE_RTIMD_KERNEL_DRIVER
+#else
+U8_T vc_i2c_bus_number[MAX_NUM_VC_DEVICE_CH] = {
+    VC_DEVICE_CH_RDC_RDP0, /* VC_DEVICE_CH_RDC_RDP0 */
+    VC_DEVICE_CH_RDP1 /* VC_DEVICE_CH_RDP1 */
+};
 #endif /* #ifdef _CFG_USE_RTI_MD_LINUX_KERNEL_I2C_DRIVER */
 
 /**
-* External functions
-*/
+ * External functions
+ */
 #ifndef ECLIPSE_RCP
 #ifdef __cplusplus
-extern "C"{
+extern "C" {
 #endif
 #endif
 int rtiVC_prepare_controller(void);
@@ -87,15 +88,32 @@ void rtiVC_WriteDevice16(E_VC_DEVICE_CH_T dev_ch, U8_T dev_slave_addr,
     set_reg(dev_slave_addr, reg, val);
 }
 
+// TODO: make sure this
 int rtiVC_ReadBurstDeviceExt(E_VC_DEVICE_CH_T dev_ch, U8_T dev_slave_addr,
     U8_T* w_buf, U16_T w_size,
     U8_T* r_buf, U16_T r_size)
 {
-    return -1;
+    bool ret = true;
+    uint16_t w_reg = (((uint16_t)w_buf[0] & 0x00ff << 8) | ((uint16_t)w_buf[1] & 0x00ff));
+    uint16_t r_reg = (((uint16_t)r_buf[0] & 0x00ff << 8) | ((uint16_t)r_buf[1] & 0x00ff));
+
+    ret |= set_reg_block(dev_slave_addr, w_reg, w_buf + 2, w_size - 2);
+    ret |= get_reg_block(dev_slave_addr, r_reg, r_buf + 2, r_size - 2);
+    if (ret)
+        return 0;
+    else
+        return -1;
 }
 
 int rtiVC_WriteBurstDeviceExt(E_VC_DEVICE_CH_T dev_ch, U8_T dev_slave_addr,
     U8_T* buf, U16_T size)
 {
-    return -1;
+    bool ret = true;
+    uint16_t w_reg = (((uint16_t)buf[0] & 0x00ff << 8) | ((uint16_t)buf[1] & 0x00ff));
+
+    ret |= set_reg_block(dev_slave_addr, w_reg, buf + 2, size - 2);
+    if (ret)
+        return 0;
+    else
+        return -1;
 }

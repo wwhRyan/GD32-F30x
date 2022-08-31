@@ -16,6 +16,7 @@
 #include "file.h"
 #include "gd32f307c_eval.h"
 #include "gd32f30x.h"
+#include "gd32f30x_adc.h"
 #include "i2c.h"
 #include "main.h"
 
@@ -101,6 +102,14 @@ const fan_timer_config_t cw_wheel_fg = {
     .channel_interrupt_flag = TIMER_INT_FLAG_CH3,
     .channel_interrupt_enable = TIMER_INT_CH3,
     .p_st_calc = &cw_wheel_fg_calc,
+};
+
+const ntc_adc_config_t blue_led_ntc = {
+    .adc_clock = RCU_ADC0,
+    .adc_base = ADC0,
+    .adc_channel = ADC_CHANNEL_0,
+    .gpio_port = B_LED_NTC_PORT,
+    .gpio_pin = B_LED_NTC_PIN,
 };
 
 const ntc_adc_config_t red_ld_ntc = {
@@ -213,20 +222,16 @@ gpio_config_t gpio_config_table[] = {
     { DISCHARGE_PORT, DISCHARGE_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
     { DISCHARGE2_PORT, DISCHARGE2_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
     { SYS_12V_ON_PORT, SYS_12V_ON_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET },
-    { RDC200A_RESET_PORT, RDC200A_RESET_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET },
-    { MCU_GPIO_INT_PORT, MCU_GPIO_INT_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
-
-    // input
-    { HW_VER0_PORT, HW_VER0_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET },
-    { HW_VER1_PORT, HW_VER1_PIN, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_50MHZ, RESET },
-
-    { RESERVERD_1_PORT, RESERVERD_1_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
+    { RDC200A_RESET_PORT, RDC200A_RESET_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET }, /* reset RDC200A 0.2ms after VCC supply */
+    { MCU_GPIO_INT_PORT, MCU_GPIO_INT_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET }, /* for MLB input MIPI */
+    { RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET }, /* RDC200A MCU BUSY */
+    { RDC200A_VCC_EN_PORT, RDC200A_VCC_EN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, SET }, /* RDC200A 3.3V 1.8V */
+    { RDC200A_BOOTB_IN_PORT, RDC200A_BOOTB_IN_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET }, /* RDC200A BOOT select */
     { RESERVERD_2_PORT, RESERVERD_2_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
     { EE_WP_PORT, EE_WP_PIN, GPIO_MODE_OUT_PP, GPIO_OSPEED_50MHZ, RESET },
+    // input
 
 };
-
-
 
 void application_init()
 {
@@ -253,6 +258,7 @@ void application_init()
 
     ntc_adc_config(&red_ld_ntc);
     ntc_adc_config(&green_led_ntc);
+    ntc_adc_config(&blue_led_ntc);
     ntc_adc_config(&evn_ntc);
     ntc_adc_config(&lcos_panel_ntc);
 
@@ -261,6 +267,7 @@ void application_init()
     laser_dac_set(2.00);
 
     INewSoftwareI2C(&raontech_i2c);
+    INewSoftwareI2C(&sensor_i2c);
 
     printf("OV Lcos Board %s finished\r\n", __func__);
     /* print out the clock frequency of system, AHB, APB1 and APB2 */

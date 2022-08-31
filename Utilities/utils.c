@@ -37,7 +37,7 @@ void system_ipc_init(void)
     set_sig(sys_sig, sig_lightsource, true);
     set_sig(sys_sig, sig_system, true);
     clear_sig(sys_sig, sig_light_status);
-    clear_sig(sys_sig, sig_update_anf);
+    clear_sig(sys_sig, sig_update_rdc200a);
     clear_sig(sys_sig, sig_update_firmware);
     clear_sig(sys_sig, sig_eeprom_write);
     set_sig(sys_sig, sig_slient_async_msg, false);

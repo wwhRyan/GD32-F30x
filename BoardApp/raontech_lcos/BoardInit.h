@@ -62,7 +62,7 @@ typedef enum sys_sig_t {
     sig_rdc200a_status,
     sig_light_status,
     sig_slient_async_msg,
-    sig_update_anf,
+    sig_update_rdc200a,
     sig_update_firmware,
     sig_eeprom_write,
     sig_mcu_init_ok,
@@ -128,11 +128,17 @@ typedef struct msg_t {
 #define SENSOR_SDA_PIN GPIO_PIN_15
 
 /*<! hardware version detect !>*/
-#define HW_VER0_PORT GPIOC
-#define HW_VER0_PIN GPIO_PIN_14
+// #define HW_VER0_PORT GPIOC
+// #define HW_VER0_PIN GPIO_PIN_14
 
-#define HW_VER1_PORT GPIOC
-#define HW_VER1_PIN GPIO_PIN_15
+#define RDC200A_BOOT_OUT_PORT GPIOC
+#define RDC200A_BOOT_OUT_PIN GPIO_PIN_14
+
+// #define HW_VER1_PORT GPIOC
+// #define HW_VER1_PIN GPIO_PIN_15
+
+#define RDC200A_VCC_EN_PORT GPIOC
+#define RDC200A_VCC_EN_PIN GPIO_PIN_15
 
 #define B_LED_NTC_PORT GPIOA
 #define B_LED_NTC_PIN GPIO_PIN_0
@@ -181,8 +187,8 @@ typedef struct msg_t {
 #define FG_PIN GPIO_PIN_11
 
 /*<! None using. !>*/
-#define RESERVERD_1_PORT GPIOA
-#define RESERVERD_1_PIN GPIO_PIN_12
+#define RDC200A_BOOTB_IN_PORT GPIOA
+#define RDC200A_BOOTB_IN_PIN GPIO_PIN_12
 
 /*<! None using. !>*/
 #define RESERVERD_2_PORT GPIOA
