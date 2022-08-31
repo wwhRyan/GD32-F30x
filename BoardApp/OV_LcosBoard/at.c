@@ -358,8 +358,8 @@ IAtOperationRegister(kCmdReset, pAt_Kv_List, pAt_feedback_str)
         if (kKeyFactory == my_kvs[0].value) {
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
-            eeprom_write(&BL24C64A, eeprom_mem[idx_check_sum].addr, 0);
-            init_eeprom(&BL24C64A);
+            eeprom_write(&AT24C02D, eeprom_mem[idx_check_sum].addr, 0);
+            init_eeprom(&AT24C02D);
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
         } else if (kKeyUser == my_kvs[0].value) {
@@ -697,7 +697,7 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
         if (msg.size > 256)
             goto EEPROM_VALUE_ERROR;
 
-        if (true == eeprom_block_read(&BL24C64A, addr, (uint8_t*)data_output, size)) {
+        if (true == eeprom_block_read(&AT24C02D, addr, (uint8_t*)data_output, size)) {
             IntToAscii(data_output, ascii_output, 1, size);
             IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_output);
         } else {

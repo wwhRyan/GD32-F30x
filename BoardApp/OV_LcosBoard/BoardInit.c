@@ -173,7 +173,7 @@ const eeprom_model_t AT24C02D = {
     .lock = eeprom_lock,
     .page_size = 8,
     .write_delay_time = 5 + 5,
-    .i2c = &ovp921_i2c,
+    .i2c = &sensor_i2c,
 };
 
 const exti_gpio_t R_pwm_led = {
@@ -294,7 +294,6 @@ void application_init()
     printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
     printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
 
-    // init_eeprom(&BL24C64A);
     omnivision_lcos_init();
 }
 
