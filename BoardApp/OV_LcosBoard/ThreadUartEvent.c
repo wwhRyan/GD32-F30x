@@ -19,6 +19,7 @@
 
 
 asAtProtocol at_obj;
+asAtProtocol output_obj;
 extern const Uarter uart0_output;
 extern const Uarter uart1_debug;
 
@@ -28,13 +29,14 @@ void ThreadUartEvent(void* pvParameters)
     reload_idu_current();
 
     IInitAtLib(&at_obj, kAtNormalMode, NULL, debug_printf);
+    IInitAtLib(&output_obj, kAtNormalMode, NULL, output_printf);
 
     while (1) {
 
         if (0 != GetRxlen(&uart0_output)) {
             debug_printf("Rec SignalBoard: %s\r\n", GetRxData(&uart0_output));
             // ICmdLinesInput(GetRxData(&uart0_output));
-            // IAtCmdDecodeAndRun(&at_obj, str);
+            IAtCmdDecodeAndRun(&output_obj, GetRxData(&uart0_output));
             ClearRxData(&uart0_output);
         }
 

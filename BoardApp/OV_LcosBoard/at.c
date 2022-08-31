@@ -37,7 +37,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             ULOG_DEBUG("system on\n");
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             break;
 
         case kKeyIdle:
@@ -45,7 +45,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             clear_sig(sys_sig, sig_system);
             clear_sig(sys_sig, sig_update_anf);
             clear_sig(sys_sig, sig_update_firmware);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             break;
 
         case kKeyOff:
@@ -59,7 +59,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             clear_sig(sys_sig, sig_ovp921_status);
             ULOG_DEBUG("sig_lightsource off\n");
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             break;
 
         default:
@@ -91,13 +91,13 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
             set_sig(sys_sig, sig_lightsource, true);
             ULOG_DEBUG("sig_lightsource on\n");
             if (get_sig(sys_sig, sig_ovp921_status))
-                IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+                IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             else
                 IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n"); // ovp921 must work normal with MIPI input
         } else if (kKeyOff == my_kvs[0].value) {
             clear_sig(sys_sig, sig_lightsource);
             ULOG_DEBUG("sig_lightsource off\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
     } else {
@@ -229,20 +229,20 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
 
             horizontal_flip(true);
             vertical_flip(false);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyCeilingRear == my_kvs[0].value) {
             horizontal_flip(false);
             vertical_flip(false);
 
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyTableFront == my_kvs[0].value) {
             horizontal_flip(true);
             vertical_flip(true);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyTableRear == my_kvs[0].value) {
             horizontal_flip(false);
             vertical_flip(true);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
@@ -259,40 +259,40 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyRed == my_kvs[0].value) {
             show_solid_color_pattern(255, 0, 0);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyGreen == my_kvs[0].value) {
             show_solid_color_pattern(0, 255, 0);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyBlue == my_kvs[0].value) {
             show_solid_color_pattern(0, 0, 255);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyGrey == my_kvs[0].value) {
             show_solid_color_pattern(127, 127, 127);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyMagenta == my_kvs[0].value) {
             show_solid_color_pattern(255, 0, 255);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyCyan == my_kvs[0].value) {
             show_solid_color_pattern(0, 255, 255);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyYellow == my_kvs[0].value) {
             show_solid_color_pattern(255, 255, 0);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyBlack == my_kvs[0].value) {
             show_solid_color_pattern(0, 0, 0);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyWhite == my_kvs[0].value) {
             show_solid_color_pattern(255, 255, 255);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyCheckerboard == my_kvs[0].value) {
             checkerboard_pattern();
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyHorizontalRamp == my_kvs[0].value) {
             gray_ramp_pattern();
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyOff == my_kvs[0].value) {
             off_pattern();
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
@@ -343,7 +343,7 @@ IAtOperationRegister(kCmdCwSpeed, pAt_Kv_List, pAt_feedback_str)
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     } else {
         if (kKeyScatteringWheel == my_kvs[0].key) {
-            IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[0].key.pData, Get_fan_timer_FG(&cw_wheel_fg));
+            IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[0].key.pData, Get_fan_timer_FG(&cw_wheel_fg) * 15);
         } else
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
     }
@@ -433,20 +433,22 @@ IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
                 return;
             }
         }
+        IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+
     } else {
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyR:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%f\n",
-                    pAt_Kv_List->pList[i].key.pData, eeprom.red);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n",
+                    pAt_Kv_List->pList[i].key.pData, (int)eeprom.red);
                 break;
             case kKeyG:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%f\n",
-                    pAt_Kv_List->pList[i].key.pData, eeprom.green);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n",
+                    pAt_Kv_List->pList[i].key.pData, (int)eeprom.green);
                 break;
             case kKeyB:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%f\n",
-                    pAt_Kv_List->pList[i].key.pData, eeprom.blue);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n",
+                    pAt_Kv_List->pList[i].key.pData, (int)eeprom.blue);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -673,6 +675,7 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
         msg.addr = addr;
         msg.size = size;
         xQueueSend(xQueue_eeprom, (void*)&msg, (TickType_t)10);
+        IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
     } else {
         char ascii_output[512 + 1] = { 0 };
         uint8_t data_output[256] = { 0 };

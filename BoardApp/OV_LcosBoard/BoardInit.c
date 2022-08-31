@@ -272,7 +272,7 @@ void application_init()
     extern_gpio_interrupt_init(&B_pwm_led);
 
     fan_timer_pwm_config(&cw_wheel_pwm);
-    Set_fan_timer_pwm(&cw_wheel_pwm, 90);
+    Set_fan_timer_pwm(&cw_wheel_pwm, 25);
 
     fan_timer_FG_config(&cw_wheel_fg);
 

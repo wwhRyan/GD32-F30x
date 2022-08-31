@@ -39,10 +39,10 @@ void timer_pwm_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint16_t
     // timer_deinit(timer_base);
 
     /* timer_base configuration */
-    timer_initpara.prescaler = 119;
+    timer_initpara.prescaler = 0;
     timer_initpara.alignedmode = TIMER_COUNTER_EDGE;
     timer_initpara.counterdirection = TIMER_COUNTER_UP;
-    timer_initpara.period = 15999;
+    timer_initpara.period = 4800 - 1;
     timer_initpara.clockdivision = TIMER_CKDIV_DIV1;
     timer_initpara.repetitioncounter = 0;
     timer_init(timer_base, &timer_initpara);
@@ -58,7 +58,7 @@ void timer_pwm_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint16_t
     timer_channel_output_config(timer_base, timer_channel, &timer_ocintpara);
 
     /* timer_channel configuration in PWM mode0, default duty cycle 25% */
-    timer_channel_output_pulse_value_config(timer_base, timer_channel, 3999);
+    timer_channel_output_pulse_value_config(timer_base, timer_channel, (4800 - 1) /4);
     timer_channel_output_mode_config(timer_base, timer_channel, TIMER_OC_MODE_PWM0);
     timer_channel_output_shadow_config(timer_base, timer_channel, TIMER_OC_SHADOW_DISABLE);
 
@@ -82,7 +82,7 @@ void timer_pwm_config(rcu_periph_enum timer_clock, uint32_t timer_base, uint16_t
  */
 void set_timer_counter(uint32_t timer_base, uint16_t timer_channel, uint16_t percent)
 {
-    timer_channel_output_pulse_value_config(timer_base, timer_channel, (uint32_t)((uint32_t)percent * 15999 / 100));
+    timer_channel_output_pulse_value_config(timer_base, timer_channel, (uint32_t)((uint32_t)percent * (4800 - 1) / 100));
 }
 
 /**
