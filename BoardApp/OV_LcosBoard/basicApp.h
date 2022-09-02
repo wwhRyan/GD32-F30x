@@ -19,10 +19,15 @@
 #include "main.h"
 #include "ovp921.h"
 
-
+#if 1
+#define R_CURRENT (eeprom.red)
+#define G_CURRENT (eeprom.green)
+#define B_CURRENT (eeprom.blue)
+#else
 #define R_CURRENT (2.5 + 0.3)
 #define G_CURRENT (4.6 + 0.5)
 #define B_CURRENT (4.6 + 0.5)
+#endif
 
 typedef enum color_t {
     RED,

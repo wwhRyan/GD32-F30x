@@ -137,7 +137,7 @@ const ntc_adc_config_t lcos_panel_ntc = {
 
 const dac_t laser_dac = {
     .dac_clock = RCU_DAC,
-    .dac_base = DAC1,
+    .dac_base = DAC0,
     .gpio_port = DAC1_PORT,
     .gpio_pin = DAC1_PIN,
 };
