@@ -61,7 +61,7 @@ void ThreadFirstConsumer(void* pvParameters)
         }
 
         extern const fan_timer_config_t cw_wheel_pwm;
-        int error = (7200 - Get_fan_timer_FG(&cw_wheel_fg) * 15);
+        int error = (7200 - Get_fan_timer_FG(&cw_wheel_fg) * 30);
         cw_speed = cw_speed + error / 50;
         Set_fan_timer_pwm(&cw_wheel_pwm, cw_speed);
 

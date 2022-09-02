@@ -26,6 +26,8 @@ extern const Uarter uart1_debug;
 void ThreadUartEvent(void* pvParameters)
 {
     ULOG_DEBUG("%s\n", __func__);
+    init_eeprom(&AT24C02D);
+
     reload_idu_current();
 
     IInitAtLib(&at_obj, kAtNormalMode, NULL, debug_printf);

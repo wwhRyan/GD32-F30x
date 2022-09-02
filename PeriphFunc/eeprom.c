@@ -120,14 +120,14 @@ bool eeprom_block_write(const eeprom_model_t *model, uint16_t addr, uint8_t *dat
         for (size_t i = 0; i < cnt; i++)
         {
             xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-            ret = ISoftwareI2CRegRead(model->i2c, model->i2c_addr, addr, model->i2c_addr_type,
+            ret = ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, addr, model->i2c_addr_type,
                                       data + i * model->page_size, model->page_size, 0xFFFF);
             xSemaphoreGive(i2c_Semaphore);
             vTaskDelay(model->write_delay_time);
         }
         int left_cnt = size % model->page_size;
         xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-        ret = ISoftwareI2CRegRead(model->i2c, model->i2c_addr, addr, model->i2c_addr_type,
+        ret = ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, addr, model->i2c_addr_type,
                                   data + cnt * model->page_size, left_cnt, 0xFFFF);
         xSemaphoreGive(i2c_Semaphore);
         vTaskDelay(model->write_delay_time);
@@ -135,7 +135,7 @@ bool eeprom_block_write(const eeprom_model_t *model, uint16_t addr, uint8_t *dat
     else
     {
         xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-        ret = ISoftwareI2CRegRead(model->i2c, model->i2c_addr, addr, model->i2c_addr_type, data, size, 0xFFFF);
+        ret = ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, addr, model->i2c_addr_type, data, size, 0xFFFF);
         xSemaphoreGive(i2c_Semaphore);
         vTaskDelay(model->write_delay_time);
     }

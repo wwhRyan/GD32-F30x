@@ -343,7 +343,7 @@ IAtOperationRegister(kCmdCwSpeed, pAt_Kv_List, pAt_feedback_str)
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     } else {
         if (kKeyScatteringWheel == my_kvs[0].key) {
-            IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[0].key.pData, Get_fan_timer_FG(&cw_wheel_fg) * 15);
+            IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[0].key.pData, Get_fan_timer_FG(&cw_wheel_fg) * 30);
         } else
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
     }
@@ -406,26 +406,26 @@ IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
-        float current;
+        int current;
 
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyR:
-                sscanf(my_kvs[i].value, "%f", &current);
+                sscanf(my_kvs[i].value, "%d", &current);
                 // check current
-                eeprom.red = current;
+                eeprom.red = (float)current / 100;
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_red], (TickType_t)10);
                 break;
             case kKeyG:
-                sscanf(my_kvs[i].value, "%f", &current);
+                sscanf(my_kvs[i].value, "%d", &current);
                 // check current
-                eeprom.green = current;
+                eeprom.green = (float)current / 100;
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_green], (TickType_t)10);
                 break;
             case kKeyB:
-                sscanf(my_kvs[i].value, "%f", &current);
+                sscanf(my_kvs[i].value, "%d", &current);
                 // check current
-                eeprom.blue = current;
+                eeprom.blue = (float)current / 100;
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_blue], (TickType_t)10);
                 break;
             default:
@@ -440,15 +440,15 @@ IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
             switch (my_kvs[i].key) {
             case kKeyR:
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n",
-                    pAt_Kv_List->pList[i].key.pData, (int)eeprom.red);
+                    pAt_Kv_List->pList[i].key.pData, (int)(eeprom.red * 100));
                 break;
             case kKeyG:
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n",
-                    pAt_Kv_List->pList[i].key.pData, (int)eeprom.green);
+                    pAt_Kv_List->pList[i].key.pData, (int)(eeprom.green * 100));
                 break;
             case kKeyB:
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n",
-                    pAt_Kv_List->pList[i].key.pData, (int)eeprom.blue);
+                    pAt_Kv_List->pList[i].key.pData, (int)(eeprom.blue * 100));
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
