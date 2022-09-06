@@ -17,6 +17,7 @@
 #include "gd32f307c_eval.h"
 #include "gd32f30x.h"
 #include "gd32f30x_adc.h"
+#include "gd32f30x_dac.h"
 #include "i2c.h"
 #include "main.h"
 
@@ -146,9 +147,9 @@ const ntc_adc_config_t lcos_panel_ntc = {
 
 const dac_t laser_dac = {
     .dac_clock = RCU_DAC,
-    .dac_base = DAC1,
-    .gpio_port = DAC1_PORT,
-    .gpio_pin = DAC1_PIN,
+    .dac_base = DAC0,
+    .gpio_port = DAC0_PORT,
+    .gpio_pin = DAC0_PIN,
 };
 
 const SoftwareI2C raontech_i2c = {
@@ -173,7 +174,7 @@ const eeprom_model_t BL24C64A = {
     .lock = eeprom_lock,
     .page_size = 32,
     .write_delay_time = 3 + 3,
-    .i2c = &raontech_i2c,
+    .i2c = &sensor_i2c,
 };
 
 const eeprom_model_t AT24C02D = {
@@ -182,7 +183,7 @@ const eeprom_model_t AT24C02D = {
     .lock = eeprom_lock,
     .page_size = 8,
     .write_delay_time = 5 + 5,
-    .i2c = &raontech_i2c,
+    .i2c = &sensor_i2c,
 };
 
 const exti_gpio_t R_pwm_led = {
@@ -252,7 +253,7 @@ void application_init()
     extern_gpio_interrupt_init(&B_pwm_led);
 
     fan_timer_pwm_config(&cw_wheel_pwm);
-    Set_fan_timer_pwm(&cw_wheel_pwm, 90);
+    Set_fan_timer_pwm(&cw_wheel_pwm, 25);
 
     fan_timer_FG_config(&cw_wheel_fg);
 

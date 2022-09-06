@@ -19,18 +19,19 @@
 #include "rti_vc_api.h"
 
 asAtProtocol at_obj;
+asAtProtocol output_obj;
 extern const Uarter uart0_output;
 extern const Uarter uart1_debug;
 
 void ThreadUartEvent(void* pvParameters)
 {
     system_ipc_init();
-    
+
     vTaskDelay(1);
-    gpio_bit_set(RDC200A_RESET_PORT,RDC200A_RESET_PIN);
+    gpio_bit_set(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
 
     ULOG_DEBUG("%s\n", __func__);
-    init_eeprom(&BL24C64A);
+    init_eeprom(&AT24C02D);
     log_init(&eeprom_log);
     // reload_idu_current();
 
@@ -47,13 +48,14 @@ void ThreadUartEvent(void* pvParameters)
         E_assert(0);
 
     IInitAtLib(&at_obj, kAtNormalMode, NULL, debug_printf);
+    IInitAtLib(&output_obj, kAtNormalMode, NULL, output_printf);
     set_sig(sys_sig, sig_mcu_init_ok, true);
     while (1) {
 #if 0
         if (0 != GetRxlen(&uart0_output)) {
             debug_printf("Rec SignalBoard: %s\r\n", GetRxData(&uart0_output));
             // ICmdLinesInput(GetRxData(&uart0_output));
-            // IAtCmdDecodeAndRun(&at_obj, str);
+            IAtCmdDecodeAndRun(&output_obj, GetRxData(&uart0_output));
             ClearRxData(&uart0_output);
         }
 #endif

@@ -36,7 +36,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             ULOG_DEBUG("system on\n");
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             break;
 
         case kKeyIdle:
@@ -44,7 +44,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             clear_sig(sys_sig, sig_system);
             clear_sig(sys_sig, sig_update_rdc200a);
             clear_sig(sys_sig, sig_update_firmware);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             break;
 
         case kKeyOff:
@@ -58,7 +58,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             clear_sig(sys_sig, sig_rdc200a_status);
             ULOG_DEBUG("sig_lightsource off\n");
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             break;
 
         default:
@@ -91,13 +91,13 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
             set_sig(sys_sig, sig_lightsource, true);
             ULOG_DEBUG("sig_lightsource on\n");
             if (get_sig(sys_sig, sig_rdc200a_status))
-                IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+                IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             else
                 IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n"); // rdc200a must work normal with MIPI input
         } else if (kKeyOff == my_kvs[0].value) {
             clear_sig(sys_sig, sig_lightsource);
             ULOG_DEBUG("sig_lightsource off\n");
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
     } else {
@@ -225,16 +225,16 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyCeilingFront == my_kvs[0].value) {
             // TODO: add NTC read.: add raontech lcos flip
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyCeilingRear == my_kvs[0].value) {
             // TODO: add NTC read.: add raontech lcos flip
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyTableFront == my_kvs[0].value) {
             // TODO: add NTC read.: add raontech lcos flip
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyTableRear == my_kvs[0].value) {
             // TODO: add NTC read.: add raontech lcos flip
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
@@ -251,30 +251,30 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyRed == my_kvs[0].value) {
             // TODO: add NTC read.: add testpattern show
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyGreen == my_kvs[0].value) {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyBlue == my_kvs[0].value) {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyGrey == my_kvs[0].value) {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyMagenta == my_kvs[0].value) {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyCyan == my_kvs[0].value) {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyYellow == my_kvs[0].value) {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyBlack == my_kvs[0].value) {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyWhite == my_kvs[0].value) {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyCheckerboard == my_kvs[0].value) {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyHorizontalRamp == my_kvs[0].value) {
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyOff == my_kvs[0].value) {
             // TODO: add NTC read.: add testpattern off
-            IAddFeedbackStrTo(pAt_feedback_str, "OK\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
@@ -326,7 +326,7 @@ IAtOperationRegister(kCmdCwSpeed, pAt_Kv_List, pAt_feedback_str)
     } else {
         // TODO: test read speed.
         if (kKeyScatteringWheel == my_kvs[0].key) {
-            IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[0].key.pData, Get_fan_timer_FG(&cw_wheel_fg));
+            IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[0].key.pData, Get_fan_timer_FG(&cw_wheel_fg) * 30);
         } else
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
     }
@@ -341,8 +341,8 @@ IAtOperationRegister(kCmdReset, pAt_Kv_List, pAt_feedback_str)
         if (kKeyFactory == my_kvs[0].value) {
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
-            eeprom_write(&BL24C64A, eeprom_mem[idx_check_sum].addr, 0);
-            init_eeprom(&BL24C64A);
+            eeprom_write(&AT24C02D, eeprom_mem[idx_check_sum].addr, 0);
+            init_eeprom(&AT24C02D);
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
         } else if (kKeyUser == my_kvs[0].value) {
@@ -389,26 +389,26 @@ IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
-        float current;
+        int current;
 
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyR:
-                sscanf(my_kvs[i].value, "%f", &current);
-                // TODO:check current
-                eeprom.red = current;
+                sscanf(my_kvs[i].value, "%d", &current);
+                // check current
+                eeprom.red = (float)current / 100;
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_red], (TickType_t)10);
                 break;
             case kKeyG:
-                sscanf(my_kvs[i].value, "%f", &current);
+                sscanf(my_kvs[i].value, "%d", &current);
                 // check current
-                eeprom.green = current;
+                eeprom.green = (float)current / 100;
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_green], (TickType_t)10);
                 break;
             case kKeyB:
-                sscanf(my_kvs[i].value, "%f", &current);
+                sscanf(my_kvs[i].value, "%d", &current);
                 // check current
-                eeprom.blue = current;
+                eeprom.blue = (float)current / 100;
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_blue], (TickType_t)10);
                 break;
             default:
@@ -416,20 +416,21 @@ IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
                 return;
             }
         }
+        IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
     } else {
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyR:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%f\n",
-                    pAt_Kv_List->pList[i].key.pData, eeprom.red);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n",
+                    pAt_Kv_List->pList[i].key.pData, (int)(eeprom.red * 100));
                 break;
             case kKeyG:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%f\n",
-                    pAt_Kv_List->pList[i].key.pData, eeprom.green);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n",
+                    pAt_Kv_List->pList[i].key.pData, (int)(eeprom.green * 100));
                 break;
             case kKeyB:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%f\n",
-                    pAt_Kv_List->pList[i].key.pData, eeprom.blue);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n",
+                    pAt_Kv_List->pList[i].key.pData, (int)(eeprom.blue * 100));
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -685,11 +686,13 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
         if (size > 256)
             goto EEPROM_VALUE_ERROR;
 
-        // set_sig(sys_sig, sig_eeprom_write, true);
-        // msg.idx = idx_eeprom_write;
-        // msg.addr = addr;
-        // msg.size = size;
-        // xQueueSend(xQueue_eeprom, (void*)&msg, (TickType_t)10);
+        set_sig(sys_sig, sig_eeprom_write, true);
+        msg.idx = idx_eeprom_write;
+        msg.addr = addr;
+        msg.size = size;
+        xQueueSend(xQueue_eeprom, (void*)&msg, (TickType_t)10);
+        IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+
     } else {
         char ascii_output[512 + 1] = { 0 };
         uint8_t data_output[256] = { 0 };
@@ -711,12 +714,12 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
         if (size > 256)
             goto EEPROM_VALUE_ERROR;
 
-        // if (true == eeprom_block_read(&BL24C64A, addr, (uint8_t*)data_output, size)) {
-        //     IntToAscii(data_output, ascii_output, 1, size);
-        //     IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_output);
-        // } else {
-        //     IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
-        // }
+        if (true == eeprom_block_read(&BL24C64A, addr, (uint8_t*)data_output, size)) {
+            IntToAscii(data_output, ascii_output, 1, size);
+            IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_output);
+        } else {
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        }
     }
     return;
 EEPROM_VALUE_ERROR:

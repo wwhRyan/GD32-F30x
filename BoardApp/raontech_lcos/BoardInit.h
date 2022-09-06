@@ -156,8 +156,8 @@ typedef struct msg_t {
 #define GD32_UART_TX_PIN GPIO_PIN_3
 
 /*<! 电流与DAC对应关系为：DAC_VALUE=(1.24/15+1.24/20-0.03*电流值）*(4095*20/3.3) !>*/
-#define DAC1_PORT GPIOA
-#define DAC1_PIN GPIO_PIN_4
+#define DAC0_PORT GPIOA
+#define DAC0_PIN GPIO_PIN_4
 
 #define LCOS_PANEL_NTC_PORT GPIOA
 #define LCOS_PANEL_NTC_PIN GPIO_PIN_5
