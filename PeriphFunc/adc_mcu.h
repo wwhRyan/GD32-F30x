@@ -13,7 +13,6 @@
 #define __ADC_MCU_H__
 
 #include "gd32f30x.h"
-#include "main.h"
 #include "systick.h"
 #include "i2c.h"
 

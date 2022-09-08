@@ -10,6 +10,8 @@
  */
 
 #include "adc_mcu.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
 void software_triggle_adc_init(rcu_periph_enum adc_clock, uint32_t adc_base, uint32_t port, uint16_t pin)
 {

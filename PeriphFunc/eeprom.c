@@ -83,15 +83,18 @@ void eeprom_memory_reset(void)
 bool eeprom_write(const eeprom_model_t* model, uint16_t addr, uint8_t data)
 {
     bool ret = true;
-    model->lock(UNLOCK);
+
+    if (model->lock != NULL)
+        model->lock(UNLOCK);
 
     xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
     ret = ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, addr,
-                               model->i2c_addr_type, &data, 1, 0xFFFF);
+        model->i2c_addr_type, &data, 1, 0xFFFF);
     xSemaphoreGive(i2c_Semaphore);
     vTaskDelay(model->write_delay_time);
 
-    model->lock(LOCK);
+    if (model->lock != NULL)
+        model->lock(LOCK);
 
     return ret;
 }
@@ -109,7 +112,8 @@ bool eeprom_block_write(const eeprom_model_t* model, uint16_t addr, uint8_t* dat
 {
     bool ret = true;
 
-    model->lock(UNLOCK);
+    if (model->lock != NULL)
+        model->lock(UNLOCK);
     if (size > model->page_size) {
         int cnt = size / model->page_size;
         for (size_t i = 0; i < cnt; i++) {
@@ -131,7 +135,9 @@ bool eeprom_block_write(const eeprom_model_t* model, uint16_t addr, uint8_t* dat
         xSemaphoreGive(i2c_Semaphore);
         vTaskDelay(model->write_delay_time);
     }
-    model->lock(LOCK);
+
+    if (model->lock != NULL)
+        model->lock(LOCK);
     return ret;
 }
 

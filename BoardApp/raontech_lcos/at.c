@@ -129,7 +129,7 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
                 break;
             case kKeyLightEngineBoard:
                 ULOG_DEBUG("kKeyLightEngineBoard\n");
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:VER1%01X.VER0%01X\n", pAt_Kv_List->pList[i].key.pData,
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:VER1-%01X.VER0-%01X\n", pAt_Kv_List->pList[i].key.pData,
                     gpio_output_bit_get(HW_VER1_PORT, HW_VER1_PIN), gpio_output_bit_get(HW_VER0_PORT, HW_VER0_PIN));
                 break;
 
@@ -324,7 +324,6 @@ IAtOperationRegister(kCmdCwSpeed, pAt_Kv_List, pAt_feedback_str)
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     } else {
-        // TODO: test read speed.
         if (kKeyScatteringWheel == my_kvs[0].key) {
             IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[0].key.pData, Get_fan_timer_FG(&cw_wheel_fg) * 30);
         } else
@@ -341,8 +340,9 @@ IAtOperationRegister(kCmdReset, pAt_Kv_List, pAt_feedback_str)
         if (kKeyFactory == my_kvs[0].value) {
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
-            eeprom_write(&AT24C02D, eeprom_mem[idx_check_sum].addr, 0);
-            init_eeprom(&AT24C02D);
+            file_remove_all(&eeprom_log);
+            eeprom_write(&BL24C64A, eeprom_mem[idx_check_sum].addr, 0);
+            init_eeprom(&BL24C64A);
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
         } else if (kKeyUser == my_kvs[0].value) {
