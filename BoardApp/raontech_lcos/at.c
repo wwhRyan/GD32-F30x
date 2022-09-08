@@ -11,13 +11,16 @@
 #include "AtCmdHashTable.h"
 #include "AtKeyHashTable.h"
 #include "AtProtocol.h"
+#include "BoardInit.h"
 #include "basicApp.h"
 #include "ulog.h"
 
 extern asAtProtocol at_obj;
 extern const mem_t eeprom_mem[];
+extern temperature_t temperature[];
+extern file_t eeprom_log;
 
-// TODO: add NTC read.: 搞清楚RDC200A的正常运行的判断
+// TODO: 搞清楚RDC200A的正常运行的判断
 IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
@@ -80,7 +83,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
     }
 }
 
-// TODO: add NTC read.: add display off and add dispaly on
+// TODO: add display off and add dispaly on
 IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
@@ -133,19 +136,19 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
                     gpio_output_bit_get(HW_VER1_PORT, HW_VER1_PIN), gpio_output_bit_get(HW_VER0_PORT, HW_VER0_PIN));
                 break;
 
-                // TODO: add NTC read.: add version
+                // TODO: add version
             case kKeyRdc200a:
                 ULOG_DEBUG("kKeyRdc200a\n");
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
                 break;
 
-                // TODO: add NTC read.: add version
+                // TODO: add version
             case kKeyRdp250h:
                 ULOG_DEBUG("kKeyRdp250h\n");
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
                 break;
 
-                // TODO: add NTC read.: add version
+                // TODO: add version
             case kKeyEeprom:
                 ULOG_DEBUG("kKeyAnf3\n");
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
@@ -224,16 +227,16 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyCeilingFront == my_kvs[0].value) {
-            // TODO: add NTC read.: add raontech lcos flip
+            // TODO: add raontech lcos flip
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyCeilingRear == my_kvs[0].value) {
-            // TODO: add NTC read.: add raontech lcos flip
+            // TODO: add raontech lcos flip
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyTableFront == my_kvs[0].value) {
-            // TODO: add NTC read.: add raontech lcos flip
+            // TODO: add raontech lcos flip
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyTableRear == my_kvs[0].value) {
-            // TODO: add NTC read.: add raontech lcos flip
+            // TODO: add raontech lcos flip
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -250,7 +253,7 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyRed == my_kvs[0].value) {
-            // TODO: add NTC read.: add testpattern show
+            // TODO: add testpattern show
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyGreen == my_kvs[0].value) {
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
@@ -273,7 +276,7 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
         } else if (kKeyHorizontalRamp == my_kvs[0].value) {
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyOff == my_kvs[0].value) {
-            // TODO: add NTC read.: add testpattern off
+            // TODO: add testpattern off
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -291,22 +294,38 @@ IAtOperationRegister(kCmdTemperature, pAt_Kv_List, pAt_feedback_str)
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     } else {
+        // TODO:test temperature
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyNtcBlue:
-                // TODO: add NTC read.
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature[blue_sensor].temperature / 10);
                 break;
             case kKeyNtcRed:
-                // TODO: add NTC read.
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature[red_sensor].temperature / 10);
                 break;
             case kKeyNtcGreen:
-                // TODO: add NTC read.
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature[green_sensor].temperature / 10);
                 break;
             case kKeyNtcLcos:
-                // TODO: add NTC read.
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature[lcos_sensor].temperature / 10);
                 break;
             case kKeyNtcEnv:
-                // TODO: add NTC read.
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature[evn_sensor].temperature / 10);
+                break;
+            case kKeyI2cBlue:
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[blue_sensor].temperature / 10);
+                break;
+            case kKeyI2cRed:
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[red_sensor].temperature / 10);
+                break;
+            case kKeyI2cGreen:
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[green_sensor].temperature / 10);
+                break;
+            case kKeyI2cLcos:
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[evn_sensor].temperature / 10);
+                break;
+            case kKeyI2cEnv:
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[lcos_sensor].temperature / 10);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -345,8 +364,11 @@ IAtOperationRegister(kCmdReset, pAt_Kv_List, pAt_feedback_str)
             init_eeprom(&BL24C64A);
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+
         } else if (kKeyUser == my_kvs[0].value) {
             // TODO: add user reset.
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         }
     } else {
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
@@ -375,8 +397,15 @@ IAtOperationRegister(kCmdLogInfo, pAt_Kv_List, pAt_feedback_str)
     } else {
         if (kKeyStatus == my_kvs[0].key) {
             // TODO: add log read
+            line_t line_tmp[256] = { 0 };
+            int number = file_burst_read(&eeprom_log, line_tmp, my_kvs[0].value);
+            for (int i = 0; i < number; i++) {
+                IAddFeedbackStrTo(pAt_feedback_str, "%s:%d.%s\n", ulog_level_name(line_tmp[i].level), line_tmp[i].time, line_tmp[i].text);
+            }
         } else if (kKeyClear == my_kvs[0].key) {
-            // TODO: add log read.
+            // TODO: add log clear.
+            file_remove_all(&eeprom_log);
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
@@ -674,7 +703,11 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
                 ret = sscanf(my_kvs[i].value, "%256s", eeprom_data);
                 break;
             case kKeyClear:
-                // TODO: add NTC read.
+                // TODO: add eeprom clear
+                file_remove_all(&eeprom_log);
+                eeprom_write(&BL24C64A, eeprom_mem[idx_check_sum].addr, 0);
+                init_eeprom(&BL24C64A);
+                IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");

@@ -130,7 +130,7 @@ void my_file_logger(ulog_level_t severity, char* msg)
     char_replace(new_line.text, '\n', '\0');
     strncpy(new_line.text, msg, TEXT_NUMBER);
 
-    output_printf("AT+Error#%s:%d.%s\n", ulog_level_name(new_line.level), new_line.time, new_line.text);
+    output_printf("AT+Error#%s:%d.%s\n", ulog_level_name(severity), new_line.time, new_line.text);
     file_append_line(&eeprom_log, &new_line);
 }
 

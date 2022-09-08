@@ -15,6 +15,7 @@
 #include "main.h"
 
 extern const Uarter uart0_output;
+extern temperature_t temperature[];
 
 void ThreadSecondConsumer(void* pvParameters)
 {
@@ -34,6 +35,14 @@ void ThreadSecondConsumer(void* pvParameters)
         }
         vTaskDelay(200);
 #endif
-        vTaskDelay(2000);
+        for (int i = 0; i < sensor_num; i++) {
+            get_temperature(&temperature[i]);
+        }
+
+        for (int i = 0; i < sensor_num; i++) {
+            get_i2c_temperature(&temperature_i2c[i]);
+        }
+
+        vTaskDelay(500);
     }
 }

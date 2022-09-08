@@ -56,6 +56,8 @@ extern const eeprom_model_t AT24C02D; /* 2K bytes page=8*/
 extern const fan_timer_config_t cw_wheel_fg;
 extern file_t eeprom_log;
 
+extern temperature_i2c_t temperature_i2c[];
+
 typedef enum sys_sig_t {
     sig_lightsource,
     sig_system,

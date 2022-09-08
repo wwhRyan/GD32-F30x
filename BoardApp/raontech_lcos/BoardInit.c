@@ -145,6 +145,39 @@ const ntc_adc_config_t lcos_panel_ntc = {
     .gpio_pin = LCOS_PANEL_NTC_PIN,
 };
 
+temperature_t temperature[sensor_num] = {
+    {
+        .p_ntc_adc_config = &blue_led_ntc,
+        .p_ntc = &NCP18WB473F10RB,
+        .buff = { 0, 0, 0, 0, 0 },
+        .temperature = 0,
+    },
+    {
+        .p_ntc_adc_config = &red_ld_ntc,
+        .p_ntc = &NCP18WB473F10RB,
+        .buff = { 0, 0, 0, 0, 0 },
+        .temperature = 0,
+    },
+    {
+        .p_ntc_adc_config = &green_led_ntc,
+        .p_ntc = &NCP18WB473F10RB,
+        .buff = { 0, 0, 0, 0, 0 },
+        .temperature = 0,
+    },
+    {
+        .p_ntc_adc_config = &evn_ntc,
+        .p_ntc = &NCP18WB473F10RB,
+        .buff = { 0, 0, 0, 0, 0 },
+        .temperature = 0,
+    },
+    {
+        .p_ntc_adc_config = &lcos_panel_ntc,
+        .p_ntc = &NCP18WB473F10RB,
+        .buff = { 0, 0, 0, 0, 0 },
+        .temperature = 0,
+    },
+};
+
 const dac_t laser_dac = {
     .dac_clock = RCU_DAC,
     .dac_base = DAC0,
@@ -169,7 +202,7 @@ const SoftwareI2C sensor_i2c = {
 };
 
 const eeprom_model_t BL24C64A = {
-    .i2c_addr = EEPROM_ADDRESS,
+    .i2c_addr = (0x50 < 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
     .lock = eeprom_lock,
     .page_size = 32,
@@ -184,6 +217,79 @@ const eeprom_model_t AT24C02D = {
     .page_size = 8,
     .write_delay_time = 5 + 5,
     .i2c = &sensor_i2c,
+};
+
+const eeprom_model_t GX112D_red = {
+    .i2c_addr = (0x4b < 1) & 0x00ff,
+    .i2c_addr_type = REG_ADDR_2BYTE,
+    .lock = NULL,
+    .page_size = 1,
+    .write_delay_time = 5,
+    .i2c = &sensor_i2c,
+};
+
+const eeprom_model_t GX112D_blue = {
+    .i2c_addr = (0x49 < 1) & 0x00ff,
+    .i2c_addr_type = REG_ADDR_2BYTE,
+    .lock = NULL,
+    .page_size = 1,
+    .write_delay_time = 5,
+    .i2c = &sensor_i2c,
+};
+
+const eeprom_model_t GX112D_green = {
+    .i2c_addr = (0x4a < 1) & 0x00ff,
+    .i2c_addr_type = REG_ADDR_2BYTE,
+    .lock = NULL,
+    .page_size = 1,
+    .write_delay_time = 5,
+    .i2c = &sensor_i2c,
+};
+
+const eeprom_model_t GX112D_lcos = {
+    .i2c_addr = (0x48 < 1) & 0x00ff,
+    .i2c_addr_type = REG_ADDR_2BYTE,
+    .lock = NULL,
+    .page_size = 1,
+    .write_delay_time = 5,
+    .i2c = &sensor_i2c,
+};
+
+const eeprom_model_t GX75C_env = {
+    .i2c_addr = (0x4c < 1) & 0x00ff,
+    .i2c_addr_type = REG_ADDR_2BYTE,
+    .lock = NULL,
+    .page_size = 1,
+    .write_delay_time = 5,
+    .i2c = &sensor_i2c,
+};
+
+temperature_i2c_t temperature_i2c[sensor_num] = {
+    {
+        .p_i2c = &GX112D_blue,
+        .buff = { 0, 0, 0, 0, 0 },
+        .temperature = 0,
+    },
+    {
+        .p_i2c = &GX112D_red,
+        .buff = { 0, 0, 0, 0, 0 },
+        .temperature = 0,
+    },
+    {
+        .p_i2c = &GX112D_green,
+        .buff = { 0, 0, 0, 0, 0 },
+        .temperature = 0,
+    },
+    {
+        .p_i2c = &GX75C_env,
+        .buff = { 0, 0, 0, 0, 0 },
+        .temperature = 0,
+    },
+    {
+        .p_i2c = &GX112D_lcos,
+        .buff = { 0, 0, 0, 0, 0 },
+        .temperature = 0,
+    },
 };
 
 const exti_gpio_t R_pwm_led = {

@@ -15,8 +15,9 @@
 #include "Common.h"
 #include "gd32f30x.h"
 #include "i2c.h"
-#include "main.h"
 #include <stdint.h>
+#include "eeprom.h"
+#include "adc_mcu.h"
 
 #define RDC200A_ADDR (0x4A << 1)
 
@@ -44,6 +45,28 @@ typedef struct ntc_t {
     bool is_pull_up; // true: divided_voltage_R pull up, false: divided_voltage_R pull down
 } ntc_t;
 
+typedef struct temperature_t{
+    const ntc_adc_config_t * p_ntc_adc_config;
+    const ntc_t * p_ntc;
+    int temperature;
+    int buff[5];/* store temperature * 10 for filtering */
+}temperature_t;
+
+typedef enum temperature_enum_t{
+    blue_sensor,
+    red_sensor,
+    green_sensor,
+    evn_sensor,
+    lcos_sensor,
+    sensor_num,
+}temperature_enum_t;
+
+typedef struct temperature_i2c_t{
+    const eeprom_model_t * p_i2c;
+    int temperature;
+    int buff[5];/* store temperature * 10 for filtering */
+}temperature_i2c_t;
+
 uint8_t get_reg(uint8_t dev_addr, uint16_t reg_addr);
 bool set_reg(uint8_t dev_addr, uint16_t reg_addr, uint8_t reg_val);
 bool get_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t size);
@@ -56,7 +79,8 @@ void laser_dac_set(float current);
 
 uint8_t get_idu_value(float current);
 float get_current_value(uint8_t idu);
-float get_temperature(int adc_value);
+float get_temperature(temperature_t * p_temp);
+float get_i2c_temperature(temperature_i2c_t* p_temp);
 
 void reload_idu_current(void);
 
@@ -66,7 +90,6 @@ char* get_sn(int number, char* buff);
 uint32_t get_MSB_array_crc(uint8_t* array, size_t size);
 uint32_t get_LSB_array_crc(uint8_t* array, size_t size);
 
-void printf_temperature(uint32_t interval);
-void printf_on_power_temperature(uint32_t interval);
+extern const ntc_t NCP18WB473F10RB;
 
 #endif
