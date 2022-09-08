@@ -23,6 +23,15 @@
 // #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)   //获取文件名 linux下
 // #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__) //获取文件名 windows下
 
+#define EXCUTE_ONCE(x)                     \
+    do {                                   \
+        static uint8_t once##__LINE__ = 0; \
+        if (once##__LINE__ == 0) {         \
+            once##__LINE__ = 1;            \
+            x;                             \
+        }                                  \
+    } while (0)
+
 #if 0
 #ifdef DEBUG
 /**
