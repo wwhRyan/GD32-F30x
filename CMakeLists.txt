@@ -1,8 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
-
+# set(CMAKE_TOOLCHAIN_FILE cmake/arm-none-eabi-gcc.cmake)
 project(GD32-F303CC)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 enable_language(C ASM)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -24,6 +26,19 @@ if(${FORCE_COLORED_OUTPUT})
     add_compile_options(-fcolor-diagnostics)
   endif()
 endif()
+
+# add_compile_options(
+# 	-mcpu=cortex-m4
+# 	-mthumb
+# 	$<$<CONFIG:Debug>:-Og>
+# 	$<$<CONFIG:Release>:-O3>
+# 	$<$<CONFIG:MinSizeRel>:-Os>
+# 	$<$<CONFIG:RelWithDebInfo>:-O3>
+# )
+
+# add_link_options(
+# 	-mcpu=cortex-m4
+# )
 
 # add MCU build c flags
 add_definitions(-DDEBUG)

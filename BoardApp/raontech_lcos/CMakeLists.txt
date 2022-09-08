@@ -24,4 +24,5 @@ target_link_libraries(
           CmdProtocol
           simple_file
           AsciiConvert
-          ulog)
+          ulog
+          utils)
