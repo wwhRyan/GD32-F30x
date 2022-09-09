@@ -358,8 +358,8 @@ IAtOperationRegister(kCmdReset, pAt_Kv_List, pAt_feedback_str)
         if (kKeyFactory == my_kvs[0].value) {
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
-            eeprom_write(&AT24C02D, eeprom_mem[idx_check_sum].addr, 0);
-            init_eeprom(&AT24C02D);
+            eeprom_write(&BL24C64A, eeprom_mem[idx_check_sum].addr, 0);
+            init_eeprom(&BL24C64A);
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
         } else if (kKeyUser == my_kvs[0].value) {
@@ -636,26 +636,28 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
+    char ascii_buff[512 + 1] = { 0 };
     size_t addr, size = 0;
     int ret = 0;
     msg_t msg;
-    msg.pData = eeprom_data;
+
+    if (get_sig(sys_sig, sig_eeprom_write)) {
+        IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        return;
+    }
+    memset(eeprom_data, 0, sizeof(eeprom_data));
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
-        if (get_sig(sys_sig, sig_eeprom_write)) {
-            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
-            return;
-        }
-        memset(eeprom_data, 0, sizeof(eeprom_data));
+
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyAddr:
-                ret = sscanf(my_kvs[i].value, "%2X", &addr);
+                ret = sscanf(my_kvs[i].value, "%X", &addr);
                 break;
             case kKeySize:
-                ret = sscanf(my_kvs[i].value, "%1X", &size);
+                ret = sscanf(my_kvs[i].value, "%X", &size);
                 break;
             case kKeyData:
-                ret = sscanf(my_kvs[i].value, "%256s", eeprom_data);
+                ret = sscanf(my_kvs[i].value, "%256s", ascii_buff);
                 break;
             case kKeyClear:
                 // todo
@@ -667,18 +669,24 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
             if (ret == EOF || ret == 0)
                 goto EEPROM_VALUE_ERROR;
         }
-        if (msg.size > 256)
+        if (size > 256)
             goto EEPROM_VALUE_ERROR;
 
+        AsciiToInt(ascii_buff, eeprom_data, 1);
         set_sig(sys_sig, sig_eeprom_write, true);
         msg.idx = idx_eeprom_write;
         msg.addr = addr;
         msg.size = size;
+        msg.pData = eeprom_data;
         xQueueSend(xQueue_eeprom, (void*)&msg, (TickType_t)10);
         IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+#if 0
+        if (true == eeprom_block_write(&BL24C64A, msg.addr, (uint8_t*)msg.pData, msg.size))
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+        else
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+#endif
     } else {
-        char ascii_output[512 + 1] = { 0 };
-        uint8_t data_output[256] = { 0 };
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyAddr:
@@ -697,9 +705,9 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
         if (msg.size > 256)
             goto EEPROM_VALUE_ERROR;
 
-        if (true == eeprom_block_read(&AT24C02D, addr, (uint8_t*)data_output, size)) {
-            IntToAscii(data_output, ascii_output, 1, size);
-            IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_output);
+        if (true == eeprom_block_read(&BL24C64A, addr, (uint8_t*)eeprom_data, size)) {
+            IntToAscii(eeprom_data, ascii_buff, 1, size);
+            IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_buff);
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
         }

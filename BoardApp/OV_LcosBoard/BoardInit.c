@@ -159,12 +159,12 @@ const SoftwareI2C sensor_i2c = {
 };
 
 const eeprom_model_t BL24C64A = {
-    .i2c_addr = EEPROM_ADDRESS,
+    .i2c_addr = 0x50 << 1,
     .i2c_addr_type = REG_ADDR_2BYTE,
     .lock = eeprom_lock,
     .page_size = 32,
     .write_delay_time = 3 + 3,
-    .i2c = &ovp921_i2c,
+    .i2c = &sensor_i2c,
 };
 
 const eeprom_model_t AT24C02D = {
@@ -286,6 +286,7 @@ void application_init()
     laser_dac_set(2.00);
 
     INewSoftwareI2C(&ovp921_i2c);
+    INewSoftwareI2C(&sensor_i2c);
 
     printf("OV Lcos Board %s finished\r\n", __func__);
     /* print out the clock frequency of system, AHB, APB1 and APB2 */
