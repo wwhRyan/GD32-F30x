@@ -51,8 +51,14 @@ void eeprom_lock(bool lock)
 bool eeprom_update_crc(const eeprom_model_t* model)
 {
     bool ret = true;
-    eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom) + sizeof(uint32_t), sizeof(eeprom_t) - sizeof(uint32_t));
-    ret = eeprom_block_write(model, CONFIG_START_ADDR, ((uint8_t*)&eeprom.check_sum), sizeof(uint32_t));
+    eeprom_t temp = {0};
+
+    ret &= ISoftwareI2CRegRead(model->i2c, model->i2c_addr, CONFIG_START_ADDR,
+        model->i2c_addr_type, ((uint8_t*)&temp), sizeof(eeprom_t), 0xFFFF);
+
+    uint32_t calc_check_sum = get_LSB_array_crc((uint8_t*)(&temp) + sizeof(uint32_t), sizeof(eeprom_t) - sizeof(uint32_t));
+
+    ret &= eeprom_block_write(model, CONFIG_START_ADDR, ((uint8_t*)&calc_check_sum), sizeof(uint32_t));
 
     return ret;
 }
@@ -157,16 +163,16 @@ void init_eeprom(const eeprom_model_t* model)
     uint32_t calc_check_sum = get_LSB_array_crc((uint8_t*)(&eeprom) + sizeof(uint32_t), sizeof(eeprom_t) - sizeof(uint32_t));
 
     if (eeprom.magic_num != eeprom_magic_number || calc_check_sum != eeprom.check_sum) {
-        printf("eeprom check_sum = %08X!\n", eeprom.check_sum);
-        printf("calc_check_sum = %08X!\n", calc_check_sum);
-        printf("reset eeprom!\n");
+        // output_printf("eeprom check_sum = %08X!\n", eeprom.check_sum);
+        // output_printf("calc_check_sum = %08X!\n", calc_check_sum);
+        // output_printf("reset eeprom!\n");
         eeprom_memory_reset();
         eeprom.check_sum = calc_check_sum;
         eeprom_block_write(model, CONFIG_START_ADDR, ((uint8_t*)&eeprom), sizeof(eeprom_t));
-        for (int i = 0; i < sizeof(eeprom_t); i++) {
-            output_printf("%X", ((uint8_t*)&eeprom) + i);
-        }
-        output_printf("\n");
+        // for (int i = 0; i < sizeof(eeprom_t); i++) {
+        //     output_printf("%X", ((uint8_t*)&eeprom) + i);
+        // }
+        // output_printf("\n");
         ULOG_ERROR("EEPROM DATA RESET!\n");
     } else {
         printf("Ok eeprom.\n");

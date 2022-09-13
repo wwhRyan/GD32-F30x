@@ -9,6 +9,7 @@
  *
  */
 #include "AtProtocol.h"
+#include "BoardInit.h"
 #include "basicApp.h"
 #include "main.h"
 #include "ovp921.h"
@@ -167,7 +168,24 @@ IAtOperationRegister(kCmdSn, pAt_Kv_List, pAt_feedback_str)
     char str_buff[32] = { 0 };
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
-        IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        // IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        for (size_t i = 0; i < pAt_Kv_List->size; i++) {
+            switch (my_kvs[i].key) {
+            case kKeyLightEngine:
+                strncpy(eeprom.Sn_LightEngine, my_kvs[i].value, 32);
+                break;
+            case kKeySourceLight:
+                strncpy(eeprom.Sn_SourceLight, my_kvs[i].value, 32);
+                break;
+            case kKeyProjector:
+                strncpy(eeprom.Sn_Projector, my_kvs[i].value, 32);
+                break;
+            default:
+                IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+                return;
+            }
+        }
+        IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
     } else {
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {

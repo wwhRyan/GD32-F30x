@@ -87,7 +87,7 @@ void my_file_logger(ulog_level_t severity, char *msg)
 {
     // debug_printf("%s.%s", ulog_level_name(severity), msg);
     if (get_sig(sys_sig, sig_slient_async_msg) == false)
-        debug_printf("%s.%d-%02d-%02d.%s", ulog_level_name(severity), eeprom.light_source_time / 60 / 60, (eeprom.light_source_time / 60) % 60, eeprom.light_source_time % 60, msg);
+        output_printf("AT+Error#%s:%d-%02d-%02d.%s", ulog_level_name(severity), eeprom.light_source_time / 60 / 60, (eeprom.light_source_time / 60) % 60, eeprom.light_source_time % 60, msg);
 }
 
 void log_init()
