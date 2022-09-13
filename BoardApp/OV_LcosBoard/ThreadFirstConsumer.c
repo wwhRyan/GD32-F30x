@@ -20,7 +20,8 @@ extern const mem_t eeprom_mem[];
 
 #define EEPROM_W_QUEUE_LENGTH 5
 QueueHandle_t xQueue_eeprom = NULL;
-int cw_speed = 25;
+int cw_pwm = 25;
+int target_speed = 7200;
 
 void ThreadFirstConsumer(void* pvParameters)
 {
@@ -61,9 +62,13 @@ void ThreadFirstConsumer(void* pvParameters)
         }
 
         extern const fan_timer_config_t cw_wheel_pwm;
-        int error = (7200 - Get_fan_timer_FG(&cw_wheel_fg) * 30);
-        cw_speed = cw_speed + error / 50;
-        Set_fan_timer_pwm(&cw_wheel_pwm, cw_speed);
+        int error = (target_speed - Get_fan_timer_FG(&cw_wheel_fg) * 30);
+        cw_pwm = cw_pwm + error / 50;
+        if (cw_pwm < 10)
+            cw_pwm = 10;
+        if (cw_pwm > 100)
+            cw_pwm = 100;
+        Set_fan_timer_pwm(&cw_wheel_pwm, cw_pwm);
 
         while (get_sig(sys_sig, sig_system) == false) // system is off do nothing.
         {

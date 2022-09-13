@@ -358,7 +358,13 @@ IAtOperationRegister(kCmdCwSpeed, pAt_Kv_List, pAt_feedback_str)
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
-        IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        // IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        extern int target_speed;
+        if (kKeyScatteringWheel == my_kvs[0].key) {
+            sscanf(my_kvs[0].value, "%d", &target_speed);
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+        } else
+            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
     } else {
         if (kKeyScatteringWheel == my_kvs[0].key) {
             IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[0].key.pData, Get_fan_timer_FG(&cw_wheel_fg) * 30);
