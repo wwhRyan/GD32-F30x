@@ -9,10 +9,13 @@
  *
  */
 
+#include "Common.h"
 #include "basicApp.h"
 #include "i2c.h"
 #include "eeprom.h"
 #include "BoardInit.h"
+#include <stddef.h>
+#include <stdint.h>
 
 void eeprom_lock(bool lock);
 
@@ -149,6 +152,19 @@ bool eeprom_block_read(const eeprom_model_t* model, uint16_t addr, uint8_t* data
     xSemaphoreGive(i2c_Semaphore);
     vTaskDelay(model->write_delay_time);
     return ret;
+}
+
+bool memory_endian_conversion(void* pointer, size_t size)
+{
+    if (size % sizeof(uint32_t) != 0)
+        return false;
+    else {
+        int int_number = size / sizeof(uint32_t);
+        for (int i = 0; i < int_number; i++) {
+            *((uint32_t*)(pointer) + i * sizeof(uint32_t)) = BSWAP_32(*((uint32_t*)(pointer) + i * sizeof(uint32_t)));
+        }
+        return true;
+    }
 }
 
 /**

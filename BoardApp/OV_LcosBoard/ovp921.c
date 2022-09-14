@@ -615,11 +615,11 @@ void get_anf_version(char* p_version, int anf_idx)
 void get_firmware_version(char* p_version)
 {
 
-    uint16_t year = ovp921_read_flash(0x000c) + 2000;
-    uint8_t day = ovp921_read_flash(0x000b);
-    uint8_t month = ovp921_read_flash(0x000a);
-    uint8_t minor = ovp921_read_flash(0x0009);
-    uint8_t major = ovp921_read_flash(0x0008);
+    // uint16_t year = ovp921_read_flash(0x004d) + 2000;
+    // uint8_t day = ovp921_read_flash(0x000b);
+    // uint8_t month = ovp921_read_flash(0x000a);
+    uint8_t major = ovp921_read_flash(0x004d);
+    uint8_t minor = ovp921_read_flash(0x004e);
     // sprintf(p_version, "%d-%02d-%02d.%d.%d", year, month, day, major, minor);
     sprintf(p_version, "%d.%d", major, minor);
 }

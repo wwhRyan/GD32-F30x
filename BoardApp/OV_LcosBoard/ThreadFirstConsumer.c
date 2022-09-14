@@ -69,6 +69,7 @@ void ThreadFirstConsumer(void* pvParameters)
         if (cw_pwm > 100)
             cw_pwm = 100;
         Set_fan_timer_pwm(&cw_wheel_pwm, cw_pwm);
+        // output_printf("speed=%d\r\n", Get_fan_timer_FG(&cw_wheel_fg) * 30);
 
         while (get_sig(sys_sig, sig_system) == false) // system is off do nothing.
         {

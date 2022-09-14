@@ -102,4 +102,5 @@ void init_eeprom(const eeprom_model_t *model);
 void eeprom_reset(void);
 bool eeprom_update_crc(const eeprom_model_t *model);
 
+bool memory_endian_conversion(void* pointer, size_t size);
 #endif
