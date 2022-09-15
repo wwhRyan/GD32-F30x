@@ -17,6 +17,7 @@
 #include "ovp921.h"
 #include "ulog.h"
 #include "utilsAsciiConvert.h"
+#include <string.h>
 
 extern asAtProtocol at_obj;
 extern const mem_t eeprom_mem[];
@@ -700,11 +701,15 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
             if (ret == EOF || ret == 0)
                 goto EEPROM_VALUE_ERROR;
         }
-        if (size > 256)
+
+        if (size > 256 && size % 4 != 0)
+            goto EEPROM_VALUE_ERROR;
+        if (addr % 4 != 0)
             goto EEPROM_VALUE_ERROR;
 
         AsciiToInt(ascii_buff, eeprom_data, 1);
         set_sig(sys_sig, sig_eeprom_write, true);
+        memory_endian_conversion(eeprom_data, size);
         msg.idx = idx_eeprom_write;
         msg.addr = addr;
         msg.size = size;
@@ -733,10 +738,14 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
             if (ret == EOF || ret == 0)
                 goto EEPROM_VALUE_ERROR;
         }
-        if (msg.size > 256)
+        if (size > 256 && size % 4 != 0)
+            goto EEPROM_VALUE_ERROR;
+        if (addr % 4 != 0)
             goto EEPROM_VALUE_ERROR;
 
+        memset(eeprom_data, 0, sizeof(eeprom_data));
         if (true == eeprom_block_read(&BL24C64A, addr, (uint8_t*)eeprom_data, size)) {
+            memory_endian_conversion(eeprom_data, size);
             IntToAscii(eeprom_data, ascii_buff, 1, size);
             IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_buff);
         } else {

@@ -71,6 +71,10 @@ void ThreadFirstConsumer(void* pvParameters)
         Set_fan_timer_pwm(&cw_wheel_pwm, cw_pwm);
         // output_printf("speed=%d\r\n", Get_fan_timer_FG(&cw_wheel_fg) * 30);
 
+        if (cw_wheel_fg.p_st_calc->idle_flag == true)
+            cw_wheel_fg.p_st_calc->fre = 0;
+        cw_wheel_fg.p_st_calc->idle_flag = true;
+
         while (get_sig(sys_sig, sig_system) == false) // system is off do nothing.
         {
             vTaskDelay(500);

@@ -54,12 +54,12 @@ void eeprom_lock(bool lock)
 bool eeprom_update_crc(const eeprom_model_t* model)
 {
     bool ret = true;
-    eeprom_t temp = {0};
+    eeprom_t temp = { 0 };
 
     ret &= ISoftwareI2CRegRead(model->i2c, model->i2c_addr, CONFIG_START_ADDR,
         model->i2c_addr_type, ((uint8_t*)&temp), sizeof(eeprom_t), 0xFFFF);
 
-    uint32_t calc_check_sum = get_LSB_array_crc((uint8_t*)(&temp) + sizeof(uint32_t), sizeof(eeprom_t) - sizeof(uint32_t));
+    uint32_t calc_check_sum = get_LSB_array_crc((uint8_t*)(&temp.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
 
     ret &= eeprom_block_write(model, CONFIG_START_ADDR, ((uint8_t*)&calc_check_sum), sizeof(uint32_t));
 
@@ -154,19 +154,6 @@ bool eeprom_block_read(const eeprom_model_t* model, uint16_t addr, uint8_t* data
     return ret;
 }
 
-bool memory_endian_conversion(void* pointer, size_t size)
-{
-    if (size % sizeof(uint32_t) != 0)
-        return false;
-    else {
-        int int_number = size / sizeof(uint32_t);
-        for (int i = 0; i < int_number; i++) {
-            *((uint32_t*)(pointer) + i * sizeof(uint32_t)) = BSWAP_32(*((uint32_t*)(pointer) + i * sizeof(uint32_t)));
-        }
-        return true;
-    }
-}
-
 /**
  * @brief Call before rtos task
  */
@@ -176,7 +163,7 @@ void init_eeprom(const eeprom_model_t* model)
     ISoftwareI2CRegRead(model->i2c, model->i2c_addr, CONFIG_START_ADDR,
         model->i2c_addr_type, ((uint8_t*)&eeprom), sizeof(eeprom_t), 0xFFFF);
 
-    uint32_t calc_check_sum = get_LSB_array_crc((uint8_t*)(&eeprom) + sizeof(uint32_t), sizeof(eeprom_t) - sizeof(uint32_t));
+    uint32_t calc_check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num) , sizeof(eeprom_t) - sizeof(uint32_t));
 
     if (eeprom.magic_num != eeprom_magic_number || calc_check_sum != eeprom.check_sum) {
         // output_printf("eeprom check_sum = %08X!\n", eeprom.check_sum);

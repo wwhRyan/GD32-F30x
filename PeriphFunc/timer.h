@@ -14,15 +14,16 @@
 
 #include "port.h"
 #include "gd32f30x.h"
+#include "Common.h"
 
-typedef struct timer_capture_calc_t
-{
+typedef struct timer_capture_calc_t {
     uint16_t readvalue1;
     uint16_t readvalue2;
     __IO uint16_t ccnumber;
     __IO uint32_t count;
     __IO uint16_t fre;
-}timer_capture_calc_t;
+    __IO bool idle_flag; /* true : the pwm capture is idle, if true fre set to zero */
+} timer_capture_calc_t;
 
 typedef struct fan_timer_config_t
 {

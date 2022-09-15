@@ -179,6 +179,7 @@ void timer_input_capture_IRQ(const fan_timer_config_t *fan_timer_config)
     {
         /* clear channel 0 interrupt bit */
         timer_interrupt_flag_clear(fan_timer_config->timer_base, fan_timer_config->channel_interrupt_flag);
+        fan_timer_config->p_st_calc->idle_flag = false;
 
         if (0 == fan_timer_config->p_st_calc->ccnumber)
         {
