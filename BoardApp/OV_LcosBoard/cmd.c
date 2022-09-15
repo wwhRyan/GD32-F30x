@@ -277,16 +277,19 @@ void laser(char argc, char* argv)
             switch (idx) {
             case RED:
                 eeprom.red = current;
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num) , sizeof(eeprom_t) - sizeof(uint32_t));
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_red], (TickType_t)10);
 
                 break;
             case GREEN:
                 eeprom.green = current;
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num) , sizeof(eeprom_t) - sizeof(uint32_t));
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_green], (TickType_t)10);
 
                 break;
             case BLUE:
                 eeprom.blue = current;
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num) , sizeof(eeprom_t) - sizeof(uint32_t));
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_blue], (TickType_t)10);
 
                 break;

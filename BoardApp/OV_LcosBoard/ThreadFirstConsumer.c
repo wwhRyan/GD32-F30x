@@ -14,7 +14,6 @@
 #include "main.h"
 #include "ovp921.h"
 
-
 extern const SoftwareI2C ovp921_i2c;
 extern const mem_t eeprom_mem[];
 
@@ -35,7 +34,7 @@ void ThreadFirstConsumer(void* pvParameters)
     clear_sig(sys_sig, sig_eeprom_write);
     set_sig(sys_sig, sig_slient_async_msg, false);
 
-    xQueue_eeprom = xQueueCreate(EEPROM_W_QUEUE_LENGTH, sizeof(msg_t));
+    xQueue_eeprom = xQueueCreate(EEPROM_W_QUEUE_LENGTH, sizeof(mem_t));
     E_assert(xQueue_eeprom);
     ULOG_INFO("xQueue_eeprom create\n");
     while (1) {
@@ -58,6 +57,7 @@ void ThreadFirstConsumer(void* pvParameters)
 
         if (gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN) && is_one_second() == true) {
             eeprom.light_source_time += 1;
+            eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
             xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_light_source_time], (TickType_t)10);
         }
 

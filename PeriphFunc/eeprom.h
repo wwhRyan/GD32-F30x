@@ -95,7 +95,7 @@ extern eeprom_t eeprom;
 
 void eeprom_lock(bool lock);
 bool eeprom_write(const eeprom_model_t *model, uint16_t addr, uint8_t data);
-bool eeprom_block_write(const eeprom_model_t *model, uint16_t addr, uint8_t *data, uint16_t size);
+bool eeprom_block_write(const eeprom_model_t* model, uint16_t WriteAddr, uint8_t* data, uint16_t size);
 uint8_t eeprom_read(const eeprom_model_t *model, uint8_t addr);
 bool eeprom_block_read(const eeprom_model_t *model, uint16_t addr, uint8_t *data, uint16_t size);
 void init_eeprom(const eeprom_model_t *model);

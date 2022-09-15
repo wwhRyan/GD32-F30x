@@ -156,7 +156,7 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
                 get_firmware_version(str_buff);
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
                 break;
-                case kKeyEeprom:
+            case kKeyEeprom:
                 ULOG_DEBUG("kKeyEeprom\n");
                 get_firmware_version(str_buff);
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:V%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.version);
@@ -181,12 +181,18 @@ IAtOperationRegister(kCmdSn, pAt_Kv_List, pAt_feedback_str)
             switch (my_kvs[i].key) {
             case kKeyLightEngine:
                 strncpy(eeprom.Sn_LightEngine, my_kvs[i].value, 32);
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
+                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_Sn_LightEngine], (TickType_t)10);
                 break;
             case kKeySourceLight:
                 strncpy(eeprom.Sn_SourceLight, my_kvs[i].value, 32);
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
+                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_Sn_SourceLight], (TickType_t)10);
                 break;
             case kKeyProjector:
                 strncpy(eeprom.Sn_Projector, my_kvs[i].value, 32);
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
+                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_Sn_Projector], (TickType_t)10);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -446,18 +452,21 @@ IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
                 sscanf(my_kvs[i].value, "%d", &current);
                 // check current
                 eeprom.red = (float)current / 100;
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_red], (TickType_t)10);
                 break;
             case kKeyG:
                 sscanf(my_kvs[i].value, "%d", &current);
                 // check current
                 eeprom.green = (float)current / 100;
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_green], (TickType_t)10);
                 break;
             case kKeyB:
                 sscanf(my_kvs[i].value, "%d", &current);
                 // check current
                 eeprom.blue = (float)current / 100;
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_blue], (TickType_t)10);
                 break;
             default:
@@ -671,7 +680,7 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
     char ascii_buff[512 + 1] = { 0 };
     size_t addr, size = 0;
     int ret = 0;
-    msg_t msg;
+    mem_t msg;
 
     if (get_sig(sys_sig, sig_eeprom_write)) {
         IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");

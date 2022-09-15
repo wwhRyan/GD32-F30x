@@ -14,8 +14,10 @@
 #include "i2c.h"
 #include "eeprom.h"
 #include "BoardInit.h"
+#include "ulog.h"
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 void eeprom_lock(bool lock);
 
@@ -60,6 +62,8 @@ bool eeprom_update_crc(const eeprom_model_t* model)
         model->i2c_addr_type, ((uint8_t*)&temp), sizeof(eeprom_t), 0xFFFF);
 
     uint32_t calc_check_sum = get_LSB_array_crc((uint8_t*)(&temp.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
+    // if (calc_check_sum != eeprom.check_sum)
+    //     ULOG_WARNING("EEPROM_had_been_external_update\n");
 
     ret &= eeprom_block_write(model, CONFIG_START_ADDR, ((uint8_t*)&calc_check_sum), sizeof(uint32_t));
 
@@ -79,6 +83,7 @@ void eeprom_memory_reset(void)
             break;
 
         case string_type:
+            memset(eeprom_mem[i].pData, 0, eeprom_mem[i].size);
             strcpy((char*)eeprom_mem[i].pData, eeprom_mem[i].default_string);
             break;
 
@@ -113,31 +118,83 @@ uint8_t eeprom_read(const eeprom_model_t* model, uint8_t addr)
     return data;
 }
 
-bool eeprom_block_write(const eeprom_model_t* model, uint16_t addr, uint8_t* data, uint16_t size)
+bool eeprom_block_write(const eeprom_model_t* model, uint16_t WriteAddr, uint8_t* data, uint16_t size)
 {
     bool ret = true;
-
     model->lock(UNLOCK);
-    if (size > model->page_size) {
-        int cnt = size / model->page_size;
-        for (size_t i = 0; i < cnt; i++) {
+    uint8_t NumOfPage = 0, NumOfSingle = 0, Addr = 0, count = 0;
+
+    Addr = WriteAddr % model->page_size;
+    count = model->page_size - Addr;
+    NumOfPage = size / model->page_size;
+    NumOfSingle = size % model->page_size;
+
+    if (Addr == 0) {
+
+        if (NumOfPage == 0) {
             xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-            ret = ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, addr + i * model->page_size, model->i2c_addr_type,
-                data + i * model->page_size, model->page_size, 0xFFFF);
+            ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
             xSemaphoreGive(i2c_Semaphore);
             vTaskDelay(model->write_delay_time);
         }
-        int left_cnt = size % model->page_size;
-        xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-        ret = ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, addr + cnt * model->page_size, model->i2c_addr_type,
-            data + cnt * model->page_size, left_cnt, 0xFFFF);
-        xSemaphoreGive(i2c_Semaphore);
-        vTaskDelay(model->write_delay_time);
-    } else {
-        xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-        ret = ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, addr, model->i2c_addr_type, data, size, 0xFFFF);
-        xSemaphoreGive(i2c_Semaphore);
-        vTaskDelay(model->write_delay_time);
+
+        else {
+            while (NumOfPage--) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, model->page_size, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+                WriteAddr += model->page_size;
+                data += model->page_size;
+            }
+
+            if (NumOfSingle != 0) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+            }
+        }
+    }
+
+    else {
+
+        if (NumOfPage == 0) {
+            xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+            ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
+            xSemaphoreGive(i2c_Semaphore);
+            vTaskDelay(model->write_delay_time);
+        }
+
+        else {
+            size -= count;
+            NumOfPage = size / model->page_size;
+            NumOfSingle = size % model->page_size;
+
+            if (count != 0) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, count, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+                WriteAddr += count;
+                data += count;
+            }
+
+            while (NumOfPage--) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, model->page_size, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+                WriteAddr += model->page_size;
+                data += model->page_size;
+            }
+            if (NumOfSingle != 0) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+            }
+        }
     }
     model->lock(LOCK);
     return ret;
