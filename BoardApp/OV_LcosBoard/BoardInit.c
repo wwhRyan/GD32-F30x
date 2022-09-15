@@ -329,15 +329,3 @@ void EXTI5_9_IRQHandler(void)
         exti_interrupt_flag_clear(EXTI_8);
     }
 }
-
-void output_printf(const char* fmt, ...)
-{
-    char buf[256] = { 0 };
-
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    va_end(args);
-
-    uarter_send(&uart0_output, buf, strlen(buf));
-}

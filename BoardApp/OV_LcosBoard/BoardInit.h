@@ -40,7 +40,6 @@ void ThreadFirstConsumer(void* pvParameters);
 void ThreadUartEvent(void* pvParameters);
 void ThreadSecondConsumer(void* pvParameters);
 
-void output_printf(const char* fmt, ...);
 void system_ipc_init(void);
 
 extern EventGroupHandle_t sys_sig;

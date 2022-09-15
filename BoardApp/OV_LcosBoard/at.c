@@ -8,9 +8,11 @@
  * @copyright Copyright@appotronics 2022. All Rights Reserved
  *
  */
+#include "AtKeyHashTable.h"
 #include "AtProtocol.h"
 #include "BoardInit.h"
 #include "basicApp.h"
+#include "eeprom.h"
 #include "main.h"
 #include "ovp921.h"
 #include "ulog.h"
@@ -152,6 +154,11 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
                 ULOG_DEBUG("kKeyOvp921\n");
                 get_firmware_version(str_buff);
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
+                break;
+                case kKeyEeprom:
+                ULOG_DEBUG("kKeyEeprom\n");
+                get_firmware_version(str_buff);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:V%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.version);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
