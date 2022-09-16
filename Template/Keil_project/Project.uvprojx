@@ -338,7 +338,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_STDPERIPH_DRIVER,GD32F30X_HD,DEBUG,ATHENA_OV_LCOS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS;..\..\easy-mcu\AtProtocol;..\..\easy-mcu\AtProtocol\Src\At_internal;..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine;..\..\easy-mcu\AtProtocol\Src\At_HashTable;..\..\easy-mcu\utils\AsciiConvert;..\..\easy-mcu\CmdProtocol;..\..\easy-mcu\Include;..\..\BoardApp\OV_LcosBoard;..\..\PeriphFunc;..\..\ulog\src</IncludePath>
+              <IncludePath>..\..\Firmware\CMSIS;..\..\Firmware\CMSIS\GD\GD32F30x\Include;..\..\Firmware\GD32F30x_standard_peripheral\Include;..\..\Utilities;..\;..\..\FreeRTOS\include;..\..\FreeRTOS\portable\RVDS\ARM_CM4F;..\..\FreeRTOS;..\..\easy-mcu\AtProtocol;..\..\easy-mcu\AtProtocol\Src\At_internal;..\..\easy-mcu\AtProtocol\Src\At_internal\StateMachine;..\..\easy-mcu\AtProtocol\Src\At_HashTable;..\..\easy-mcu\utils\AsciiConvert;..\..\easy-mcu\CmdProtocol;..\..\easy-mcu\Include;..\..\BoardApp\LcosBoard;..\..\PeriphFunc;..\..\ulog\src</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -946,47 +946,47 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OV_LcosBoard</GroupName>
+          <GroupName>LcosBoard</GroupName>
           <Files>
-            <File>
-              <FileName>BoardInit.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\BoardInit.c</FilePath>
-            </File>
             <File>
               <FileName>at.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\at.c</FilePath>
-            </File>
-            <File>
-              <FileName>cmd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\cmd.c</FilePath>
-            </File>
-            <File>
-              <FileName>ovp921.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ovp921.c</FilePath>
+              <FilePath>..\..\BoardApp\LcosBoard\at.c</FilePath>
             </File>
             <File>
               <FileName>basicApp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\basicApp.c</FilePath>
+              <FilePath>..\..\BoardApp\LcosBoard\basicApp.c</FilePath>
+            </File>
+            <File>
+              <FileName>BoardInit.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\LcosBoard\BoardInit.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\LcosBoard\cmd.c</FilePath>
+            </File>
+            <File>
+              <FileName>ovp921.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\LcosBoard\ovp921.c</FilePath>
             </File>
             <File>
               <FileName>ThreadFirstConsumer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadFirstConsumer.c</FilePath>
+              <FilePath>..\..\BoardApp\LcosBoard\ThreadFirstConsumer.c</FilePath>
             </File>
             <File>
               <FileName>ThreadSecondConsumer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadSecondConsumer.c</FilePath>
+              <FilePath>..\..\BoardApp\LcosBoard\ThreadSecondConsumer.c</FilePath>
             </File>
             <File>
               <FileName>ThreadUartEvent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadUartEvent.c</FilePath>
+              <FilePath>..\..\BoardApp\LcosBoard\ThreadUartEvent.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1822,7 +1822,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>OV_LcosBoard</GroupName>
+          <GroupName>LcosBoard</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -1894,44 +1894,44 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>BoardInit.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\BoardInit.c</FilePath>
-            </File>
-            <File>
               <FileName>at.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\at.c</FilePath>
-            </File>
-            <File>
-              <FileName>cmd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\cmd.c</FilePath>
-            </File>
-            <File>
-              <FileName>ovp921.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ovp921.c</FilePath>
+              <FilePath>..\..\BoardApp\LcosBoard\at.c</FilePath>
             </File>
             <File>
               <FileName>basicApp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\basicApp.c</FilePath>
+              <FilePath>..\..\BoardApp\LcosBoard\basicApp.c</FilePath>
+            </File>
+            <File>
+              <FileName>BoardInit.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\LcosBoard\BoardInit.c</FilePath>
+            </File>
+            <File>
+              <FileName>cmd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\LcosBoard\cmd.c</FilePath>
+            </File>
+            <File>
+              <FileName>ovp921.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\BoardApp\LcosBoard\ovp921.c</FilePath>
             </File>
             <File>
               <FileName>ThreadFirstConsumer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadFirstConsumer.c</FilePath>
+              <FilePath>..\..\BoardApp\LcosBoard\ThreadFirstConsumer.c</FilePath>
             </File>
             <File>
               <FileName>ThreadSecondConsumer.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadSecondConsumer.c</FilePath>
+              <FilePath>..\..\BoardApp\LcosBoard\ThreadSecondConsumer.c</FilePath>
             </File>
             <File>
               <FileName>ThreadUartEvent.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\BoardApp\OV_LcosBoard\ThreadUartEvent.c</FilePath>
+              <FilePath>..\..\BoardApp\LcosBoard\ThreadUartEvent.c</FilePath>
             </File>
           </Files>
         </Group>
