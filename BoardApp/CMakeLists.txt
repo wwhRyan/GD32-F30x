@@ -1,1 +1,1 @@
-add_subdirectory(raontech_lcos)
+add_subdirectory(LcosBoard)

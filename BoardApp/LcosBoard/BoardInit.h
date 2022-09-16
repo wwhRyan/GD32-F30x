@@ -12,6 +12,7 @@
 #ifndef EXECTHREAD_H
 #define EXECTHREAD_H
 
+#include "file.h"
 #define MCU_VERSION "V1.0"
 
 #include "adc_mcu.h"
@@ -26,7 +27,6 @@
 #include "uart.h"
 #include "ulog.h"
 
-
 #ifndef ATHENA_OV_LCOS
 #error "Please define ATHENA_OV_LCOS"
 #endif
@@ -35,6 +35,8 @@
 #define THREAD_UART_EVENT_STACK_SIZE (1024 * 2)
 #define THREAD_FIRST_CONSUMER_STACK_SIZE (1024 * 2)
 #define THREAD_SECOND_CONSUMER_STACK_SIZE 512
+#define CONFIG_START_ADDR 0x00
+#define LOG_START_ADDR 0x1024
 
 void ThreadFirstConsumer(void* pvParameters);
 void ThreadUartEvent(void* pvParameters);
@@ -47,20 +49,25 @@ extern EventGroupHandle_t sys_sig;
 extern SemaphoreHandle_t uart_Semaphore;
 extern SemaphoreHandle_t i2c_Semaphore;
 extern QueueHandle_t xQueue_eeprom;
+// extern SoftwareI2C raontech_i2c;
 
-extern const eeprom_model_t BL24C64A;
-extern const eeprom_model_t AT24C02D;
+extern const eeprom_model_t BL24C64A; /* 8K bytes page=32 */
+extern const eeprom_model_t AT24C02D; /* 2K bytes page=8*/
 extern const fan_timer_config_t cw_wheel_fg;
+extern file_t eeprom_log;
+
+extern temperature_i2c_t temperature_i2c[];
 
 typedef enum sys_sig_t {
     sig_lightsource,
     sig_system,
-    sig_ovp921_status,
+    sig_rdc200a_status,
     sig_light_status,
     sig_slient_async_msg,
-    sig_update_anf,
+    sig_update_rdc200a,
     sig_update_firmware,
     sig_eeprom_write,
+    sig_mcu_init_ok,
 } sys_sig_t;
 
 typedef struct msg_t {
@@ -110,8 +117,8 @@ typedef struct msg_t {
 #define FAN_PWM_PORT GPIOB
 #define FAN_PWM_PIN GPIO_PIN_11
 
-#define OVP921_RESET_PORT GPIOB
-#define OVP921_RESET_PIN GPIO_PIN_12
+#define RDC200A_RESET_PORT GPIOB
+#define RDC200A_RESET_PIN GPIO_PIN_12
 
 #define MCU_GPIO_INT_PORT GPIOB
 #define MCU_GPIO_INT_PIN GPIO_PIN_13
@@ -122,12 +129,19 @@ typedef struct msg_t {
 #define SENSOR_SDA_PORT GPIOB
 #define SENSOR_SDA_PIN GPIO_PIN_15
 
-/*<! hardware version detect !>*/
+/* 使用IIC温度读取的版本未有此功能定义 */
 #define HW_VER0_PORT GPIOC
 #define HW_VER0_PIN GPIO_PIN_14
 
+#define RDC200A_BOOT_OUT_PORT GPIOC
+#define RDC200A_BOOT_OUT_PIN GPIO_PIN_14
+
+/* 使用IIC温度读取的版本未有此功能定义 */
 #define HW_VER1_PORT GPIOC
 #define HW_VER1_PIN GPIO_PIN_15
+
+#define RDC200A_VCC_EN_PORT GPIOC
+#define RDC200A_VCC_EN_PIN GPIO_PIN_15
 
 #define B_LED_NTC_PORT GPIOA
 #define B_LED_NTC_PIN GPIO_PIN_0
@@ -145,8 +159,8 @@ typedef struct msg_t {
 #define GD32_UART_TX_PIN GPIO_PIN_3
 
 /*<! 电流与DAC对应关系为：DAC_VALUE=(1.24/15+1.24/20-0.03*电流值）*(4095*20/3.3) !>*/
-#define DAC1_PORT GPIOA
-#define DAC1_PIN GPIO_PIN_4
+#define DAC0_PORT GPIOA
+#define DAC0_PIN GPIO_PIN_4
 
 #define LCOS_PANEL_NTC_PORT GPIOA
 #define LCOS_PANEL_NTC_PIN GPIO_PIN_5
@@ -176,8 +190,8 @@ typedef struct msg_t {
 #define FG_PIN GPIO_PIN_11
 
 /*<! None using. !>*/
-#define RESERVERD_1_PORT GPIOA
-#define RESERVERD_1_PIN GPIO_PIN_12
+#define RDC200A_BOOTB_IN_PORT GPIOA
+#define RDC200A_BOOTB_IN_PIN GPIO_PIN_12
 
 /*<! None using. !>*/
 #define RESERVERD_2_PORT GPIOA
