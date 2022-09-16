@@ -236,7 +236,7 @@ inline void G_to_R()
 
     gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
     // gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
-    DelayUs(100);
+    DelayUs(250);
     gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
     // gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
@@ -245,10 +245,10 @@ inline void B_to_G()
 {
     laser_dac_set(G_CURRENT);
 
-    // gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
+    gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
-    DelayUs(100);
-    // gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
+    DelayUs(200);
+    gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
 

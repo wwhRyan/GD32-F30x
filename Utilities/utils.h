@@ -70,6 +70,7 @@ extern EventGroupHandle_t sys_sig;
 extern QueueHandle_t xQueue_eeprom;
 
 void debug_printf(const char* fmt, ...);
+void output_printf(const char* fmt, ...);
 bool get_sig(EventGroupHandle_t pEventGroup, int BitInx);
 void set_sig(EventGroupHandle_t pEventGroup, int BitInx, bool status);
 void clear_sig(EventGroupHandle_t pEventGroup, int BitInx);

@@ -33,16 +33,15 @@
 
 // configMINIMAL_STACK_SIZE
 #define THREAD_UART_EVENT_STACK_SIZE (1024 * 2)
-#define THREAD_FIRST_CONSUMER_STACK_SIZE (1024 * 2)
+#define THREAD_FIRST_CONSUMER_STACK_SIZE (256)
 #define THREAD_SECOND_CONSUMER_STACK_SIZE 512
 #define CONFIG_START_ADDR 0x00
-#define LOG_START_ADDR 0x1024
+#define LOG_START_ADDR (4 * 1024)
 
 void ThreadFirstConsumer(void* pvParameters);
 void ThreadUartEvent(void* pvParameters);
 void ThreadSecondConsumer(void* pvParameters);
 
-void output_printf(const char* fmt, ...);
 void system_ipc_init(void);
 
 extern EventGroupHandle_t sys_sig;
@@ -69,13 +68,6 @@ typedef enum sys_sig_t {
     sig_eeprom_write,
     sig_mcu_init_ok,
 } sys_sig_t;
-
-typedef struct msg_t {
-    uint8_t idx;
-    void* pData;
-    uint16_t addr;
-    uint8_t size;
-} msg_t;
 
 /*<! Red laser NTC !>*/
 #define R_LD_NTC_PORT GPIOB

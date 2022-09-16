@@ -202,7 +202,7 @@ const SoftwareI2C sensor_i2c = {
 };
 
 const eeprom_model_t BL24C64A = {
-    .i2c_addr = (0x50 < 1) & 0x00ff,
+    .i2c_addr = 0x50 << 1,
     .i2c_addr_type = REG_ADDR_2BYTE,
     .lock = eeprom_lock,
     .page_size = 32,
@@ -220,7 +220,7 @@ const eeprom_model_t AT24C02D = {
 };
 
 const eeprom_model_t GX112D_red = {
-    .i2c_addr = (0x4b < 1) & 0x00ff,
+    .i2c_addr = (0x4b << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
     .lock = NULL,
     .page_size = 1,
@@ -229,7 +229,7 @@ const eeprom_model_t GX112D_red = {
 };
 
 const eeprom_model_t GX112D_blue = {
-    .i2c_addr = (0x49 < 1) & 0x00ff,
+    .i2c_addr = (0x49 << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
     .lock = NULL,
     .page_size = 1,
@@ -238,7 +238,7 @@ const eeprom_model_t GX112D_blue = {
 };
 
 const eeprom_model_t GX112D_green = {
-    .i2c_addr = (0x4a < 1) & 0x00ff,
+    .i2c_addr = (0x4a << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
     .lock = NULL,
     .page_size = 1,
@@ -247,7 +247,7 @@ const eeprom_model_t GX112D_green = {
 };
 
 const eeprom_model_t GX112D_lcos = {
-    .i2c_addr = (0x48 < 1) & 0x00ff,
+    .i2c_addr = (0x48 << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
     .lock = NULL,
     .page_size = 1,
@@ -256,7 +256,7 @@ const eeprom_model_t GX112D_lcos = {
 };
 
 const eeprom_model_t GX75C_env = {
-    .i2c_addr = (0x4c < 1) & 0x00ff,
+    .i2c_addr = (0x4c << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
     .lock = NULL,
     .page_size = 1,
@@ -414,16 +414,4 @@ void EXTI5_9_IRQHandler(void)
         color_EN_EXIT_IRQ(RED);
         exti_interrupt_flag_clear(EXTI_8);
     }
-}
-
-void output_printf(const char* fmt, ...)
-{
-    char buf[256] = { 0 };
-
-    va_list args;
-    va_start(args, fmt);
-    vsnprintf(buf, sizeof(buf), fmt, args);
-    va_end(args);
-
-    uarter_send(&uart0_output, buf, strlen(buf));
 }

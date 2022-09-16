@@ -13,7 +13,11 @@
 #include "AtProtocol.h"
 #include "BoardInit.h"
 #include "basicApp.h"
+#include "eeprom.h"
 #include "ulog.h"
+#include "utilsAsciiConvert.h"
+#include <stdio.h>
+#include <string.h>
 
 extern asAtProtocol at_obj;
 extern const mem_t eeprom_mem[];
@@ -168,7 +172,30 @@ IAtOperationRegister(kCmdSn, pAt_Kv_List, pAt_feedback_str)
     char str_buff[32] = { 0 };
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
-        IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        // IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        for (size_t i = 0; i < pAt_Kv_List->size; i++) {
+            switch (my_kvs[i].key) {
+            case kKeyLightEngine:
+                strncpy(eeprom.Sn_LightEngine, my_kvs[i].value, 32);
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
+                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_Sn_LightEngine], (TickType_t)10);
+                break;
+            case kKeySourceLight:
+                strncpy(eeprom.Sn_SourceLight, my_kvs[i].value, 32);
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
+                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_Sn_SourceLight], (TickType_t)10);
+                break;
+            case kKeyProjector:
+                strncpy(eeprom.Sn_Projector, my_kvs[i].value, 32);
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
+                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_Sn_Projector], (TickType_t)10);
+                break;
+            default:
+                IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+                return;
+            }
+        }
+        IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
     } else {
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
@@ -341,7 +368,13 @@ IAtOperationRegister(kCmdCwSpeed, pAt_Kv_List, pAt_feedback_str)
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
-        IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        // IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        extern int target_speed;
+        if (kKeyScatteringWheel == my_kvs[0].key) {
+            sscanf(my_kvs[0].value, "%d", &target_speed);
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+        } else
+            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
     } else {
         if (kKeyScatteringWheel == my_kvs[0].key) {
             IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[0].key.pData, Get_fan_timer_FG(&cw_wheel_fg) * 30);
@@ -681,26 +714,28 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
+    char ascii_buff[512 + 1] = { 0 };
     size_t addr, size = 0;
     int ret = 0;
-    msg_t msg;
-    msg.pData = eeprom_data;
+    mem_t msg;
+
+    if (get_sig(sys_sig, sig_eeprom_write)) {
+        IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        return;
+    }
+    memset(eeprom_data, 0, sizeof(eeprom_data));
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
-        if (get_sig(sys_sig, sig_eeprom_write)) {
-            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
-            return;
-        }
-        memset(eeprom_data, 0, sizeof(eeprom_data));
+
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyAddr:
-                ret = sscanf(my_kvs[i].value, "%2X", &addr);
+                ret = sscanf(my_kvs[i].value, "%X", &addr);
                 break;
             case kKeySize:
-                ret = sscanf(my_kvs[i].value, "%1X", &size);
+                ret = sscanf(my_kvs[i].value, "%X", &size);
                 break;
             case kKeyData:
-                ret = sscanf(my_kvs[i].value, "%256s", eeprom_data);
+                ret = sscanf(my_kvs[i].value, "%512s", ascii_buff);
                 break;
             case kKeyClear:
                 // TODO: add eeprom clear
@@ -716,19 +751,24 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
             if (ret == EOF || ret == 0)
                 goto EEPROM_VALUE_ERROR;
         }
-        if (size > 256)
+
+        if (size > 256 && size % 4 != 0)
+            goto EEPROM_VALUE_ERROR;
+        if (addr % 4 != 0)
             goto EEPROM_VALUE_ERROR;
 
+        AsciiToInt(ascii_buff, eeprom_data, 1);
         set_sig(sys_sig, sig_eeprom_write, true);
+        memory_endian_conversion(eeprom_data, size);
         msg.idx = idx_eeprom_write;
         msg.addr = addr;
         msg.size = size;
+        msg.pData = eeprom_data;
+
         xQueueSend(xQueue_eeprom, (void*)&msg, (TickType_t)10);
         IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
 
     } else {
-        char ascii_output[512 + 1] = { 0 };
-        uint8_t data_output[256] = { 0 };
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyAddr:
@@ -744,12 +784,16 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
             if (ret == EOF || ret == 0)
                 goto EEPROM_VALUE_ERROR;
         }
-        if (size > 256)
+        if (size > 256 && size % 4 != 0)
+            goto EEPROM_VALUE_ERROR;
+        if (addr % 4 != 0)
             goto EEPROM_VALUE_ERROR;
 
-        if (true == eeprom_block_read(&BL24C64A, addr, (uint8_t*)data_output, size)) {
-            IntToAscii(data_output, ascii_output, 1, size);
-            IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_output);
+        memset(eeprom_data, 0, sizeof(eeprom_data));
+        if (true == eeprom_block_read(&BL24C64A, addr, (uint8_t*)eeprom_data, size)) {
+            memory_endian_conversion(eeprom_data, size);
+            IntToAscii(eeprom_data, ascii_buff, 1, size);
+            IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_buff);
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
         }

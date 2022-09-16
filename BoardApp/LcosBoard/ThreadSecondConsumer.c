@@ -11,6 +11,7 @@
 
 #include "BoardInit.h"
 #include "basicApp.h"
+#include "eeprom.h"
 #include "gd32f30x.h"
 #include "main.h"
 
@@ -22,26 +23,24 @@ void ThreadSecondConsumer(void* pvParameters)
     xEventGroupWaitBits(sys_sig, (0x00000001 << sig_mcu_init_ok), pdFALSE, pdTRUE, 0xFFFF);
     ULOG_DEBUG("%s\n", __func__);
 
-    // msg_t xQueue_eeprom_recv = { 0 };
+    mem_t xQueue_eeprom_recv = { 0 };
     while (1) {
-#if 0
         if (xQueueReceive(xQueue_eeprom, &(xQueue_eeprom_recv), (TickType_t)10) == pdPASS) {
-            eeprom_block_write(&AT24C02D, xQueue_eeprom_recv.addr, (uint8_t *)xQueue_eeprom_recv.pData, xQueue_eeprom_recv.size);
+            eeprom_block_write(&BL24C64A, xQueue_eeprom_recv.addr, (uint8_t*)xQueue_eeprom_recv.pData, xQueue_eeprom_recv.size);
             if (xQueue_eeprom_recv.idx == idx_eeprom_write) {
                 // reset eeprom crc and get data to memory.
                 clear_sig(sys_sig, sig_eeprom_write);
-                eeprom_update_crc(&AT24C02D);
             }
+            eeprom_update_crc(&BL24C64A);
         }
-        vTaskDelay(200);
-#endif
-        for (int i = 0; i < sensor_num; i++) {
-            get_temperature(&temperature[i]);
-        }
+        //TODO: verify it, have bug, value always is the
+        // for (int i = 0; i < sensor_num; i++) {
+        //     get_temperature(&temperature[i]);
+        // }
 
-        for (int i = 0; i < sensor_num; i++) {
-            get_i2c_temperature(&temperature_i2c[i]);
-        }
+        // for (int i = 0; i < sensor_num; i++) {
+        //     get_i2c_temperature(&temperature_i2c[i]);
+        // }
 
         vTaskDelay(500);
     }

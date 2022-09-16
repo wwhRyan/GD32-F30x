@@ -18,6 +18,7 @@
 #define EEPROM_W_QUEUE_LENGTH 5
 
 extern eeprom_t eeprom;
+extern const Uarter uart0_output;
 SemaphoreHandle_t uart_Semaphore = NULL;
 SemaphoreHandle_t i2c_Semaphore = NULL;
 EventGroupHandle_t sys_sig = NULL;
@@ -42,7 +43,7 @@ void system_ipc_init(void)
     clear_sig(sys_sig, sig_eeprom_write);
     set_sig(sys_sig, sig_slient_async_msg, false);
 
-    xQueue_eeprom = xQueueCreate(EEPROM_W_QUEUE_LENGTH, sizeof(msg_t));
+    xQueue_eeprom = xQueueCreate(EEPROM_W_QUEUE_LENGTH, sizeof(mem_t));
     E_assert(xQueue_eeprom);
     ULOG_INFO("xQueue_eeprom create\n");
 }
@@ -62,6 +63,18 @@ void debug_printf(const char* fmt, ...)
     vprintf(fmt, args);
     va_end(args);
     xSemaphoreGive(uart_Semaphore);
+}
+
+void output_printf(const char* fmt, ...)
+{
+    char buf[1280] = { 0 };
+
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buf, sizeof(buf), fmt, args);
+    va_end(args);
+
+    uarter_send(&uart0_output, buf, strlen(buf));
 }
 
 /* printf is not thread safety, but can output freeRTOS bug. */
@@ -136,17 +149,17 @@ void my_file_logger(ulog_level_t severity, char* msg)
 
 void log_read(void* pdata, size_t size, uint32_t addr)
 {
-    eeprom_block_read(&AT24C02D, addr, pdata, size);
+    eeprom_block_read(&BL24C64A, addr, pdata, size);
 }
 void log_write(void* pdata, size_t size, uint32_t addr)
 {
-    eeprom_block_write(&AT24C02D, addr, pdata, size);
+    eeprom_block_write(&BL24C64A, addr, pdata, size);
 }
 
 void log_init(file_t* pfile)
 {
     ULOG_INIT();
-    file_init(pfile, LOG_START_ADDR, 1024, log_read, log_write, get_LSB_array_crc);
+    file_init(pfile, LOG_START_ADDR, 1024 * 4, log_read, log_write, get_LSB_array_crc);
     ULOG_SUBSCRIBE(my_console_logger, ULOG_DEBUG_LEVEL);
     ULOG_SUBSCRIBE(my_file_logger, ULOG_WARNING_LEVEL);
     ULOG_INFO("ULOG init\n"); // logs to file and console
