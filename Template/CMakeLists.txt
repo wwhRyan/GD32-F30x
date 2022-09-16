@@ -7,13 +7,15 @@ file(
   FreeRTOSSrc
   ${PROJECT_SOURCE_DIR}/FreeRTOS/*.c
   ${PROJECT_SOURCE_DIR}/FreeRTOS/include/*.h
-  ${PROJECT_SOURCE_DIR}/FreeRTOS/portable/*.c
-  ${PROJECT_SOURCE_DIR}/FreeRTOS/portable/*.h)
+  ${PROJECT_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM4F/*.c
+  ${PROJECT_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM4F/*.h
+  ${PROJECT_SOURCE_DIR}/FreeRTOS/portable/MemMang/*.c
+  )
 
 include_directories(
   . ${PROJECT_SOURCE_DIR}/FreeRTOS/include
   ${PROJECT_SOURCE_DIR}/FreeRTOS/portable ${PROJECT_SOURCE_DIR}/FreeRTOS
-  ${PROJECT_SOURCE_DIR}/FreeRTOS/portable/RVDS/ARM_CM4F)
+  ${PROJECT_SOURCE_DIR}/FreeRTOS/portable/GCC/ARM_CM4F)
 
 add_executable(${EXEC_NAME} gd32f30x_it.c main.c systick.c ${FreeRTOSSrc})
 
