@@ -25,31 +25,27 @@ extern const SoftwareI2C raontech_i2c;
 extern const dac_t laser_dac;
 
 const ntc_t NCP18WB473F10RB = {
-    .B = 4108,
-    .normal_R = 47000,
-    .divided_voltage_R = 10000,
-    .is_pull_up = true,
+    .B = 4108, /* NTC B常数 (25-85℃) */
+    .normal_R = 47000, /* 电阻值 (25℃) ，单位Ω*/
+    .divided_voltage_R = 100000, /* 分压电阻，单位Ω */
+    .is_pull_up = true, /* 分压电阻是上拉电阻？上拉：TRUE，下拉：false */
 };
 
 uint8_t get_reg(uint8_t dev_addr, uint16_t reg_addr)
 {
     uint8_t reg_val = 0;
 
-    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
     ISoftwareI2CRegRead(&raontech_i2c, dev_addr, reg_addr,
         REG_ADDR_2BYTE, (uint8_t*)&reg_val, 1, I2C_DELAY_TIME);
-    xSemaphoreGive(i2c_Semaphore);
     return reg_val;
 }
 
 bool set_reg(uint8_t dev_addr, uint16_t reg_addr, uint8_t reg_val)
 {
     bool ret;
-    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
 
     ret = ISoftwareI2CRegWrite(&raontech_i2c, dev_addr, reg_addr,
         REG_ADDR_2BYTE, (uint8_t*)&reg_val, 1, I2C_DELAY_TIME);
-    xSemaphoreGive(i2c_Semaphore);
     return ret;
 }
 
@@ -57,21 +53,17 @@ bool get_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t
 {
     bool ret;
 
-    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
     ret = ISoftwareI2CRegRead(&raontech_i2c, dev_addr, reg_addr,
         REG_ADDR_2BYTE, reg_val, size, I2C_DELAY_TIME);
-    xSemaphoreGive(i2c_Semaphore);
     return ret;
 }
 
 bool set_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t size)
 {
     bool ret;
-    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
 
     ret = ISoftwareI2CRegWrite(&raontech_i2c, dev_addr, reg_addr,
         REG_ADDR_2BYTE, reg_val, size, I2C_DELAY_TIME);
-    xSemaphoreGive(i2c_Semaphore);
     return ret;
 }
 
@@ -94,7 +86,8 @@ float get_ntc_temperature(const ntc_t* ntc, float Voltage)
 
 float get_temperature(temperature_t* p_temp)
 {
-    float voltage = get_ntc_adc_sample(p_temp->p_ntc_adc_config);
+    uint16_t value = get_ntc_adc_sample(p_temp->p_ntc_adc_config);
+    float voltage = (float)value * 3.3 / 4095;
     float measure_temp = get_ntc_temperature(p_temp->p_ntc, voltage);
     array_shift(p_temp->buff, sensor_num, 4);
     p_temp->buff[sensor_num - 1] = (int)(measure_temp * 10);
@@ -103,20 +96,21 @@ float get_temperature(temperature_t* p_temp)
     return (float)p_temp->temperature / 10;
 }
 
-float get_i2c_temperature(temperature_i2c_t* p_temp)
+bool get_i2c_temperature(temperature_i2c_t* p_temp)
 {
-    int value = eeprom_read(p_temp->p_i2c, 0x00);
-    int temperature;
-    if (GET_BIT(value, 11))
-        temperature = -value * 10 / 16;
-    else
-        temperature = value * 10 / 16;
+    uint8_t value[2] = { 0 };
+    bool ret = eeprom_block_read(p_temp->p_i2c, 0x00, value, sizeof(value));
+
+    int temperature = (value[0] & 0x7f) * 10; // temperature 定点一个小数点
+    temperature += (((value[1] >> 4) & 0x0f) * 10) / 16;
+    if (GET_BIT(value[0], 7))
+        temperature = -temperature;
 
     array_shift(p_temp->buff, sensor_num, 4);
     p_temp->buff[sensor_num - 1] = temperature;
     quick_sort(p_temp->buff, 0, sensor_num - 1);
     p_temp->temperature = p_temp->buff[5 / 2 + 1];
-    return (float)p_temp->temperature / 10;
+    return ret;
 }
 
 void laser_on(void)

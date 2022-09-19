@@ -10,10 +10,12 @@
  */
 
 #include "BoardInit.h"
+#include "Common.h"
 #include "basicApp.h"
 #include "eeprom.h"
 #include "gd32f30x.h"
 #include "main.h"
+#include "utils.h"
 
 extern const Uarter uart0_output;
 extern temperature_t temperature[];
@@ -33,14 +35,35 @@ void ThreadSecondConsumer(void* pvParameters)
             }
             eeprom_update_crc(&BL24C64A);
         }
-        //TODO: verify it, have bug, value always is the
-        // for (int i = 0; i < sensor_num; i++) {
-        //     get_temperature(&temperature[i]);
-        // }
+        /* The adc cannot know whether the connection is abnormal */
+        for (int i = 0; i < sensor_num; i++) {
+            get_temperature(&temperature[i]);
+        }
 
-        // for (int i = 0; i < sensor_num; i++) {
-        //     get_i2c_temperature(&temperature_i2c[i]);
-        // }
+        for (int i = 0; i < sensor_num; i++) {
+            if (get_i2c_temperature(&temperature_i2c[i]) == false) {
+                switch (i) {
+                case blue_sensor:
+                    EXCUTE_ONCE(ULOG_ERROR("blue_sensor I2C cat not connect\n"));
+                    break;
+                case red_sensor:
+                    EXCUTE_ONCE(ULOG_ERROR("red_sensor I2C cat not connect\n"));
+                    break;
+                case green_sensor:
+                    EXCUTE_ONCE(ULOG_ERROR("green_sensor I2C cat not connect\n"));
+                    break;
+                case lcos_sensor:
+                    EXCUTE_ONCE(ULOG_ERROR("lcos_sensor I2C cat not connect\n"));
+                    break;
+                case evn_sensor:
+                    EXCUTE_ONCE(ULOG_ERROR("evn_sensor I2C cat not connect\n"));
+                    break;
+                default:
+                    E_assert(0);
+                    break;
+                }
+            }
+        }
 
         vTaskDelay(500);
     }
