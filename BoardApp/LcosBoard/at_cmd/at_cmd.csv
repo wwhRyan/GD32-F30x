@@ -21,7 +21,9 @@ Sn,LightEngine,string,Empty
 LightSourceTime,Second,int,Empty
 ,Minute,int,Empty
 ,Hour,int,Empty
-Error,Status,int,Empty
+Error,Status,string,Empty
+,Time,string,Empty
+,Text,string,Empty
 LogInfo,Status,string,Empty
 ,Clear,string,Empty
 InstallationMode,Status,enum,CeilingRear

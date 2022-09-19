@@ -56,7 +56,7 @@ void ThreadUartEvent(void* pvParameters)
     while (1) {
 
         if (0 != GetRxlen(&uart0_output)) {
-            debug_printf("Rec SignalBoard: %s\r\n", GetRxData(&uart0_output));
+            debug_printf("<uart0_output rx> %s\n", GetRxData(&uart0_output));
             // ICmdLinesInput(GetRxData(&uart0_output));
             IAtCmdDecodeAndRun(&output_obj, GetRxData(&uart0_output));
             ClearRxData(&uart0_output);
@@ -65,7 +65,7 @@ void ThreadUartEvent(void* pvParameters)
         if (0 != GetRxlen(&uart1_debug)) {
             // debug_printf("cmd rec->:%s\r\n", GetRxData(&uart1_debug));
             // ICmdLinesInput(GetRxData(&uart1_debug));
-            debug_printf("AT rec->:%s\r\n", GetRxData(&uart1_debug));
+            debug_printf("<uart1_debug rx> %s\n", GetRxData(&uart1_debug));
             IAtCmdDecodeAndRun(&at_obj, GetRxData(&uart1_debug));
             ClearRxData(&uart1_debug);
         }

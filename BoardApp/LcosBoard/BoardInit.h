@@ -36,7 +36,7 @@
 #define THREAD_FIRST_CONSUMER_STACK_SIZE (256)
 #define THREAD_SECOND_CONSUMER_STACK_SIZE 512
 #define CONFIG_START_ADDR 0x00
-#define LOG_START_ADDR (4 * 1024)
+#define LOG_START_ADDR (2 * 1024)
 
 void ThreadFirstConsumer(void* pvParameters);
 void ThreadUartEvent(void* pvParameters);

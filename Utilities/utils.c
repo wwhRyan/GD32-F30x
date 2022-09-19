@@ -143,7 +143,7 @@ void my_file_logger(ulog_level_t severity, char* msg)
     char_replace(new_line.text, '\n', '\0');
     strncpy(new_line.text, msg, TEXT_NUMBER);
 
-    output_printf("AT+Error#%s:%d.%s\n", ulog_level_name(severity), new_line.time, new_line.text);
+    output_printf("AT+Error#Time:%.2d-%02d-%02d,Text:%s\n", new_line.time / 60 / 60, (new_line.time / 60) % 60, new_line.time % 60, new_line.text);
     file_append_line(&eeprom_log, &new_line);
 }
 
@@ -159,7 +159,7 @@ void log_write(void* pdata, size_t size, uint32_t addr)
 void log_init(file_t* pfile)
 {
     ULOG_INIT();
-    file_init(pfile, LOG_START_ADDR, 1024 * 4, log_read, log_write, get_LSB_array_crc);
+    file_init(pfile, LOG_START_ADDR, 1024 * 6, log_read, log_write, get_LSB_array_crc);
     ULOG_SUBSCRIBE(my_console_logger, ULOG_DEBUG_LEVEL);
     ULOG_SUBSCRIBE(my_file_logger, ULOG_WARNING_LEVEL);
     ULOG_INFO("ULOG init\n"); // logs to file and console

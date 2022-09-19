@@ -15,6 +15,7 @@
 #include "basicApp.h"
 #include "eeprom.h"
 #include "ulog.h"
+#include "utils.h"
 #include "utilsAsciiConvert.h"
 #include <stdio.h>
 #include <string.h>
@@ -230,14 +231,14 @@ IAtOperationRegister(kCmdLightSourceTime, pAt_Kv_List, pAt_feedback_str)
     } else {
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
-            case kKeyMinute:
+            case kKeyHour:
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.light_source_time / 60);
                 break;
-            case kKeyHour:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.light_source_time / 60 / 60);
+            case kKeyMinute:
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.light_source_time / 60 % 60);
                 break;
             case kKeySecond:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.light_source_time);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.light_source_time % 60);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -349,10 +350,10 @@ IAtOperationRegister(kCmdTemperature, pAt_Kv_List, pAt_feedback_str)
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[green_sensor].temperature / 10);
                 break;
             case kKeyI2cLcos:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[evn_sensor].temperature / 10);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[lcos_sensor].temperature / 10);
                 break;
             case kKeyI2cEnv:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[lcos_sensor].temperature / 10);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[evn_sensor].temperature / 10);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -429,14 +430,13 @@ IAtOperationRegister(kCmdLogInfo, pAt_Kv_List, pAt_feedback_str)
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     } else {
         if (kKeyStatus == my_kvs[0].key) {
-            // TODO: add log read
-            line_t line_tmp[256] = { 0 };
-            int number = file_burst_read(&eeprom_log, line_tmp, my_kvs[0].value);
-            for (int i = 0; i < number; i++) {
-                IAddFeedbackStrTo(pAt_feedback_str, "%s:%d.%s\n", ulog_level_name(line_tmp[i].level), line_tmp[i].time, line_tmp[i].text);
+            line_t line_tmp[32] = { 0 };
+            int read_number = my_kvs[0].value > sizeof(line_tmp) ? sizeof(line_tmp) : my_kvs[0].value;
+            int feedback_number = file_burst_read(&eeprom_log, line_tmp, read_number);
+            for (int i = 0; i < feedback_number; i++) {
+                output_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", line_tmp[i].time / 60 / 60, (line_tmp[i].time / 60) % 60, line_tmp[i].time % 60, line_tmp[i].text);
             }
         } else if (kKeyClear == my_kvs[0].key) {
-            // TODO: add log clear.
             file_remove_all(&eeprom_log);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
@@ -717,7 +717,7 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
     char ascii_buff[512 + 1] = { 0 };
     size_t addr, size = 0;
     int ret = 0;
-    mem_t msg;
+    mem_t msg = { 0 };
 
     if (get_sig(sys_sig, sig_eeprom_write)) {
         IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
@@ -757,7 +757,9 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
         if (addr % 4 != 0)
             goto EEPROM_VALUE_ERROR;
 
-        AsciiToInt(ascii_buff, eeprom_data, 1);
+        if (AsciiToInt(ascii_buff, eeprom_data, 1) != true)
+            goto EEPROM_VALUE_ERROR;
+
         set_sig(sys_sig, sig_eeprom_write, true);
         memory_endian_conversion(eeprom_data, size);
         msg.idx = idx_eeprom_write;

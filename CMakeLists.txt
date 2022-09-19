@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-set(CMAKE_TOOLCHAIN_FILE cmake/arm-none-eabi-gcc.cmake)
+# set(CMAKE_TOOLCHAIN_FILE cmake/arm-none-eabi-gcc.cmake)
 project(GD32-F303CC)
 
 set(CMAKE_C_STANDARD 11)
@@ -27,19 +27,19 @@ if(${FORCE_COLORED_OUTPUT})
   endif()
 endif()
 
-add_compile_options(
-	-mcpu=cortex-m4
-	-mthumb
-  -mfloat-abi=hard
-	$<$<CONFIG:Debug>:-Og>
-	$<$<CONFIG:Release>:-O3>
-	$<$<CONFIG:MinSizeRel>:-Os>
-	$<$<CONFIG:RelWithDebInfo>:-O3>
-)
+# add_compile_options(
+# 	-mcpu=cortex-m4
+# 	-mthumb
+#   -mfloat-abi=hard
+# 	$<$<CONFIG:Debug>:-Og>
+# 	$<$<CONFIG:Release>:-O3>
+# 	$<$<CONFIG:MinSizeRel>:-Os>
+# 	$<$<CONFIG:RelWithDebInfo>:-O3>
+# )
 
-add_link_options(
-	-mcpu=cortex-m4
-)
+# add_link_options(
+# 	-mcpu=cortex-m4
+# )
 
 # add MCU build c flags
 add_definitions(-DDEBUG -DATHENA_OV_LCOS)

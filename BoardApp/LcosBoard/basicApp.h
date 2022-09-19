@@ -56,8 +56,8 @@ typedef enum temperature_enum_t {
     blue_sensor,
     red_sensor,
     green_sensor,
-    lcos_sensor,
     evn_sensor,
+    lcos_sensor,
     sensor_num,
 } temperature_enum_t;
 

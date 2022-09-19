@@ -77,9 +77,9 @@ float get_ntc_temperature(const ntc_t* ntc, float Voltage)
 {
     float ntc_R;
     if (ntc->is_pull_up == false)
-        ntc_R = (3.3 / (double)Voltage) * ntc->divided_voltage_R - ntc->divided_voltage_R;
+        ntc_R = ((double)Voltage / (3.3 - (double)Voltage)) * ntc->divided_voltage_R;
     else
-        ntc_R = (3.3 / (3.3 - (double)Voltage)) * ntc->divided_voltage_R - ntc->divided_voltage_R;
+        ntc_R = ((3.3 - (double)Voltage) / 3.3) * ntc->divided_voltage_R;
 
     return (298.15 * ntc->B) / (298.15 * log(ntc_R / ntc->normal_R) + ntc->B) - 273.15;
 }

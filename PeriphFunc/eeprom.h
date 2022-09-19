@@ -34,18 +34,17 @@ typedef struct eeprom_model_t
     const SoftwareI2C *i2c;
 } eeprom_model_t;
 
-typedef struct eeprom_t
-{
-    uint32_t check_sum;
-    uint32_t magic_num;
-    uint32_t version;
-    float red;
-    float green;
-    float blue;
-    uint32_t light_source_time;
-    char Sn_LightEngine[32];
-    char Sn_SourceLight[32];
-    char Sn_Projector[32];
+typedef struct eeprom_t {
+    uint32_t check_sum; /* addr 0x00 */
+    uint32_t magic_num; /* addr 0x04 */
+    uint32_t version; /* addr 0x08 */
+    float red; /* addr 0x0c */
+    float green; /* addr 0x10 */
+    float blue; /* addr 0x14 */
+    uint32_t light_source_time; /* addr 0x18 */
+    char Sn_LightEngine[32]; /* addr 0x1c */
+    char Sn_SourceLight[32]; /* addr 0x3C */
+    char Sn_Projector[32]; /* addr 0x5C */
 } eeprom_t;
 
 typedef enum eeprom_idx_t
