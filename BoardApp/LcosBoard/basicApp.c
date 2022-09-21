@@ -84,7 +84,7 @@ char* get_rdp250h_version(char* buff, size_t size)
     uint16_t id;
     uint16_t rev;
 
-    rdp250h_get_device_id(VC_PANEL_PORT_0, &id, &rev);
+    rtiVC_GetPanelDeviceID(VC_PANEL_PORT_0, &id, &rev);
     snprintf(buff, size, "%#x_%#x", id, rev);
     return buff;
 }
@@ -109,7 +109,7 @@ float get_ntc_temperature(const ntc_t* ntc, float Voltage)
 float get_temperature(temperature_t* p_temp)
 {
     uint16_t value = get_ntc_adc_sample(p_temp->p_ntc_adc_config);
-    float voltage = (float)value * 3.3 / 4095;
+    float voltage = (double)value * 3.3 / 4095;
     float measure_temp = get_ntc_temperature(p_temp->p_ntc, voltage);
     array_shift(p_temp->buff, sensor_num, 4);
     p_temp->buff[sensor_num - 1] = (int)(measure_temp * 10);

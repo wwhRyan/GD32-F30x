@@ -40,8 +40,8 @@ typedef enum color_t {
 
 typedef struct ntc_t {
     uint16_t B;
-    uint16_t normal_R;
-    uint16_t divided_voltage_R;
+    int normal_R;
+    int divided_voltage_R;
     bool is_pull_up; // true: divided_voltage_R pull up, false: divided_voltage_R pull down
 } ntc_t;
 

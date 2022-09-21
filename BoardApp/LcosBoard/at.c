@@ -17,6 +17,7 @@
 #include "ulog.h"
 #include "utils.h"
 #include "utilsAsciiConvert.h"
+#include "rti_vc_api.h"
 #include <stdio.h>
 #include <string.h>
 
