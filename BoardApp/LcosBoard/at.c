@@ -472,18 +472,21 @@ IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
                 sscanf(my_kvs[i].value, "%d", &current);
                 // check current
                 eeprom.red = (float)current / 100;
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_red], (TickType_t)10);
                 break;
             case kKeyG:
                 sscanf(my_kvs[i].value, "%d", &current);
                 // check current
                 eeprom.green = (float)current / 100;
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_green], (TickType_t)10);
                 break;
             case kKeyB:
                 sscanf(my_kvs[i].value, "%d", &current);
                 // check current
                 eeprom.blue = (float)current / 100;
+                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
                 xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_blue], (TickType_t)10);
                 break;
             default:
