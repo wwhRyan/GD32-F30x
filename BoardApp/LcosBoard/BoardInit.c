@@ -376,12 +376,12 @@ void application_init()
     INewSoftwareI2C(&raontech_i2c);
     INewSoftwareI2C(&sensor_i2c);
 
-    printf("OV Lcos Board %s finished\r\n", __func__);
+    printf("LcosBoard %s finished\r\n", __func__);
     /* print out the clock frequency of system, AHB, APB1 and APB2 */
-    printf("CK_SYS is %d\n", rcu_clock_freq_get(CK_SYS));
-    printf("CK_AHB is %d\n", rcu_clock_freq_get(CK_AHB));
-    printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
-    printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
+    // printf("CK_SYS is %d\n", rcu_clock_freq_get(CK_SYS));
+    // printf("CK_AHB is %d\n", rcu_clock_freq_get(CK_AHB));
+    // printf("CK_APB1 is %d\n", rcu_clock_freq_get(CK_APB1));
+    // printf("CK_APB2 is %d\n", rcu_clock_freq_get(CK_APB2));
 }
 
 void USART0_IRQHandler(void)

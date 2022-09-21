@@ -144,19 +144,17 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
                 // TODO: add version
             case kKeyRdc200a:
                 ULOG_DEBUG("kKeyRdc200a\n");
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, get_rdc200a_version(str_buff, sizeof(str_buff)));
                 break;
 
-                // TODO: add version
             case kKeyRdp250h:
                 ULOG_DEBUG("kKeyRdp250h\n");
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, get_rdp250h_version(str_buff, sizeof(str_buff)));
                 break;
 
-                // TODO: add version
             case kKeyEeprom:
-                ULOG_DEBUG("kKeyAnf3\n");
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, str_buff);
+                ULOG_DEBUG("kKeyEeprom\n");
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.version);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -282,33 +280,47 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyRed == my_kvs[0].value) {
             // TODO: add testpattern show
+            rtiVC_GenerateTestPattern(255, 0, 0);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyGreen == my_kvs[0].value) {
+            rtiVC_GenerateTestPattern(0, 255, 0);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyBlue == my_kvs[0].value) {
+            rtiVC_GenerateTestPattern(0, 0, 255);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyGrey == my_kvs[0].value) {
+            rtiVC_GenerateTestPattern(128, 128, 128);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyMagenta == my_kvs[0].value) {
+            rtiVC_GenerateTestPattern(255, 0, 255);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyCyan == my_kvs[0].value) {
+            rtiVC_GenerateTestPattern(0, 255, 255);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyYellow == my_kvs[0].value) {
+            rtiVC_GenerateTestPattern(255, 255, 0);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyBlack == my_kvs[0].value) {
+            rtiVC_GenerateTestPattern(0, 0, 0);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyWhite == my_kvs[0].value) {
+            rtiVC_GenerateTestPattern(255, 255, 255);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyCheckerboard == my_kvs[0].value) {
+            rtiVC_GenerateTestPattern(255, 255, 255);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyHorizontalRamp == my_kvs[0].value) {
+            rtiVC_GenerateTestPattern(255, 255, 255);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyOff == my_kvs[0].value) {
             // TODO: add testpattern off
+            rtiVC_EnableTestPattern(false);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+            return;
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
+        rtiVC_EnableTestPattern(true);
     } else {
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     }

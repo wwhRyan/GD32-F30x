@@ -17,6 +17,7 @@
 #include "gd32f30x.h"
 #include "main.h"
 #include "rti_vc_api.h"
+#include "ulog.h"
 
 asAtProtocol at_obj;
 asAtProtocol output_obj;
@@ -27,31 +28,34 @@ void ThreadUartEvent(void* pvParameters)
 {
     system_ipc_init();
     log_init(&eeprom_log);
+    ULOG_INFO("log enable\n");
+    ULOG_DEBUG("%s\n", __func__);
 
     vTaskDelay(1);
+    ULOG_INFO("rdc200a_reset_pin pull up\n");
     gpio_bit_set(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
 
-    ULOG_DEBUG("%s\n", __func__);
+    ULOG_INFO("eeprom init\n");
     init_eeprom(&BL24C64A);
     // reload_idu_current();
 
-    //TODO: verify it
-    #if 0
+    // TODO: verify it
+    ULOG_INFO("RDC200A init\n");
     int ret;
     ret = rtiVC_Initialize(RDC200A_ADDR);
-    if (ret != 0) {
-        printf("VC init error (%d)\n", ret);
-        E_assert(0);
-    }
+    if (ret != 0)
+        ULOG_ERROR("VC init error (%d)\n", ret);
 
     // Open device
     ret = rtiVC_OpenDevice();
     if (ret)
-        E_assert(0);
-    #endif
+        ULOG_ERROR("VC open device error (%d)\n", ret);
 
+    ULOG_INFO("AtLib init\n");
     IInitAtLib(&at_obj, kAtNormalMode, NULL, debug_printf);
     IInitAtLib(&output_obj, kAtNormalMode, NULL, output_printf);
+
+    ULOG_INFO("init complete\n");
     set_sig(sys_sig, sig_mcu_init_ok, true);
     while (1) {
 

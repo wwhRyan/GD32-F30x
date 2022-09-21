@@ -13,11 +13,13 @@
 #include "eeprom.h"
 #include "i2c.h"
 #include "rti_vc_api.h"
+#include "rti_vc_panel.h"
 #include "rti_vc_rdc.h"
 #include "rti_vc_regio.h"
 #include "sort.h"
 #include "utils.h"
 #include <math.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 
@@ -65,6 +67,26 @@ bool set_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t
     ret = ISoftwareI2CRegWrite(&raontech_i2c, dev_addr, reg_addr,
         REG_ADDR_2BYTE, reg_val, size, I2C_DELAY_TIME);
     return ret;
+}
+
+char* get_rdc200a_version(char* buff, size_t size)
+{
+    uint16_t id;
+    uint16_t rev;
+
+    rtiVC_GetRdcDeviceID(&id, &rev);
+    snprintf(buff, size, "%#x_%#x", id, rev);
+    return buff;
+}
+
+char* get_rdp250h_version(char* buff, size_t size)
+{
+    uint16_t id;
+    uint16_t rev;
+
+    rdp250h_get_device_id(VC_PANEL_PORT_0, &id, &rev);
+    snprintf(buff, size, "%#x_%#x", id, rev);
+    return buff;
 }
 
 /**

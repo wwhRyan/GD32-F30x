@@ -41,7 +41,7 @@ void ThreadSecondConsumer(void* pvParameters)
             for (int i = 0; i < sensor_num; i++) {
                 get_temperature(&temperature[i]);
             }
-
+#if 0
             for (int i = 0; i < sensor_num; i++) {
                 if (get_i2c_temperature(&temperature_i2c[i]) == false) {
                     switch (i) {
@@ -66,6 +66,7 @@ void ThreadSecondConsumer(void* pvParameters)
                     }
                 }
             }
+#endif
         }
 
         vTaskDelay(500);

@@ -254,12 +254,18 @@ bool ISoftwareI2CRegWrite(const SoftwareI2C *psI2c, uint16_t dev_addr, uint16_t 
 
 	/* Start I2C. */
 	tempRet &= m_SoftI2cStart(psI2c);
+	if (!tempRet) 
+		return tempRet;
 
 	/* WRITE: Send Device Address that its last bit must be 0.*/
 	tempRet &= m_SoftI2cSendAddress(psI2c, OPTION_WRITE, dev_addr, reg_addr, reg_addr_type);
+	if (!tempRet) 
+		return tempRet;
 
 	/* Send data. */
 	tempRet &= m_SoftI2cBurst(psI2c, OPTION_WRITE, pData, size, timeout);
+	if (!tempRet) 
+		return tempRet;
 
 	/* Stop Writing. */
 	tempRet &= m_SoftI2cStop(psI2c);
@@ -274,12 +280,18 @@ bool ISoftwareI2CRegRead(const SoftwareI2C *psI2c, uint16_t dev_addr, uint16_t r
 
 	/* Start I2C. */
 	tempRet &= m_SoftI2cStart(psI2c);
+	if (!tempRet) 
+		return tempRet;
 
 	/* READ: Send Device Address that its last bit must be 1. */
 	tempRet &= m_SoftI2cSendAddress(psI2c, OPTION_READ, dev_addr, reg_addr, reg_addr_type);
+	if (!tempRet) 
+		return tempRet;
 
 	/* Receve Data. */
 	tempRet &= m_SoftI2cBurst(psI2c, OPTION_READ, pData, size, timeout);
+	if (!tempRet) 
+		return tempRet;
 
 	/* Stop Reading. */
 	tempRet &= m_SoftI2cStop(psI2c);
@@ -345,20 +357,28 @@ static bool m_SoftI2cSendAddress(const SoftwareI2C *psI2c, uint8_t option,
      * by setting the last bit 0. */
 	stat &= m_SoftI2cWriteByte(psI2c, dev_addr & 0xFE);
 	stat &= m_SoftI2cWaitAck(psI2c);
+	if (!stat)
+		return stat;
 
 	/* Send Register Address. */
 	if (REG_ADDR_1BYTE == reg_addr_type)
 	{
 		stat &= m_SoftI2cWriteByte(psI2c, reg_addr & 0xFF);
 		stat &= m_SoftI2cWaitAck(psI2c);
+		if (!stat)
+			return stat;
 	}
 	else if (REG_ADDR_2BYTE == reg_addr_type)
 	{
 		stat &= m_SoftI2cWriteByte(psI2c, (reg_addr >> 8) & 0xFF);
 		stat &= m_SoftI2cWaitAck(psI2c);
+		if(!stat)
+			return stat;
 
 		stat &= m_SoftI2cWriteByte(psI2c, reg_addr & 0xFF);
 		stat &= m_SoftI2cWaitAck(psI2c);
+		if(!stat)
+			return stat;
 	}
 
 	/* If option = READ, Device Address need to be sent again with "READ CMD"
@@ -371,6 +391,8 @@ static bool m_SoftI2cSendAddress(const SoftwareI2C *psI2c, uint8_t option,
 
 		stat &= m_SoftI2cWriteByte(psI2c, dev_addr | 0x01);
 		stat &= m_SoftI2cWaitAck(psI2c);
+		if(!stat)
+			return stat;
 	}
 
 	return stat;
@@ -380,12 +402,11 @@ static bool m_SoftI2cBurst(const SoftwareI2C *psI2c, uint8_t option,
 						   uint8_t *pData, uint16_t size, uint32_t timeout)
 {
 	bool stat = true;
-	uint32_t tick_temp = SysTick->VAL;
 
 	if (OPTION_READ == option)
 	{
 		/* Receve Data. */
-		while (size-- && (abs(tick_temp - SysTick->VAL) <= timeout * SystemCoreClock / 1000U))
+		while (size--)
 		{
 			*pData = m_SoftI2cReadByte(psI2c);
 			if (size)
@@ -402,10 +423,12 @@ static bool m_SoftI2cBurst(const SoftwareI2C *psI2c, uint8_t option,
 	else if (OPTION_WRITE == option)
 	{
 		/* Send data. */
-		while (size-- && (abs(tick_temp - SysTick->VAL) <= timeout * SystemCoreClock / 1000U))
+		while (size--)
 		{
 			stat &= m_SoftI2cWriteByte(psI2c, *pData);
 			stat &= m_SoftI2cWaitAck(psI2c);
+			if(!stat)
+				return stat;
 			pData++;
 		}
 	}
