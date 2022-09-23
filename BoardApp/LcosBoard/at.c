@@ -572,6 +572,45 @@ SPIFLASH_VALUE_ERROR:
     IAddFeedbackStrTo(pAt_feedback_str, "InvalidValue\n");
 }
 
+IAtOperationRegister(kCmdSpiFlashErase, pAt_Kv_List, pAt_feedback_str)
+{
+    asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
+    ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
+
+    size_t addr, size = 0;
+    int ret = 0;
+    if (kAtControlType == IGetAtCmdType(&at_obj)) {
+
+        for (size_t i = 0; i < pAt_Kv_List->size; i++) {
+            switch (my_kvs[i].key) {
+            case kKeyAddr:
+                ret = sscanf(my_kvs[i].value, "%X", &addr);
+                break;
+            case kKeySize:
+                ret = sscanf(my_kvs[i].value, "%X", &size);
+                break;
+            default:
+                IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+                return;
+            }
+            if (ret == EOF || ret == 0) {
+                IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+                return;
+            }
+        }
+
+        if (spi_flash_erase(addr, size) == true)
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+        else {
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        }
+    } else {
+        IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+    }
+}
+
+// TODO：验证功能
+// TODO：验证大小端
 IAtOperationRegister(kCmdRdc200a, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];

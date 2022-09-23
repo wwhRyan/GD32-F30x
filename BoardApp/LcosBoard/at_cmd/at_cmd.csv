@@ -87,8 +87,11 @@ Rdp250h,Addr,string,Empty
 ,Size,string,Empty
 ,Data,string,Empty
 SpiFlash,Addr,string,Empty
+,Size,string,Empty
 ,Crc,string,Empty
 ,Data,string,Empty
+SpiFlashErase,Addr,string,Empty
+,Size,string,Empty
 FlashBootb,Status,enum,On
 ,,enum,Off
 ,,enum,Ok
