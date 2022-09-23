@@ -160,7 +160,7 @@ void log_init(file_t* pfile)
 {
     ULOG_INIT();
     file_init(pfile, LOG_START_ADDR, 1024 * 6, log_read, log_write, get_LSB_array_crc);
-    ULOG_SUBSCRIBE(my_console_logger, ULOG_DEBUG_LEVEL);
+    ULOG_SUBSCRIBE(my_console_logger, ULOG_TRACE_LEVEL);
     ULOG_SUBSCRIBE(my_file_logger, ULOG_WARNING_LEVEL);
     ULOG_INFO("ULOG init\n"); // logs to file and console
 }

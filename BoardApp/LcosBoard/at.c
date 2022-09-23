@@ -14,10 +14,10 @@
 #include "BoardInit.h"
 #include "basicApp.h"
 #include "eeprom.h"
+#include "rti_vc_api.h"
 #include "ulog.h"
 #include "utils.h"
 #include "utilsAsciiConvert.h"
-#include "rti_vc_api.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -415,6 +415,8 @@ IAtOperationRegister(kCmdReset, pAt_Kv_List, pAt_feedback_str)
 
         } else if (kKeyUser == my_kvs[0].value) {
             // TODO: add user reset.
+            extern void my_console_logger(ulog_level_t severity, char* msg);
+            ULOG_SUBSCRIBE(my_console_logger, ULOG_WARNING_LEVEL);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         }
     } else {

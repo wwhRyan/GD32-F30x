@@ -37,7 +37,6 @@ void ThreadUartEvent(void* pvParameters)
 
     ULOG_INFO("eeprom init\n");
     init_eeprom(&BL24C64A);
-    // reload_idu_current();
 
     // TODO: verify it
     ULOG_INFO("RDC200A init\n");
@@ -60,16 +59,16 @@ void ThreadUartEvent(void* pvParameters)
     while (1) {
 
         if (0 != GetRxlen(&uart0_output)) {
-            debug_printf("<uart0_output rx> %s\n", GetRxData(&uart0_output));
+            ULOG_TRACE("<uart0_output rx> %s\n", GetRxData(&uart0_output));
             // ICmdLinesInput(GetRxData(&uart0_output));
             IAtCmdDecodeAndRun(&output_obj, GetRxData(&uart0_output));
             ClearRxData(&uart0_output);
         }
 
         if (0 != GetRxlen(&uart1_debug)) {
-            // debug_printf("cmd rec->:%s\r\n", GetRxData(&uart1_debug));
+            // ULOG_TRACE("cmd rec->:%s\r\n", GetRxData(&uart1_debug));
             // ICmdLinesInput(GetRxData(&uart1_debug));
-            debug_printf("<uart1_debug rx> %s\n", GetRxData(&uart1_debug));
+            ULOG_TRACE("<uart1_debug rx> %s\n", GetRxData(&uart1_debug));
             IAtCmdDecodeAndRun(&at_obj, GetRxData(&uart1_debug));
             ClearRxData(&uart1_debug);
         }

@@ -94,8 +94,8 @@ int rtiVC_ReadBurstDeviceExt(E_VC_DEVICE_CH_T dev_ch, U8_T dev_slave_addr,
     U8_T* r_buf, U16_T r_size)
 {
     bool ret = true;
-    uint16_t w_reg = (((uint16_t)w_buf[0] & 0x00ff << 8) | ((uint16_t)w_buf[1] & 0x00ff));
-    uint16_t r_reg = (((uint16_t)r_buf[0] & 0x00ff << 8) | ((uint16_t)r_buf[1] & 0x00ff));
+    uint16_t w_reg = (((uint16_t)w_buf[0] & 0x00ff) << 8 | ((uint16_t)w_buf[1] & 0x00ff));
+    uint16_t r_reg = (((uint16_t)r_buf[0] & 0x00ff) << 8 | ((uint16_t)r_buf[1] & 0x00ff));
 
     ret |= set_reg_block(dev_slave_addr, w_reg, w_buf + 2, w_size - 2);
     ret |= get_reg_block(dev_slave_addr, r_reg, r_buf + 2, r_size - 2);

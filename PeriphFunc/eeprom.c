@@ -128,9 +128,9 @@ bool eeprom_block_write(const eeprom_model_t* model, uint16_t WriteAddr, uint8_t
     uint8_t NumOfPage = 0, NumOfSingle = 0, Addr = 0, count = 0;
 
     Addr = WriteAddr % model->page_size;
-    count = model->page_size - Addr;
+    count = model->page_size - Addr; /* 差count个数据值，刚好可以对齐到页地址 */
     NumOfPage = size / model->page_size;
-    NumOfSingle = size % model->page_size;
+    NumOfSingle = size % model->page_size; /* mod运算求余，计算出剩余不满一页的字节数 */
 
     if (Addr == 0) {
 
@@ -163,10 +163,24 @@ bool eeprom_block_write(const eeprom_model_t* model, uint16_t WriteAddr, uint8_t
     else {
 
         if (NumOfPage == 0) {
-            xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-            ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
-            xSemaphoreGive(i2c_Semaphore);
-            vTaskDelay(model->write_delay_time);
+            if (count < NumOfSingle) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+            } else {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, count, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+
+                WriteAddr += count;
+                data += count;
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle - count, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+            }
         }
 
         else {
@@ -234,6 +248,6 @@ void init_eeprom(const eeprom_model_t* model)
         eeprom_block_write(model, CONFIG_START_ADDR, ((uint8_t*)&eeprom), sizeof(eeprom_t));
         eeprom_update_crc(model);
     } else {
-        printf("Ok eeprom.\n");
+        ULOG_INFO("Ok eeprom.\n");
     }
 }

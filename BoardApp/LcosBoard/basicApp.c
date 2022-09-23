@@ -153,74 +153,6 @@ void laser_dac_set(float current)
     laser_dac_set_value(&laser_dac, (uint32_t)((1.24 / 24 + 1.24 / 30 - 0.015 * (double)current) * (4095 * 30 / 3.3)));
 }
 
-uint8_t get_idu_value(float current)
-{
-    return (1.24 * 1000 - 40 * 0.075 * current) * 128 / (40 * 50 * current);
-}
-
-float get_current_value(uint8_t idu)
-{
-    return 9920.0 / (125.0 * idu + 24.0);
-}
-
-/**
- * @brief
- *
- * @param idx R\G\B\Y 0\1\2\3
- * @param current A
- * @note i2c addr 0x66
- * @note i2c speed 100K
- * @note min 127, max 21
- */
-bool laser_set(int idx, float current)
-{
-    uint8_t digital_value = get_idu_value(current);
-    if (digital_value > 127 || digital_value < 21) {
-        debug_printf("%s param current value error!\n", __func__);
-        return false;
-    } else if (idx > 3 || idx < 0) {
-        debug_printf("%s param idx error!\n", __func__);
-        return false;
-    } else {
-        xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
-        ISoftwareI2CRegWrite(&raontech_i2c, 0x66, (uint8_t)idx, REG_ADDR_1BYTE, &digital_value, 1, 5);
-        xSemaphoreGive(i2c_Semaphore);
-        vTaskDelay(1);
-    }
-    return true;
-}
-
-void reload_idu_current(void)
-{
-    uint8_t red_idu_value = eeprom.red;
-    uint8_t green_idu_value = eeprom.green;
-    uint8_t blue_idu_value = eeprom.blue;
-
-    if (red_idu_value <= 127 && red_idu_value >= 21) {
-        laser_set(RED, get_current_value(red_idu_value));
-        debug_printf("RED: %f A\r\n", get_current_value(red_idu_value));
-    } else {
-        laser_set(RED, 1.0);
-        debug_printf("laser_set RED is %f A\r\n", 1.0);
-    }
-
-    if (green_idu_value <= 127 && green_idu_value >= 21) {
-        laser_set(GREEN, get_current_value(green_idu_value));
-        debug_printf("GREEN: %f A\r\n", get_current_value(green_idu_value));
-    } else {
-        laser_set(GREEN, 0.8);
-        debug_printf("laser_set GREEN is %f A\r\n", 0.8);
-    }
-
-    if (blue_idu_value <= 127 && blue_idu_value >= 21) {
-        laser_set(BLUE, get_current_value(blue_idu_value));
-        debug_printf("BLUE: %f A\r\n", get_current_value(blue_idu_value));
-    } else {
-        laser_set(BLUE, 0.623);
-        debug_printf("laser_set BLUE is %f A\r\n", 0.623);
-    }
-}
-
 // DISCHARGE2 voltage big --> little
 // DISCHARGE current big --> little
 
@@ -361,7 +293,7 @@ uint32_t get_MSB_array_crc(uint8_t* array, size_t size)
     for (size_t i = 0; i < size / sizeof(uint32_t); i++) {
         valcrc = crc_single_data_calculate(BSWAP_32(*(pval32 + i)));
     }
-    debug_printf("valcrc %#x\n", valcrc);
+    ULOG_TRACE("valcrc %#x\n", valcrc);
     return valcrc;
 }
 
