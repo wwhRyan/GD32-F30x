@@ -525,46 +525,74 @@ IAtOperationRegister(kCmdSpiFlash, pAt_Kv_List, pAt_feedback_str)
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
 
-    size_t addr, at_crc = 0;
-    uint8_t anf_data[256] = { 0 };
+    size_t addr, at_crc, size = 0;
+    uint8_t buff[256] = { 0 };
+    char string[512 + 1] = { 0 };
+    int ret = 0;
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyAddr:
-                sscanf(my_kvs[i].value, "%X", &addr);
+                ret = sscanf(my_kvs[i].value, "%X", &addr);
                 if (addr > 0xFFFF)
                     goto SPIFLASH_VALUE_ERROR;
                 break;
             case kKeyCrc:
-                sscanf(my_kvs[i].value, "%X", &at_crc);
-                ULOG_DEBUG("at_crc: %#x\n", at_crc);
+                ret = sscanf(my_kvs[i].value, "%X", &at_crc);
+                ULOG_TRACE("at_crc: %#x\n", at_crc);
                 break;
             case kKeyData:
+                ret = sscanf(my_kvs[i].value, "%512s", string);
                 if (512 != strlen(my_kvs[i].value))
-                    goto SPIFLASH_VALUE_ERROR;
-                if (false == AsciiToInt(my_kvs[i].value, anf_data, 1))
                     goto SPIFLASH_VALUE_ERROR;
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
                 return;
             }
+            if (ret == EOF || ret == 0)
+                goto SPIFLASH_VALUE_ERROR;
         }
-
-        if (at_crc != get_MSB_array_crc(anf_data, sizeof(anf_data)))
+        if (false == AsciiToInt(string, buff, 1))
             goto SPIFLASH_VALUE_ERROR;
 
-        clear_sig(sys_sig, sig_system);
+        if (at_crc != get_MSB_array_crc(buff, sizeof(buff)))
+            goto SPIFLASH_VALUE_ERROR;
 
-        // TODO: add rdc200a update.
-        if (0) {
+        set_sig(sys_sig, sig_update_rdc200a, true);
+        if (0 != rtiVC_ProgramFLASH(addr, buff, 256)) {
             IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
             clear_sig(sys_sig, sig_update_rdc200a);
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         }
     } else {
-        IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        for (size_t i = 0; i < pAt_Kv_List->size; i++) {
+            switch (my_kvs[i].key) {
+            case kKeyAddr:
+                ret = sscanf(my_kvs[i].value, "%X", &addr);
+                if (addr > 0xFFFF)
+                    goto SPIFLASH_VALUE_ERROR;
+                break;
+            case kKeySize:
+                ret = sscanf(my_kvs[i].value, "%X", &size);
+                if (size > 256)
+                    goto SPIFLASH_VALUE_ERROR;
+                break;
+            default:
+                IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+                return;
+            }
+            if (ret == EOF || ret == 0)
+                goto SPIFLASH_VALUE_ERROR;
+        }
+
+        if (rtiVC_ReadFLASH(addr, buff, size) != 0) {
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        } else {
+            IntToAscii(buff, string, 1, size);
+            IAddFeedbackStrTo(pAt_feedback_str, "Data:%s\n", string);
+        }
     }
     return;
 SPIFLASH_VALUE_ERROR:
@@ -618,8 +646,8 @@ IAtOperationRegister(kCmdRdc200a, pAt_Kv_List, pAt_feedback_str)
 
     size_t size = 0;
     size_t addr = 0;
-    char string[256] = { 0 };
-    uint8_t data[128] = { 0 };
+    char string[512 + 1] = { 0 };
+    uint8_t data[256] = { 0 };
     int ret;
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
@@ -632,7 +660,7 @@ IAtOperationRegister(kCmdRdc200a, pAt_Kv_List, pAt_feedback_str)
                 ret = sscanf(my_kvs[i].value, "%X", &size);
                 break;
             case kKeyData:
-                ret = sscanf(my_kvs[i].value, "%256s", string);
+                ret = sscanf(my_kvs[i].value, "%512s", string);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -641,22 +669,17 @@ IAtOperationRegister(kCmdRdc200a, pAt_Kv_List, pAt_feedback_str)
             if (ret == EOF || ret == 0)
                 goto RDC200A_VALUE_ERROR;
         }
-        if (size > 128)
+        if (size > 256)
             goto RDC200A_VALUE_ERROR;
 
-        // if (AsciiToInt(string, data, size) == false)
-        //     goto RDC200A_VALUE_ERROR;
+        if (AsciiToInt(string, data, 1) == false)
+            goto RDC200A_VALUE_ERROR;
 
-        // if (set_reg_block(addr, data, size) != true)
-        //     IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
-        // else
-        //     IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-
-        // memset(string, 0, size);
-        // IntToAscii(data, string, 1, size);
-        // ULOG_DEBUG("set_reg_block %#X:%s\n", addr, string);
+        if (set_reg_block(RDC200A_ADDR, addr, data, size) != true)
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        else
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
     } else {
-        char ascii_output[512 + 1] = { 0 };
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyAddr:
@@ -675,13 +698,12 @@ IAtOperationRegister(kCmdRdc200a, pAt_Kv_List, pAt_feedback_str)
         if (size > 256)
             goto RDC200A_VALUE_ERROR;
 
-        // TODO: add rdc200a r w
-        //  if (get_reg_block(addr, data, size) != true) {
-        //      IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
-        //  } else {
-        //      IntToAscii(data, ascii_output, 1, size);
-        //      IAddFeedbackStrTo(pAt_feedback_str, "Data:%s\n", ascii_output);
-        //  }
+        if (get_reg_block(RDC200A_ADDR, addr, data, size) != true) {
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        } else {
+            IntToAscii(data, string, 1, size);
+            IAddFeedbackStrTo(pAt_feedback_str, "Data:%s\n", string);
+        }
     }
     return;
 RDC200A_VALUE_ERROR:
