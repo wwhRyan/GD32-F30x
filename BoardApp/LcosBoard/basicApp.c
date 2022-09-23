@@ -87,9 +87,13 @@ char* get_rdc200a_version(char* buff, size_t size)
 {
     uint16_t id;
     uint16_t rev;
+    uint8_t major;
+    uint8_t minor;
 
     rtiVC_GetRdcDeviceID(&id, &rev);
-    snprintf(buff, size, "%#x_%#x", id, rev);
+    major = (RDC_REG_GET(0x0002) & 0xf0) >> 4;
+    minor = RDC_REG_GET(0x0003);
+    snprintf(buff, size, "%#x_%x.%x", id, major, minor);
     return buff;
 }
 

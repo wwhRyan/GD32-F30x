@@ -228,6 +228,7 @@ bool eeprom_block_read(const eeprom_model_t* model, uint16_t addr, uint8_t* data
     return ret;
 }
 
+//TODO: eeprom 写入的防掉电操作
 /**
  * @brief Call in rtos task
  */

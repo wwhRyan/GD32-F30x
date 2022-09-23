@@ -26,7 +26,7 @@ extern const mem_t eeprom_mem[];
 extern temperature_t temperature[];
 extern file_t eeprom_log;
 
-// TODO: 搞清楚RDC200A的正常运行的判断
+//TODO: 验证上下电的时序
 IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
@@ -142,7 +142,6 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
                     gpio_output_bit_get(HW_VER1_PORT, HW_VER1_PIN), gpio_output_bit_get(HW_VER0_PORT, HW_VER0_PIN));
                 break;
 
-                // TODO: add version
             case kKeyRdc200a:
                 ULOG_DEBUG("kKeyRdc200a\n");
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, get_rdc200a_version(str_buff, sizeof(str_buff)));
@@ -335,7 +334,6 @@ IAtOperationRegister(kCmdTemperature, pAt_Kv_List, pAt_feedback_str)
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     } else {
-        // TODO:test temperature
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyNtcBlue:
@@ -710,6 +708,7 @@ RDC200A_VALUE_ERROR:
     IAddFeedbackStrTo(pAt_feedback_str, "InvalidValue\n");
 }
 
+//TODO: verify it
 IAtOperationRegister(kCmdRdp250h, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
@@ -817,7 +816,6 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
                 ret = sscanf(my_kvs[i].value, "%512s", ascii_buff);
                 break;
             case kKeyClear:
-                // TODO: add eeprom clear
                 file_remove_all(&eeprom_log);
                 eeprom_write(&BL24C64A, eeprom_mem[idx_check_sum].addr, 0);
                 init_eeprom(&BL24C64A);
