@@ -18,6 +18,7 @@
 #include "ulog.h"
 #include "utils.h"
 #include "utilsAsciiConvert.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -26,7 +27,6 @@ extern const mem_t eeprom_mem[];
 extern temperature_t temperature[];
 extern file_t eeprom_log;
 
-//TODO: 验证上下电的时序
 IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
@@ -35,25 +35,29 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         switch (my_kvs[0].value) {
         case kKeyOn:
-            gpio_bit_set(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
-            if (get_sig(sys_sig, sig_rdc200a_status) != true) // if rdc200a is not working, then reset it
-            {
-                gpio_bit_set(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
-                vTaskDelay(100);
-                gpio_bit_reset(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
+            if (power_resume() == true) {
+                set_sig(sys_sig, sig_lightsource, true);
+                set_sig(sys_sig, sig_system, true);
+                IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+
+            } else {
+                set_sig(sys_sig, sig_lightsource, false);
+                set_sig(sys_sig, sig_system, false);
+                IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+                EXCUTE_ONCE(ULOG_ERROR("error to power on"));
             }
-            ULOG_DEBUG("system on\n");
-            set_sig(sys_sig, sig_lightsource, true);
-            set_sig(sys_sig, sig_system, true);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             break;
 
         case kKeyIdle:
-            clear_sig(sys_sig, sig_lightsource);
-            clear_sig(sys_sig, sig_system);
-            clear_sig(sys_sig, sig_update_rdc200a);
-            clear_sig(sys_sig, sig_update_firmware);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+            if (gpio_output_bit_get(SYS_12V_ON_PORT, SYS_12V_ON_PIN)) {
+                clear_sig(sys_sig, sig_lightsource);
+                clear_sig(sys_sig, sig_system);
+                clear_sig(sys_sig, sig_update_rdc200a);
+                clear_sig(sys_sig, sig_update_firmware);
+                IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+            } else {
+                IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+            }
             break;
 
         case kKeyOff:
@@ -253,22 +257,39 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyCeilingFront == my_kvs[0].value) {
-            // TODO: add raontech lcos flip
+            h_v_flip_set(v_0_h_0);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyCeilingRear == my_kvs[0].value) {
-            // TODO: add raontech lcos flip
+            h_v_flip_set(v_0_h_1);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyTableFront == my_kvs[0].value) {
-            // TODO: add raontech lcos flip
+            h_v_flip_set(v_1_h_0);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyTableRear == my_kvs[0].value) {
-            // TODO: add raontech lcos flip
+            h_v_flip_set(v_1_h_1);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
     } else {
-        IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        flip_t tmp = h_v_flip_get();
+        switch (tmp) {
+        case v_0_h_0:
+            IAddFeedbackStrTo(pAt_feedback_str, "CeilingFront\n");
+            break;
+        case v_0_h_1:
+            IAddFeedbackStrTo(pAt_feedback_str, "CeilingRear\n");
+            break;
+        case v_1_h_0:
+            IAddFeedbackStrTo(pAt_feedback_str, "TableFront\n");
+            break;
+        case v_1_h_1:
+            IAddFeedbackStrTo(pAt_feedback_str, "TableRear\n");
+            break;
+        default:
+            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+            return;
+        }
     }
 }
 
@@ -278,51 +299,71 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
-        if (kKeyRed == my_kvs[0].value) {
-            // TODO: add testpattern show
-            rtiVC_GenerateTestPattern(255, 0, 0);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else if (kKeyGreen == my_kvs[0].value) {
-            rtiVC_GenerateTestPattern(0, 255, 0);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else if (kKeyBlue == my_kvs[0].value) {
-            rtiVC_GenerateTestPattern(0, 0, 255);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else if (kKeyGrey == my_kvs[0].value) {
-            rtiVC_GenerateTestPattern(128, 128, 128);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else if (kKeyMagenta == my_kvs[0].value) {
-            rtiVC_GenerateTestPattern(255, 0, 255);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else if (kKeyCyan == my_kvs[0].value) {
-            rtiVC_GenerateTestPattern(0, 255, 255);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else if (kKeyYellow == my_kvs[0].value) {
-            rtiVC_GenerateTestPattern(255, 255, 0);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else if (kKeyBlack == my_kvs[0].value) {
-            rtiVC_GenerateTestPattern(0, 0, 0);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else if (kKeyWhite == my_kvs[0].value) {
-            rtiVC_GenerateTestPattern(255, 255, 255);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else if (kKeyCheckerboard == my_kvs[0].value) {
-            rtiVC_GenerateTestPattern(255, 255, 255);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else if (kKeyHorizontalRamp == my_kvs[0].value) {
-            rtiVC_GenerateTestPattern(255, 255, 255);
+        if (kKeyOff != my_kvs[0].value) {
+            switch (my_kvs[0].value) {
+            case kKeyRed:
+                Border(255, 0, 0);
+                break;
+
+            case kKeyGreen:
+                Border(0, 255, 0);
+                break;
+
+            case kKeyBlue:
+                Border(0, 0, 255);
+                break;
+
+            case kKeyGrey:
+                Border(128, 128, 128);
+                break;
+
+            case kKeyMagenta:
+                Border(255, 0, 255);
+                break;
+
+            case kKeyCyan:
+                Border(0, 255, 255);
+                break;
+
+            case kKeyYellow:
+                Border(255, 255, 0);
+                break;
+
+            case kKeyBlack:
+                Border(0, 0, 0);
+                break;
+
+            case kKeyWhite:
+                Border(255, 255, 255);
+                break;
+
+            case kKeyCheckerboard:
+                check_box();
+                break;
+
+            case kKeyHorizontalRamp:
+                vertical_gradation();
+                break;
+
+            case kKeyVerticalRamp:
+                horizontal_gradation();
+                break;
+
+            default:
+                IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+                return;
+            }
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyOff == my_kvs[0].value) {
-            // TODO: add testpattern off
-            rtiVC_EnableTestPattern(false);
+            off_testpattern();
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             return;
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+            return;
         }
-        rtiVC_EnableTestPattern(true);
     } else {
-        IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        IAddFeedbackStrTo(pAt_feedback_str, "%s\n", get_test_pattern());
     }
 }
 
@@ -440,20 +481,27 @@ IAtOperationRegister(kCmdLogInfo, pAt_Kv_List, pAt_feedback_str)
     ICastAtKvListTo(kAtValueInt, pAt_Kv_List, my_kvs);
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
-        IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
+        if (kKeyClear == my_kvs[0].key) {
+            file_remove_all(&eeprom_log);
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+        } else {
+            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+        }
     } else {
         if (kKeyStatus == my_kvs[0].key) {
             line_t line_tmp[32] = { 0 };
             int read_number = my_kvs[0].value > sizeof(line_tmp) ? sizeof(line_tmp) : my_kvs[0].value;
             int feedback_number = file_burst_read(&eeprom_log, line_tmp, read_number);
-            for (int i = 0; i < feedback_number; i++) {
-                output_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", line_tmp[i].time / 60 / 60, (line_tmp[i].time / 60) % 60, line_tmp[i].time % 60, line_tmp[i].text);
+            /* Text:%s include '\n' */
+            if (feedback_number != 0) {
+                for (int i = 0; i < feedback_number; i++) {
+                    output_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", line_tmp[i].time / 60 / 60, (line_tmp[i].time / 60) % 60, line_tmp[i].time % 60, line_tmp[i].text);
+                    debug_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", line_tmp[i].time / 60 / 60, (line_tmp[i].time / 60) % 60, line_tmp[i].time % 60, line_tmp[i].text);
+                }
+            } else {
+                output_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", 0, 0, 0, "Null");
+                debug_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", 0, 0, 0, "Null");
             }
-        } else if (kKeyClear == my_kvs[0].key) {
-            file_remove_all(&eeprom_log);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-        } else {
-            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
     }
 }
@@ -708,7 +756,7 @@ RDC200A_VALUE_ERROR:
     IAddFeedbackStrTo(pAt_feedback_str, "InvalidValue\n");
 }
 
-//TODO: verify it
+// TODO: verify it
 IAtOperationRegister(kCmdRdp250h, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
@@ -716,8 +764,8 @@ IAtOperationRegister(kCmdRdp250h, pAt_Kv_List, pAt_feedback_str)
 
     size_t size = 0;
     size_t addr = 0;
-    char string[256] = { 0 };
-    uint8_t data[128] = { 0 };
+    char string[512 + 1] = { 0 };
+    uint8_t data[256] = { 0 };
     int ret;
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
@@ -739,22 +787,15 @@ IAtOperationRegister(kCmdRdp250h, pAt_Kv_List, pAt_feedback_str)
             if (ret == EOF || ret == 0)
                 goto RDC250H_VALUE_ERROR;
         }
-        if (size > 128)
+        if (size > 256)
             goto RDC250H_VALUE_ERROR;
 
-        // if (AsciiToInt(string, data, size) == false)
-        //     goto RDC250H_VALUE_ERROR;
+        if (AsciiToInt(string, data, 1) == false)
+            goto RDC250H_VALUE_ERROR;
 
-        // if (set_reg_block(addr, data, size) != true)
-        //     IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
-        // else
-        //     IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-
-        // memset(string, 0, size);
-        // IntToAscii(data, string, 1, size);
-        // ULOG_DEBUG("set_reg_block %#X:%s\n", addr, string);
+        set_panel_reg_block(addr, data, size);
+        IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
     } else {
-        char ascii_output[512 + 1] = { 0 };
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyAddr:
@@ -773,13 +814,9 @@ IAtOperationRegister(kCmdRdp250h, pAt_Kv_List, pAt_feedback_str)
         if (size > 256)
             goto RDC250H_VALUE_ERROR;
 
-        // TODO: add rdc250h r w
-        //  if (get_reg_block(addr, data, size) != true) {
-        //      IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
-        //  } else {
-        //      IntToAscii(data, ascii_output, 1, size);
-        //      IAddFeedbackStrTo(pAt_feedback_str, "Data:%s\n", ascii_output);
-        //  }
+        get_panel_reg_block(addr, data, size);
+        IntToAscii(data, string, 1, size);
+        IAddFeedbackStrTo(pAt_feedback_str, "Data:%s\n", string);
     }
     return;
 RDC250H_VALUE_ERROR:

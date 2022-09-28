@@ -11,12 +11,14 @@
 
 #include "basicApp.h"
 #include "eeprom.h"
+#include "gd32f30x_gpio.h"
 #include "i2c.h"
 #include "rti_vc_api.h"
 #include "rti_vc_panel.h"
 #include "rti_vc_rdc.h"
 #include "rti_vc_regio.h"
 #include "sort.h"
+#include "ulog.h"
 #include "utils.h"
 #include <math.h>
 #include <stddef.h>
@@ -33,6 +35,54 @@ const ntc_t NCP18WB473F10RB = {
     .is_pull_up = true, /* 分压电阻是上拉电阻？上拉：TRUE，下拉：false */
 };
 
+bool check_boot_done()
+{
+    for (int i = 0; i < 25; i++) {
+        vTaskDelay(100);
+        if (gpio_input_bit_get(RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool power_on()
+{
+    gpio_bit_set(RDC200A_VCC_EN_PORT, RDC200A_VCC_EN_PIN);
+    vTaskDelay(1);
+    gpio_bit_set(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
+
+    return check_boot_done();
+}
+
+void power_off()
+{
+    rtiVC_PowerOnPanel(false);
+    vTaskDelay(10);
+
+    gpio_bit_reset(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
+    vTaskDelay(10);
+
+    gpio_bit_reset(RDC200A_VCC_EN_PORT, RDC200A_VCC_EN_PIN);
+}
+
+bool power_resume()
+{
+    if (gpio_output_bit_get(SYS_12V_ON_PORT, SYS_12V_ON_PIN) != true) {
+        gpio_bit_reset(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
+        gpio_bit_set(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
+        vTaskDelay(100);
+        if (!power_on()) {
+            power_off();
+            gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
+            return false;
+        }
+        ULOG_DEBUG("system resume\n");
+    }
+    return true;
+}
+
+//TODO: add 互斥量
 uint8_t get_reg(uint8_t dev_addr, uint16_t reg_addr)
 {
     uint8_t reg_val = 0;
@@ -107,6 +157,120 @@ char* get_rdp250h_version(char* buff, size_t size)
     return buff;
 }
 
+bool check_video_input(void)
+{
+    // unsigned short v_active = (((unsigned short)RDC_REG_GET(0x029B) << 8) | (unsigned short)RDC_REG_GET(0x029C));
+    // unsigned short h_active = (((unsigned short)RDC_REG_GET(0x0295) << 8) | (unsigned short)RDC_REG_GET(0x0296));
+
+    // if (v_active != VERTICAL_PIXEL || h_active != HORIZONTAL_PIXEL)
+    //     return false;
+
+    // unsigned short mrx_stability = ((unsigned short)RDC_REG_GET(0x0291)) & 0x03;
+    // if (mrx_stability != 0x03)
+    //     return false;
+
+    return true;
+}
+
+bool h_v_flip_set(flip_t filp)
+{
+    unsigned short reg = (unsigned short)RDC_REG_GET(0x870);
+    reg &= (unsigned short)0xFC;
+    reg |= (unsigned short)filp;
+    RDC_REG_SET(0x870, reg);
+    return true;
+}
+
+flip_t h_v_flip_get(void)
+{
+    unsigned short reg = (unsigned short)RDC_REG_GET(0x870);
+    // reg &= (unsigned short)v_1_h_1;
+    reg &= (unsigned short)0x3;
+    return (flip_t)reg;
+}
+
+void Border(uint8_t red, uint8_t green, uint8_t blue)
+{
+    rtiVC_EnableTestPattern(true);
+
+    RDC_REG_SET(0x0280, 0x00);
+    rtiVC_GenerateTestPattern(red, green, blue);
+}
+
+void check_box(void)
+{
+    rtiVC_EnableTestPattern(true);
+    RDC_REG_SET(0x0280, 0x6A);
+    RDC_REG_SET(0x0281, 0xF0);
+    RDC_REG_SET(0x0282, 0xF0);
+    RDC_REG_SET(0x0283, 0xF0);
+}
+
+void vertical_gradation(void)
+{
+    rtiVC_EnableTestPattern(true);
+    RDC_REG_SET(0x0280, 0x23);
+}
+
+void horizontal_gradation(void)
+{
+    rtiVC_EnableTestPattern(true);
+    RDC_REG_SET(0x0280, 0x12);
+}
+
+void off_testpattern(void)
+{
+    rtiVC_EnableTestPattern(false);
+    RDC_REG_SET(0x0200, 0x02);
+    RDC_REG_SET(0x0280, 0x00);
+}
+
+char* get_test_pattern(void)
+{
+    uint8_t rdc200a_mrx_config = RDC_REG_GET(0x0200);
+    ;
+    uint8_t rdc200a_pgen_config = RDC_REG_GET(0x0280);
+    ;
+
+    if (rdc200a_mrx_config != 0x04)
+        return "Off";
+    else {
+        if (rdc200a_pgen_config == 0x00) {
+            uint32_t raw = (uint32_t)(RDC_REG_GET(0x0281)) << 16 | (uint32_t)(RDC_REG_GET(0x0282)) << 8 | (uint32_t)(RDC_REG_GET(0x0283));
+            switch (raw) {
+            case 0x00FF0000:
+                return "Red";
+            case 0x0000FF00:
+                return "Green";
+            case 0x000000FF:
+                return "Blue";
+            case 0x00808080:
+                return "Grey";
+            case 0x00FF00FF:
+                return "Magenta";
+            case 0x0000FFFF:
+                return "Cyan";
+            case 0x00FFFF00:
+                return "Yellow";
+            case 0x00000000:
+                return "Black";
+            case 0x00FFFFFF:
+                return "White";
+            default:
+                return "Unknow";
+            }
+        } else if (rdc200a_pgen_config == 0x6A) {
+            return "Checkerboard";
+        } else if (rdc200a_pgen_config == 0x12) {
+            return "VerticalRamp";
+        } else if (rdc200a_pgen_config == 0x23) {
+            return "HorizontalRamp";
+        } else {
+            return "Unknow";
+        }
+    }
+}
+
 #define FLASH_SECTOR_SIZE (4 * 1024)
 bool spi_flash_erase(size_t WriteAddr, size_t size)
 {
@@ -134,7 +298,7 @@ bool spi_flash_erase(size_t WriteAddr, size_t size)
         }
     } else {
         if (NumOfPage == 0) {
-            if (count < NumOfSingle) {
+            if (count > NumOfSingle) {
                 if (rtiVC_EraseSectorFLASH(WriteAddr) != 0)
                     return false;
             } else {

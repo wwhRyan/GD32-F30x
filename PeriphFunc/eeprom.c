@@ -58,14 +58,14 @@ bool eeprom_update_crc(const eeprom_model_t* model)
     bool ret = true;
     eeprom_t temp = { 0 };
 
-    ret &= ISoftwareI2CRegRead(model->i2c, model->i2c_addr, CONFIG_START_ADDR,
-        model->i2c_addr_type, ((uint8_t*)&temp), sizeof(eeprom_t), 0xFFFF);
+    ret &= eeprom_block_read(model, CONFIG_START_ADDR, ((uint8_t*)&temp), sizeof(eeprom_t));
 
     uint32_t calc_check_sum = get_LSB_array_crc((uint8_t*)&temp.magic_num, sizeof(eeprom_t) - sizeof(uint32_t));
-    // if (calc_check_sum != eeprom.check_sum)
-    //     ULOG_WARNING("EEPROM_had_been_external_update\n");
 
-    ret &= eeprom_block_write(model, CONFIG_START_ADDR, ((uint8_t*)&calc_check_sum), sizeof(uint32_t));
+    if (calc_check_sum != eeprom.check_sum) {
+        ret &= eeprom_block_write(model, CONFIG_START_ADDR, ((uint8_t*)&calc_check_sum), sizeof(uint32_t));
+        ULOG_INFO("EEPROM_had_been_external_update\n");
+    }
 
     return ret;
 }
@@ -163,7 +163,7 @@ bool eeprom_block_write(const eeprom_model_t* model, uint16_t WriteAddr, uint8_t
     else {
 
         if (NumOfPage == 0) {
-            if (count < NumOfSingle) {
+            if (count > NumOfSingle) {
                 xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
                 ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
                 xSemaphoreGive(i2c_Semaphore);
@@ -228,15 +228,13 @@ bool eeprom_block_read(const eeprom_model_t* model, uint16_t addr, uint8_t* data
     return ret;
 }
 
-//TODO: eeprom 写入的防掉电操作
+// TODO: eeprom 写入的防掉电操作
 /**
  * @brief Call in rtos task
  */
 void init_eeprom(const eeprom_model_t* model)
 {
-
-    ISoftwareI2CRegRead(model->i2c, model->i2c_addr, CONFIG_START_ADDR,
-        model->i2c_addr_type, ((uint8_t*)&eeprom), sizeof(eeprom_t), 0xFFFF);
+    eeprom_block_read(model, CONFIG_START_ADDR, ((uint8_t*)&eeprom), sizeof(eeprom_t));
 
     uint32_t calc_check_sum = get_LSB_array_crc((uint8_t*)&eeprom.magic_num, sizeof(eeprom_t) - sizeof(uint32_t));
 

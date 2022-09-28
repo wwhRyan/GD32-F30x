@@ -20,6 +20,8 @@
 #include "adc_mcu.h"
 
 #define RDC200A_ADDR (0x4A << 1)
+#define VERTICAL_PIXEL 1280
+#define HORIZONTAL_PIXEL 720
 
 #if 1
 #define R_CURRENT (eeprom.red)
@@ -61,12 +63,23 @@ typedef enum temperature_enum_t {
     sensor_num,
 } temperature_enum_t;
 
+typedef enum flip_t {
+    v_0_h_0,
+    v_0_h_1,
+    v_1_h_0,
+    v_1_h_1,
+} flip_t;
+
 typedef struct temperature_i2c_t{
     const eeprom_model_t * p_i2c;
     int temperature;
     int buff[5];/* store temperature * 10 for filtering */
 }temperature_i2c_t;
 
+bool check_boot_done(void);
+bool power_on(void);
+void power_off(void);
+bool power_resume(void);
 uint8_t get_reg(uint8_t dev_addr, uint16_t reg_addr);
 bool set_reg(uint8_t dev_addr, uint16_t reg_addr, uint8_t reg_val);
 bool get_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t size);
@@ -77,6 +90,15 @@ bool spi_flash_erase(size_t WriteAddr, size_t size);
 
 char* get_rdc200a_version(char* buff, size_t size);
 char* get_rdp250h_version(char* buff, size_t size);
+bool check_video_input(void);
+bool h_v_flip_set(flip_t filp);
+flip_t h_v_flip_get(void);
+void Border(uint8_t red, uint8_t green, uint8_t blue);
+void check_box(void);
+void vertical_gradation(void);
+void horizontal_gradation(void);
+void off_testpattern(void);
+char* get_test_pattern(void);
 
 void laser_on(void);
 void laser_off(void);
