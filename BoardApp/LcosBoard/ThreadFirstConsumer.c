@@ -44,9 +44,8 @@ void ThreadFirstConsumer(void* pvParameters)
             }
         }
 
-        // TODO: change it while release.
-        //  set_sig(sys_sig, sig_light_status, gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN));
-        set_sig(sys_sig, sig_light_status, true);
+         set_sig(sys_sig, sig_light_status, gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN));
+        // set_sig(sys_sig, sig_light_status, true);/* for test */
 
         if (get_sig(sys_sig, sig_rdc200a_status) == true && get_sig(sys_sig, sig_lightsource) && !get_sig(sys_sig, sig_light_status)) {
             laser_on();

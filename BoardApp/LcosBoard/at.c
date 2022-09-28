@@ -14,6 +14,7 @@
 #include "BoardInit.h"
 #include "basicApp.h"
 #include "eeprom.h"
+#include "gd32f30x_gpio.h"
 #include "rti_vc_api.h"
 #include "ulog.h"
 #include "utils.h"
@@ -451,11 +452,11 @@ IAtOperationRegister(kCmdReset, pAt_Kv_List, pAt_feedback_str)
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-
         } else if (kKeyUser == my_kvs[0].value) {
             // TODO: add user reset.
+            /* 屏蔽打印信息 */
             extern void my_console_logger(ulog_level_t severity, char* msg);
-            ULOG_SUBSCRIBE(my_console_logger, ULOG_WARNING_LEVEL);
+            ULOG_SUBSCRIBE(my_console_logger, ULOG_CRITICAL_LEVEL);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         }
     } else {
@@ -683,8 +684,6 @@ IAtOperationRegister(kCmdSpiFlashErase, pAt_Kv_List, pAt_feedback_str)
     }
 }
 
-// TODO：验证功能
-// TODO：验证大小端
 IAtOperationRegister(kCmdRdc200a, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
@@ -756,7 +755,6 @@ RDC200A_VALUE_ERROR:
     IAddFeedbackStrTo(pAt_feedback_str, "InvalidValue\n");
 }
 
-// TODO: verify it
 IAtOperationRegister(kCmdRdp250h, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
@@ -950,19 +948,22 @@ IAtOperationRegister(kCmdFlashBootb, pAt_Kv_List, pAt_feedback_str)
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyOn == my_kvs[0].value) {
-            // TODO: gpio control
+            gpio_bit_set(RDC200A_BOOTB_IN_PORT, RDC200A_BOOTB_IN_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else if (kKeyOff == my_kvs[0].value) {
+            gpio_bit_reset(RDC200A_BOOTB_IN_PORT, RDC200A_BOOTB_IN_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
     } else {
-        // TODO: gpio control
-        if (0) {
-            IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+        if (kKeyStatus == my_kvs[0].value) {
+            if (SET == gpio_output_bit_get(RDC200A_BOOTB_IN_PORT, RDC200A_BOOTB_IN_PIN))
+                IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+            else
+                IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
         } else {
-            IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }
     }
 }

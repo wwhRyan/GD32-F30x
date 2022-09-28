@@ -21,6 +21,7 @@ extern eeprom_t eeprom;
 extern const Uarter uart0_output;
 SemaphoreHandle_t uart_Semaphore = NULL;
 SemaphoreHandle_t i2c_Semaphore = NULL;
+SemaphoreHandle_t lcos_i2c_Semaphore = NULL;
 EventGroupHandle_t sys_sig = NULL;
 QueueHandle_t xQueue_eeprom = NULL;
 
@@ -30,6 +31,8 @@ void system_ipc_init(void)
     E_assert(uart_Semaphore != NULL);
     i2c_Semaphore = xSemaphoreCreateMutex();
     E_assert(i2c_Semaphore != NULL);
+    lcos_i2c_Semaphore = xSemaphoreCreateMutex();
+    E_assert(lcos_i2c_Semaphore != NULL);
 
     // Attempt to create the event group.
     sys_sig = xEventGroupCreate();

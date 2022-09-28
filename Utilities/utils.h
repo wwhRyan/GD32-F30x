@@ -66,6 +66,7 @@
 
 extern SemaphoreHandle_t uart_Semaphore;
 extern SemaphoreHandle_t i2c_Semaphore;
+extern SemaphoreHandle_t lcos_i2c_Semaphore;
 extern EventGroupHandle_t sys_sig;
 extern QueueHandle_t xQueue_eeprom;
 

@@ -82,54 +82,62 @@ bool power_resume()
     return true;
 }
 
-//TODO: add 互斥量
 uint8_t get_reg(uint8_t dev_addr, uint16_t reg_addr)
 {
     uint8_t reg_val = 0;
+    xSemaphoreTake(lcos_i2c_Semaphore, (TickType_t)0xFFFF);
 
     ISoftwareI2CRegRead(&raontech_i2c, dev_addr, reg_addr,
         REG_ADDR_2BYTE, (uint8_t*)&reg_val, 1, I2C_DELAY_TIME);
+    xSemaphoreGive(lcos_i2c_Semaphore);
+
     return reg_val;
 }
 
 bool set_reg(uint8_t dev_addr, uint16_t reg_addr, uint8_t reg_val)
 {
     bool ret;
+    xSemaphoreTake(lcos_i2c_Semaphore, (TickType_t)0xFFFF);
 
     ret = ISoftwareI2CRegWrite(&raontech_i2c, dev_addr, reg_addr,
         REG_ADDR_2BYTE, (uint8_t*)&reg_val, 1, I2C_DELAY_TIME);
+    xSemaphoreGive(lcos_i2c_Semaphore);
     return ret;
 }
 
 bool get_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t size)
 {
     bool ret;
+    xSemaphoreTake(lcos_i2c_Semaphore, (TickType_t)0xFFFF);
 
     ret = ISoftwareI2CRegRead(&raontech_i2c, dev_addr, reg_addr,
         REG_ADDR_2BYTE, reg_val, size, I2C_DELAY_TIME);
+    xSemaphoreGive(lcos_i2c_Semaphore);
     return ret;
 }
 
 bool set_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t size)
 {
     bool ret;
+    xSemaphoreTake(lcos_i2c_Semaphore, (TickType_t)0xFFFF);
 
     ret = ISoftwareI2CRegWrite(&raontech_i2c, dev_addr, reg_addr,
         REG_ADDR_2BYTE, reg_val, size, I2C_DELAY_TIME);
+    xSemaphoreGive(lcos_i2c_Semaphore);
     return ret;
 }
 
 void set_panel_reg_block(uint16_t reg_addr, uint8_t* buff, size_t size)
 {
-    for (int i; i < size; i++) {
-        RDP_REG_SET(VC_PANEL_PORT_0, reg_addr, buff[i]);
+    for (int i = 0; i < size; i++) {
+        RDP_REG_SET(VC_PANEL_PORT_0, reg_addr + i, buff[i]);
     }
 }
 
 void get_panel_reg_block(uint16_t reg_addr, uint8_t* buff, size_t size)
 {
-    for (int i; i < size; i++) {
-        buff[i] = RDP_REG_GET(VC_PANEL_PORT_0, reg_addr);
+    for (int i = 0; i < size; i++) {
+        buff[i] = RDP_REG_GET(VC_PANEL_PORT_0, reg_addr + i);
     }
 }
 
