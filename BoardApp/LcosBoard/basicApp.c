@@ -431,20 +431,9 @@ inline void G_to_B()
     gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
 
-inline void G_to_R()
+inline void B_to_R()
 {
     laser_dac_set(R_CURRENT);
-
-    gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
-    // gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
-    DelayUs(250);
-    gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
-    // gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
-}
-
-inline void B_to_G()
-{
-    laser_dac_set(G_CURRENT);
 
     gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
@@ -456,8 +445,8 @@ inline void B_to_G()
 // RGBG
 color_t color_index[color_num] = {
     GREEN,
-    GREEN,
-    GREEN,
+    BLUE,
+    RED,
 };
 
 void spoke(color_t last_color, color_t next_color)
@@ -466,20 +455,16 @@ void spoke(color_t last_color, color_t next_color)
     case RED:
         if (next_color == GREEN)
             R_to_G();
-        color_index[GREEN] = BLUE;
         break;
 
     case GREEN:
         if (next_color == BLUE)
             G_to_B();
-        if (next_color == RED)
-            G_to_R();
         break;
 
     case BLUE:
-        if (next_color == GREEN)
-            B_to_G();
-        color_index[GREEN] = RED;
+        if (next_color == RED)
+            B_to_R();
         break;
 
     default:
@@ -495,7 +480,7 @@ void color_EN_EXIT_IRQ(color_t color)
     uint8_t x = (color + 1) % color_num;
     uint8_t y = (color + 2) % color_num;
     if (cnt[x] == 0 && cnt[y] == 0) {
-        if (cnt[color] == 2) // It is time to switch different colors and change the current value of different colors
+        if (cnt[color] == 4) // It is time to switch different colors and change the current value of different colors
         {
             spoke(color, color_index[color]);
             cnt[color] = 0;
