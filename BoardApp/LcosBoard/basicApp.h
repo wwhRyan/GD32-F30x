@@ -71,7 +71,7 @@ typedef enum flip_t {
 } flip_t;
 
 typedef struct temperature_i2c_t{
-    const eeprom_model_t * p_i2c;
+    const i2c_sensor_t * p_i2c;
     int temperature;
     int buff[5];/* store temperature * 10 for filtering */
 }temperature_i2c_t;

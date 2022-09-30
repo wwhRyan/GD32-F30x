@@ -374,7 +374,7 @@ float get_temperature(temperature_t* p_temp)
 bool get_i2c_temperature(temperature_i2c_t* p_temp)
 {
     uint8_t value[2] = { 0 };
-    bool ret = eeprom_block_read(p_temp->p_i2c, 0x00, value, sizeof(value));
+    bool ret = i2c_muti_read(p_temp->p_i2c, 0x00, value, sizeof(value));
 
     int temperature = (value[0] & 0x7f) * 10; // temperature 定点一个小数点
     temperature += (((value[1] >> 4) & 0x0f) * 10) / 16;

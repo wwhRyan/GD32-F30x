@@ -181,18 +181,15 @@ IAtOperationRegister(kCmdSn, pAt_Kv_List, pAt_feedback_str)
             switch (my_kvs[i].key) {
             case kKeyLightEngine:
                 strncpy(eeprom.Sn_LightEngine, my_kvs[i].value, 32);
-                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
-                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_Sn_LightEngine], (TickType_t)10);
+                eeprom_block_write(&BL24C64A, (const mem_t*)&eeprom_mem[idx_Sn_LightEngine], true);
                 break;
             case kKeySourceLight:
                 strncpy(eeprom.Sn_SourceLight, my_kvs[i].value, 32);
-                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
-                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_Sn_SourceLight], (TickType_t)10);
+                eeprom_block_write(&BL24C64A, (const mem_t*)&eeprom_mem[idx_Sn_SourceLight], true);
                 break;
             case kKeyProjector:
                 strncpy(eeprom.Sn_Projector, my_kvs[i].value, 32);
-                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
-                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_Sn_Projector], (TickType_t)10);
+                eeprom_block_write(&BL24C64A, (const mem_t*)&eeprom_mem[idx_Sn_Projector], true);
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -235,7 +232,7 @@ IAtOperationRegister(kCmdLightSourceTime, pAt_Kv_List, pAt_feedback_str)
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
             switch (my_kvs[i].key) {
             case kKeyHour:
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.light_source_time / 60);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.light_source_time / 60 / 60);
                 break;
             case kKeyMinute:
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.light_source_time / 60 % 60);
@@ -447,8 +444,8 @@ IAtOperationRegister(kCmdReset, pAt_Kv_List, pAt_feedback_str)
             clear_sig(sys_sig, sig_lightsource);
             clear_sig(sys_sig, sig_system);
             file_remove_all(&eeprom_log);
-            eeprom_write(&BL24C64A, eeprom_mem[idx_check_sum].addr, 0);
-            init_eeprom(&BL24C64A);
+            eeprom.light_source_time = 0;
+            eeprom_block_write(&BL24C64A, &eeprom_mem[idx_light_source_time], true);
             set_sig(sys_sig, sig_lightsource, true);
             set_sig(sys_sig, sig_system, true);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
@@ -521,22 +518,20 @@ IAtOperationRegister(kCmdCurrent, pAt_Kv_List, pAt_feedback_str)
                 sscanf(my_kvs[i].value, "%d", &current);
                 // check current
                 eeprom.red = (float)current / 100;
-                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
-                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_red], (TickType_t)10);
+                eeprom_block_write(&BL24C64A, (const mem_t*)&eeprom_mem[idx_red], true);
                 break;
             case kKeyG:
                 sscanf(my_kvs[i].value, "%d", &current);
                 // check current
                 eeprom.green = (float)current / 100;
-                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
-                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_green], (TickType_t)10);
+                eeprom_block_write(&BL24C64A, (const mem_t*)&eeprom_mem[idx_green], true);
                 break;
             case kKeyB:
                 sscanf(my_kvs[i].value, "%d", &current);
                 // check current
                 eeprom.blue = (float)current / 100;
-                eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
-                xQueueSend(xQueue_eeprom, (void*)&eeprom_mem[idx_blue], (TickType_t)10);
+                eeprom_block_write(&BL24C64A, (const mem_t*)&eeprom_mem[idx_blue], true);
+
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -852,8 +847,7 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
                 break;
             case kKeyClear:
                 file_remove_all(&eeprom_log);
-                eeprom_write(&BL24C64A, eeprom_mem[idx_check_sum].addr, 0);
-                init_eeprom(&BL24C64A);
+                eeprom_block_clear();
                 IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
                 break;
             default:
@@ -879,8 +873,10 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
         msg.size = size;
         msg.pData = eeprom_data;
 
-        xQueueSend(xQueue_eeprom, (void*)&msg, (TickType_t)10);
-        IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+        if (eeprom_block_write(&BL24C64A, (const mem_t*)&msg, true))
+            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+        else
+            IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
 
     } else {
         for (size_t i = 0; i < pAt_Kv_List->size; i++) {
@@ -904,7 +900,7 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
             goto EEPROM_VALUE_ERROR;
 
         memset(eeprom_data, 0, sizeof(eeprom_data));
-        if (true == eeprom_block_read(&BL24C64A, addr, (uint8_t*)eeprom_data, size)) {
+        if (true == i2c_muti_read(&BL24C64A, addr, (uint8_t*)eeprom_data, size)) {
             memory_endian_conversion(eeprom_data, size);
             IntToAscii(eeprom_data, ascii_buff, 1, size);
             IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_buff);

@@ -11,6 +11,7 @@
 
 #include "utils.h"
 #include "Boardinit.h"
+#include "eeprom.h"
 #include "file.h"
 #include "gd32f307c_eval.h"
 #include <string.h>
@@ -152,11 +153,13 @@ void my_file_logger(ulog_level_t severity, char* msg)
 
 void log_read(void* pdata, size_t size, uint32_t addr)
 {
-    eeprom_block_read(&BL24C64A, addr, pdata, size);
+    i2c_muti_read(&BL24C64A, addr, pdata, size);
 }
 void log_write(void* pdata, size_t size, uint32_t addr)
 {
-    eeprom_block_write(&BL24C64A, addr, pdata, size);
+    eeprom_lock(UNLOCK);
+    i2c_muti_write(&BL24C64A, addr, pdata, size);
+    eeprom_lock(LOCK);
 }
 
 void log_init(file_t* pfile)

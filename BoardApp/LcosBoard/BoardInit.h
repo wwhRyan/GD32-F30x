@@ -50,8 +50,7 @@ extern SemaphoreHandle_t i2c_Semaphore;
 extern QueueHandle_t xQueue_eeprom;
 // extern SoftwareI2C raontech_i2c;
 
-extern const eeprom_model_t BL24C64A; /* 8K bytes page=32 */
-extern const eeprom_model_t AT24C02D; /* 2K bytes page=8*/
+extern const i2c_sensor_t BL24C64A; /* 8K bytes page=32 */
 extern const fan_timer_config_t cw_wheel_fg;
 extern file_t eeprom_log;
 

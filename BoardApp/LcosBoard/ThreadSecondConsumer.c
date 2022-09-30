@@ -19,21 +19,30 @@
 
 extern const Uarter uart0_output;
 extern temperature_t temperature[];
+extern const mem_t eeprom_mem[];
 
 void ThreadSecondConsumer(void* pvParameters)
 {
     xEventGroupWaitBits(sys_sig, (0x00000001 << sig_mcu_init_ok), pdFALSE, pdTRUE, 0xFFFF);
     ULOG_DEBUG("%s\n", __func__);
 
-    mem_t xQueue_eeprom_recv = { 0 };
+    mem_t recv_block = { 0 };
     while (1) {
-        if (xQueueReceive(xQueue_eeprom, &(xQueue_eeprom_recv), (TickType_t)10) == pdPASS) {
-            eeprom_block_write(&BL24C64A, xQueue_eeprom_recv.addr, (uint8_t*)xQueue_eeprom_recv.pData, xQueue_eeprom_recv.size);
-            if (xQueue_eeprom_recv.idx == idx_eeprom_write) {
+        if (xQueueReceive(xQueue_eeprom, &(recv_block), (TickType_t)10) == pdPASS) {
+            eeprom_lock(UNLOCK);
+            // TODO: add checksum modify, write the recv_block.p_check 以防断电
+            i2c_muti_write(&BL24C64A, recv_block.addr + EEPROM_0_ADDR, (uint8_t*)recv_block.pData, recv_block.size);
+            i2c_muti_write(&BL24C64A, EEPROM_0_ADDR, (uint8_t*)recv_block.p_check, eeprom_mem[idx_check_sum].size);
+            i2c_muti_write(&BL24C64A, recv_block.addr + EEPROM_1_ADDR, (uint8_t*)recv_block.pData, recv_block.size);
+            i2c_muti_write(&BL24C64A, EEPROM_1_ADDR, (uint8_t*)recv_block.p_check, eeprom_mem[idx_check_sum].size);
+
+            eeprom_lock(LOCK);
+
+            if (recv_block.idx > idx_eeprom_number) {
                 // reset eeprom crc and get data to memory.
                 clear_sig(sys_sig, sig_eeprom_write);
+                eeprom_block_update_crc(&BL24C64A, (const mem_t*)&recv_block);
             }
-            eeprom_update_crc(&BL24C64A);
         }
 
         if (get_sig(sys_sig, sig_system) == true) {

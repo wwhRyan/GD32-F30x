@@ -15,24 +15,20 @@
 #include "i2c.h"
 #include "gd32f30x.h"
 #include "Common.h"
-
-#define EEPROM_ADDRESS 0xA0 // 8'h 0xA0
-
-#define EEPROM_PAGE_NUM 8    // write max number
-#define EEPROM_WRITE_TIME 10 // unit is ms
+#include <stdint.h>
 
 #define UNLOCK false
 #define LOCK true
-
-typedef struct eeprom_model_t
-{
+#define EEPROM_SAVE_BACKUP_NUM 2
+#define EEPROM_0_ADDR 0x000
+#define EEPROM_1_ADDR 0x400
+typedef struct i2c_sensor_t {
     uint16_t i2c_addr; // 8'h
     uint8_t i2c_addr_type;
-    void (*lock)(bool status);
-    uint8_t page_size;
     uint8_t write_delay_time; // ms
-    const SoftwareI2C *i2c;
-} eeprom_model_t;
+    const SoftwareI2C* i2c;
+    uint8_t page_size;
+} i2c_sensor_t;
 
 typedef struct eeprom_t {
     uint32_t check_sum; /* addr 0x00 */
@@ -59,6 +55,7 @@ typedef enum eeprom_idx_t
     idx_Sn_LightEngine,
     idx_Sn_SourceLight,
     idx_Sn_Projector,
+    idx_eeprom_number,
     /* for msg handle */
     idx_eeprom_write,
 } eeprom_idx_t;
@@ -77,6 +74,7 @@ typedef struct mem_t
     uint16_t addr;
     uint8_t size;
     type_t type;
+    uint32_t* p_check;
     union{
         uint32_t default_uint32;
         float default_float;
@@ -87,13 +85,16 @@ typedef struct mem_t
 extern eeprom_t eeprom;
 
 void eeprom_lock(bool lock);
-bool eeprom_write(const eeprom_model_t *model, uint16_t addr, uint8_t data);
-bool eeprom_block_write(const eeprom_model_t* model, uint16_t WriteAddr, uint8_t* data, uint16_t size);
-uint8_t eeprom_read(const eeprom_model_t *model, uint8_t addr);
-bool eeprom_block_read(const eeprom_model_t *model, uint16_t addr, uint8_t *data, uint16_t size);
-void init_eeprom(const eeprom_model_t *model);
+bool i2c_write(const i2c_sensor_t *model, uint16_t addr, uint8_t data);
+bool i2c_muti_write(const i2c_sensor_t* model, uint16_t WriteAddr, uint8_t* data, uint16_t size);
+uint8_t i2c_read(const i2c_sensor_t *model, uint8_t addr);
+bool i2c_muti_read(const i2c_sensor_t *model, uint16_t addr, uint8_t *data, uint16_t size);
+bool eeprom_block_write(const i2c_sensor_t* model, const mem_t* data, bool real_time);
+void init_eeprom(const i2c_sensor_t *model);
+void eeprom_block_clear(void);
 void eeprom_reset(void);
-bool eeprom_update_crc(const eeprom_model_t *model);
+bool eeprom_update_crc(const i2c_sensor_t *model);
+bool eeprom_block_update_crc(const i2c_sensor_t* model, const mem_t* block);
 
 bool memory_endian_conversion(void* pointer, size_t size);
 #endif

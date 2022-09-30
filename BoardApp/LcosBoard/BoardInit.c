@@ -202,65 +202,45 @@ const SoftwareI2C sensor_i2c = {
     .delay_time = I2C_DELAY_TIME,
 };
 
-const eeprom_model_t BL24C64A = {
-    .i2c_addr = 0x50 << 1,
+const i2c_sensor_t BL24C64A = {
+    .i2c_addr = (0x50 << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
-    .lock = eeprom_lock,
+    .write_delay_time = 5,
+    .i2c = &sensor_i2c,
     .page_size = 32,
-    .write_delay_time = 3 + 3,
-    .i2c = &sensor_i2c,
 };
 
-const eeprom_model_t AT24C02D = {
-    .i2c_addr = EEPROM_ADDRESS,
-    .i2c_addr_type = REG_ADDR_1BYTE,
-    .lock = eeprom_lock,
-    .page_size = 8,
-    .write_delay_time = 5 + 5,
-    .i2c = &sensor_i2c,
-};
-
-const eeprom_model_t GX112D_red = {
+const i2c_sensor_t GX112D_red = {
     .i2c_addr = (0x4b << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
-    .lock = NULL,
-    .page_size = 1,
     .write_delay_time = 5,
     .i2c = &sensor_i2c,
 };
 
-const eeprom_model_t GX112D_blue = {
+const i2c_sensor_t GX112D_blue = {
     .i2c_addr = (0x49 << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
-    .lock = NULL,
-    .page_size = 1,
     .write_delay_time = 5,
     .i2c = &sensor_i2c,
 };
 
-const eeprom_model_t GX112D_green = {
+const i2c_sensor_t GX112D_green = {
     .i2c_addr = (0x4a << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
-    .lock = NULL,
-    .page_size = 1,
     .write_delay_time = 5,
     .i2c = &sensor_i2c,
 };
 
-const eeprom_model_t GX112D_lcos = {
+const i2c_sensor_t GX112D_lcos = {
     .i2c_addr = (0x48 << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
-    .lock = NULL,
-    .page_size = 1,
     .write_delay_time = 5,
     .i2c = &sensor_i2c,
 };
 
-const eeprom_model_t GX75C_env = {
+const i2c_sensor_t GX75C_env = {
     .i2c_addr = (0x4c << 1) & 0x00ff,
     .i2c_addr_type = REG_ADDR_2BYTE,
-    .lock = NULL,
-    .page_size = 1,
     .write_delay_time = 5,
     .i2c = &sensor_i2c,
 };
