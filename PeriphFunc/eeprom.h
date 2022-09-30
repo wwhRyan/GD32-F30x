@@ -85,10 +85,6 @@ typedef struct mem_t
 extern eeprom_t eeprom;
 
 void eeprom_lock(bool lock);
-bool i2c_write(const i2c_sensor_t *model, uint16_t addr, uint8_t data);
-bool i2c_muti_write(const i2c_sensor_t* model, uint16_t WriteAddr, uint8_t* data, uint16_t size);
-uint8_t i2c_read(const i2c_sensor_t *model, uint8_t addr);
-bool i2c_muti_read(const i2c_sensor_t *model, uint16_t addr, uint8_t *data, uint16_t size);
 bool eeprom_block_write(const i2c_sensor_t* model, const mem_t* data, bool real_time);
 void init_eeprom(const i2c_sensor_t *model);
 void eeprom_block_clear(void);

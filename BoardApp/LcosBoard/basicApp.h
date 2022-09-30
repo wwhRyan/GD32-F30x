@@ -13,11 +13,12 @@
 #define _BASICAPP_H_
 
 #include "Common.h"
+#include "adc_mcu.h"
+#include "eeprom.h"
 #include "gd32f30x.h"
 #include "i2c.h"
 #include <stdint.h>
-#include "eeprom.h"
-#include "adc_mcu.h"
+
 
 #define RDC200A_ADDR (0x4A << 1)
 #define VERTICAL_PIXEL 1280
@@ -47,12 +48,12 @@ typedef struct ntc_t {
     bool is_pull_up; // true: divided_voltage_R pull up, false: divided_voltage_R pull down
 } ntc_t;
 
-typedef struct temperature_t{
-    const ntc_adc_config_t * p_ntc_adc_config;
-    const ntc_t * p_ntc;
+typedef struct temperature_t {
+    const ntc_adc_config_t* p_ntc_adc_config;
+    const ntc_t* p_ntc;
     int temperature;
-    int buff[5];/* store temperature * 10 for filtering */
-}temperature_t;
+    int buff[5]; /* store temperature * 10 for filtering */
+} temperature_t;
 
 typedef enum temperature_enum_t {
     blue_sensor,
@@ -70,22 +71,26 @@ typedef enum flip_t {
     v_1_h_1,
 } flip_t;
 
-typedef struct temperature_i2c_t{
-    const i2c_sensor_t * p_i2c;
+typedef struct temperature_i2c_t {
+    const i2c_sensor_t* p_i2c;
     int temperature;
-    int buff[5];/* store temperature * 10 for filtering */
-}temperature_i2c_t;
+    int buff[5]; /* store temperature * 10 for filtering */
+} temperature_i2c_t;
 
-bool check_boot_done(void);
-bool power_on(void);
-void power_off(void);
-bool power_resume(void);
+bool i2c_write(const i2c_sensor_t* model, uint16_t addr, uint8_t data);
+bool i2c_muti_write(const i2c_sensor_t* model, uint16_t WriteAddr, uint8_t* data, uint16_t size);
+uint8_t i2c_read(const i2c_sensor_t* model, uint8_t addr);
+bool i2c_muti_read(const i2c_sensor_t* model, uint16_t addr, uint8_t* data, uint16_t size);
 uint8_t get_reg(uint8_t dev_addr, uint16_t reg_addr);
 bool set_reg(uint8_t dev_addr, uint16_t reg_addr, uint8_t reg_val);
 bool get_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t size);
 bool set_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t size);
 void set_panel_reg_block(uint16_t reg_addr, uint8_t* buff, size_t size);
 void get_panel_reg_block(uint16_t reg_addr, uint8_t* buff, size_t size);
+bool check_boot_done(void);
+bool power_on(void);
+void power_off(void);
+bool power_resume(void);
 bool spi_flash_erase(size_t WriteAddr, size_t size);
 
 char* get_rdc200a_version(char* buff, size_t size);
@@ -107,7 +112,7 @@ void laser_dac_set(float current);
 
 uint8_t get_idu_value(float current);
 float get_current_value(uint8_t idu);
-float get_temperature(temperature_t * p_temp);
+float get_temperature(temperature_t* p_temp);
 bool get_i2c_temperature(temperature_i2c_t* p_temp);
 
 void reload_idu_current(void);

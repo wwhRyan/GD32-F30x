@@ -11,17 +11,17 @@
 
 :: @echo %1
 
-@echo #    #   ##   #    # ###### 
-@echo ##  ##  #  #  #   #  #      
-@echo # ## # #    # ####   #####  
-@echo #    # ###### #  #   #      
-@echo #    # #    # #   #  #      
-@echo #    # #    # #    # ###### 
-@echo ...
+@REM @echo #    #   ##   #    # ###### 
+@REM @echo ##  ##  #  #  #   #  #      
+@REM @echo # ## # #    # ####   #####  
+@REM @echo #    # ###### #  #   #      
+@REM @echo #    # #    # #   #  #      
+@REM @echo #    # #    # #    # ###### 
+@REM @echo ...
 
-:: -t"%1"
-D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -b -j0 -t"AthenaRaontechLcos" .\Template\Keil_project\Project.uvprojx -o .\..\..\log.txt
-if not %ERRORLEVEL% == 0 goto ERROR
+@REM :: -t"%1"
+@REM D:\InstalledSoftware\IDE\Keil_v5\UV4\UV4.exe -b -j0 -t"AthenaRaontechLcos" .\Template\Keil_project\Project.uvprojx -o .\..\..\log.txt
+@REM if not %ERRORLEVEL% == 0 goto ERROR
 
 @REM if not %ERRORLEVEL% == 0 goto ERROR
 

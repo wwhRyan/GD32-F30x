@@ -35,51 +35,131 @@ const ntc_t NCP18WB473F10RB = {
     .is_pull_up = true, /* 分压电阻是上拉电阻？上拉：TRUE，下拉：false */
 };
 
-bool check_boot_done()
+bool i2c_write(const i2c_sensor_t* model, uint16_t addr, uint8_t data)
 {
-    for (int i = 0; i < 25; i++) {
-        vTaskDelay(100);
-        if (gpio_input_bit_get(RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN)) {
-            return true;
+    bool ret = true;
+
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+    ret = ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, addr,
+        model->i2c_addr_type, &data, 1, 0xFFFF);
+    xSemaphoreGive(i2c_Semaphore);
+    vTaskDelay(model->write_delay_time);
+
+    return ret;
+}
+
+uint8_t i2c_read(const i2c_sensor_t* model, uint8_t addr)
+{
+    uint8_t data;
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+    ISoftwareI2CRegRead(model->i2c, model->i2c_addr, addr, model->i2c_addr_type, &data, 1, 0xFFFF);
+    xSemaphoreGive(i2c_Semaphore);
+    return data;
+}
+
+bool i2c_muti_write(const i2c_sensor_t* model, uint16_t WriteAddr, uint8_t* data, uint16_t size)
+{
+    bool ret = true;
+    uint8_t NumOfPage = 0, NumOfSingle = 0, Addr = 0, count = 0;
+
+    Addr = WriteAddr % model->page_size;
+    count = model->page_size - Addr; /* 差count个数据值，刚好可以对齐到页地址 */
+    NumOfPage = size / model->page_size;
+    NumOfSingle = size % model->page_size; /* mod运算求余，计算出剩余不满一页的字节数 */
+
+    if (Addr == 0) {
+
+        if (NumOfPage == 0) {
+            xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+            ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
+            xSemaphoreGive(i2c_Semaphore);
+            vTaskDelay(model->write_delay_time);
+        }
+
+        else {
+            while (NumOfPage--) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, model->page_size, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+                WriteAddr += model->page_size;
+                data += model->page_size;
+            }
+
+            if (NumOfSingle != 0) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+            }
         }
     }
-    return false;
-}
 
-bool power_on()
-{
-    gpio_bit_set(RDC200A_VCC_EN_PORT, RDC200A_VCC_EN_PIN);
-    vTaskDelay(1);
-    gpio_bit_set(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
+    else {
 
-    return check_boot_done();
-}
+        if (NumOfPage == 0) {
+            if (count > NumOfSingle) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+            } else {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, count, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
 
-void power_off()
-{
-    rtiVC_PowerOnPanel(false);
-    vTaskDelay(10);
-
-    gpio_bit_reset(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
-    vTaskDelay(10);
-
-    gpio_bit_reset(RDC200A_VCC_EN_PORT, RDC200A_VCC_EN_PIN);
-}
-
-bool power_resume()
-{
-    if (gpio_output_bit_get(SYS_12V_ON_PORT, SYS_12V_ON_PIN) != true) {
-        gpio_bit_reset(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
-        gpio_bit_set(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
-        vTaskDelay(100);
-        if (!power_on()) {
-            power_off();
-            gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
-            return false;
+                WriteAddr += count;
+                data += count;
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle - count, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+            }
         }
-        ULOG_DEBUG("system resume\n");
+
+        else {
+            size -= count;
+            NumOfPage = size / model->page_size;
+            NumOfSingle = size % model->page_size;
+
+            if (count != 0) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, count, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+                WriteAddr += count;
+                data += count;
+            }
+
+            while (NumOfPage--) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, model->page_size, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+                WriteAddr += model->page_size;
+                data += model->page_size;
+            }
+            if (NumOfSingle != 0) {
+                xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+                ret &= ISoftwareI2CRegWrite(model->i2c, model->i2c_addr, WriteAddr, model->i2c_addr_type, data, NumOfSingle, 0xFFFF);
+                xSemaphoreGive(i2c_Semaphore);
+                vTaskDelay(model->write_delay_time);
+            }
+        }
     }
-    return true;
+    return ret;
+}
+
+bool i2c_muti_read(const i2c_sensor_t* model, uint16_t addr, uint8_t* data, uint16_t size)
+{
+    bool ret = true;
+
+    xSemaphoreTake(i2c_Semaphore, (TickType_t)0xFFFF);
+    ret = ISoftwareI2CRegRead(model->i2c, model->i2c_addr, addr, model->i2c_addr_type, data, size, 0xFFFF);
+    xSemaphoreGive(i2c_Semaphore);
+    vTaskDelay(model->write_delay_time);
+    return ret;
 }
 
 uint8_t get_reg(uint8_t dev_addr, uint16_t reg_addr)
@@ -139,6 +219,53 @@ void get_panel_reg_block(uint16_t reg_addr, uint8_t* buff, size_t size)
     for (int i = 0; i < size; i++) {
         buff[i] = RDP_REG_GET(VC_PANEL_PORT_0, reg_addr + i);
     }
+}
+
+bool check_boot_done()
+{
+    for (int i = 0; i < 25; i++) {
+        vTaskDelay(100);
+        if (gpio_input_bit_get(RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool power_on()
+{
+    gpio_bit_set(RDC200A_VCC_EN_PORT, RDC200A_VCC_EN_PIN);
+    vTaskDelay(1);
+    gpio_bit_set(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
+
+    return check_boot_done();
+}
+
+void power_off()
+{
+    rtiVC_PowerOnPanel(false);
+    vTaskDelay(10);
+
+    gpio_bit_reset(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
+    vTaskDelay(10);
+
+    gpio_bit_reset(RDC200A_VCC_EN_PORT, RDC200A_VCC_EN_PIN);
+}
+
+bool power_resume()
+{
+    if (gpio_output_bit_get(SYS_12V_ON_PORT, SYS_12V_ON_PIN) != true) {
+        gpio_bit_reset(RDC200A_RESET_PORT, RDC200A_RESET_PIN);
+        gpio_bit_set(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
+        vTaskDelay(100);
+        if (!power_on()) {
+            power_off();
+            gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
+            return false;
+        }
+        ULOG_DEBUG("system resume\n");
+    }
+    return true;
 }
 
 char* get_rdc200a_version(char* buff, size_t size)
