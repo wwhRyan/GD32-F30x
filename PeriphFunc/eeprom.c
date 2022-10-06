@@ -19,7 +19,6 @@
 #include <stdint.h>
 #include <string.h>
 
-
 void eeprom_lock(bool lock);
 
 eeprom_t eeprom;
@@ -136,6 +135,7 @@ void eeprom_memory_reset(void)
 bool eeprom_block_write(const i2c_sensor_t* model, const mem_t* data, bool real_time)
 {
     bool ret = true;
+    memcpy(((uint8_t*)&eeprom) + data->addr, data->pData, data->size);
     eeprom.check_sum = get_LSB_array_crc((uint8_t*)(&eeprom.magic_num), sizeof(eeprom_t) - sizeof(uint32_t));
     *(data->p_check) = eeprom.check_sum;
     if (real_time == true) {

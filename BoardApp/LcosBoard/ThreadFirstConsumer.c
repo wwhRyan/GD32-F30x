@@ -57,7 +57,7 @@ void ThreadFirstConsumer(void* pvParameters)
 
         if (get_sig(sys_sig, sig_light_status) == true && is_one_second() == true) {
             eeprom.light_source_time += 1;
-            eeprom_block_write(&BL24C64A, (const mem_t*)&eeprom_mem[idx_light_source_time], false);
+            eeprom_block_write(&BL24C64A, (const mem_t*)&eeprom_mem[idx_light_source_time], true);
         }
 
         extern const fan_timer_config_t cw_wheel_pwm;
