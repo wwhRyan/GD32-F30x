@@ -45,7 +45,7 @@ typedef struct ntc_t {
     uint16_t B;
     int normal_R;
     int divided_voltage_R;
-    bool is_pull_up; // true: divided_voltage_R pull up, false: divided_voltage_R pull down
+    bool is_divided_voltage_R_pull_up; // true: divided_voltage_R pull up, false: divided_voltage_R pull down
 } ntc_t;
 
 typedef struct temperature_t {

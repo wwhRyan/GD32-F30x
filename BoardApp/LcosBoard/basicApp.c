@@ -32,7 +32,7 @@ const ntc_t NCP18WB473F10RB = {
     .B = 4108, /* NTC B常数 (25-85℃) */
     .normal_R = 47000, /* 电阻值 (25℃) ，单位Ω*/
     .divided_voltage_R = 100000, /* 分压电阻，单位Ω */
-    .is_pull_up = true, /* 分压电阻是上拉电阻？上拉：TRUE，下拉：false */
+    .is_divided_voltage_R_pull_up = true, /* 分压电阻是上拉电阻？上拉：TRUE，下拉：false */
 };
 
 bool i2c_write(const i2c_sensor_t* model, uint16_t addr, uint8_t data)
@@ -478,7 +478,7 @@ bool spi_flash_erase(size_t WriteAddr, size_t size)
 float get_ntc_temperature(const ntc_t* ntc, float Voltage)
 {
     float ntc_R;
-    if (ntc->is_pull_up == false)
+    if (ntc->is_divided_voltage_R_pull_up == true)
         ntc_R = ((double)Voltage / (3.3 - (double)Voltage)) * ntc->divided_voltage_R;
     else
         ntc_R = ((3.3 - (double)Voltage) / 3.3) * ntc->divided_voltage_R;

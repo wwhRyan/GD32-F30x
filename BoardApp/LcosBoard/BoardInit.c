@@ -141,7 +141,7 @@ const ntc_adc_config_t evn_ntc = {
 const ntc_adc_config_t lcos_panel_ntc = {
     .adc_clock = RCU_ADC0,
     .adc_base = ADC0,
-    .adc_channel = ADC_CHANNEL_4,
+    .adc_channel = ADC_CHANNEL_5,
     .gpio_port = LCOS_PANEL_NTC_PORT,
     .gpio_pin = LCOS_PANEL_NTC_PIN,
 };
