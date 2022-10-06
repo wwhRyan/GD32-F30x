@@ -11,6 +11,7 @@
 
 #include "basicApp.h"
 #include "eeprom.h"
+#include "gd32f30x.h"
 #include "gd32f30x_gpio.h"
 #include "i2c.h"
 #include "rti_vc_api.h"
@@ -223,9 +224,9 @@ void get_panel_reg_block(uint16_t reg_addr, uint8_t* buff, size_t size)
 
 bool check_boot_done()
 {
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 20; i++) {
         vTaskDelay(100);
-        if (gpio_input_bit_get(RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN)) {
+        if (gpio_input_bit_get(RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN) == RESET) {
             return true;
         }
     }
@@ -292,24 +293,25 @@ char* get_rdp250h_version(char* buff, size_t size)
     return buff;
 }
 
-char* get_eeprom_version(char* buff,size_t size){
-    uint16_t major = (eeprom.version &0xffff0000)>>4;
-    uint16_t minor = (eeprom.version &0x0000ffff);
+char* get_eeprom_version(char* buff, size_t size)
+{
+    uint16_t major = (eeprom.version & 0xffff0000) >> 4;
+    uint16_t minor = (eeprom.version & 0x0000ffff);
 
-    snprintf(buff, size, "V%x.%x",major,minor);
+    snprintf(buff, size, "V%x.%x", major, minor);
 }
 
 bool check_video_input(void)
 {
-    // unsigned short v_active = (((unsigned short)RDC_REG_GET(0x029B) << 8) | (unsigned short)RDC_REG_GET(0x029C));
-    // unsigned short h_active = (((unsigned short)RDC_REG_GET(0x0295) << 8) | (unsigned short)RDC_REG_GET(0x0296));
+    unsigned short v_active = (((unsigned short)RDC_REG_GET(0x029B) << 8) | (unsigned short)RDC_REG_GET(0x029C));
+    unsigned short h_active = (((unsigned short)RDC_REG_GET(0x0295) << 8) | (unsigned short)RDC_REG_GET(0x0296));
 
-    // if (v_active != VERTICAL_PIXEL || h_active != HORIZONTAL_PIXEL)
-    //     return false;
+    for (int i = 0; i < 2; i++) {
+        if (v_active != VERTICAL_PIXEL || h_active != HORIZONTAL_PIXEL)
+            return false;
 
-    // unsigned short mrx_stability = ((unsigned short)RDC_REG_GET(0x0291)) & 0x03;
-    // if (mrx_stability != 0x03)
-    //     return false;
+        vTaskDelay(20);
+    }
 
     return true;
 }

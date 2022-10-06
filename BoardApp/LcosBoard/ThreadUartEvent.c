@@ -39,7 +39,6 @@ void ThreadUartEvent(void* pvParameters)
     ULOG_INFO("eeprom init\n");
     init_eeprom(&BL24C64A);
 
-    // TODO: verify it
     ULOG_INFO("RDC200A init\n");
     int ret;
     ret = rtiVC_Initialize(RDC200A_ADDR);

@@ -39,6 +39,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             if (power_resume() == true) {
                 set_sig(sys_sig, sig_lightsource, true);
                 set_sig(sys_sig, sig_system, true);
+                gpio_bit_set(MCU_GPIO_INT_PORT, MCU_GPIO_INT_PIN);
                 IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
 
             } else {
@@ -71,6 +72,7 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
             clear_sig(sys_sig, sig_slient_async_msg);
             clear_sig(sys_sig, sig_rdc200a_status);
             ULOG_DEBUG("sig_lightsource off\n");
+            gpio_bit_reset(MCU_GPIO_INT_PORT, MCU_GPIO_INT_PIN);
             gpio_bit_reset(SYS_12V_ON_PORT, SYS_12V_ON_PIN);
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
             break;
@@ -83,11 +85,11 @@ IAtOperationRegister(kCmdSystem, pAt_Kv_List, pAt_feedback_str)
         if (kKeyStatus == my_kvs[0].key) {
             if (gpio_output_bit_get(SYS_12V_ON_PORT, SYS_12V_ON_PIN)) {
                 if (get_sig(sys_sig, sig_system))
-                    IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+                    IAddFeedbackStrTo(pAt_feedback_str, "Status:On\n");
                 else
-                    IAddFeedbackStrTo(pAt_feedback_str, "Idle\n");
+                    IAddFeedbackStrTo(pAt_feedback_str, "Status:Idle\n");
             } else {
-                IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
+                IAddFeedbackStrTo(pAt_feedback_str, "Status:Off\n");
             }
         } else
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -117,9 +119,9 @@ IAtOperationRegister(kCmdLightSource, pAt_Kv_List, pAt_feedback_str)
     } else {
         if (kKeyStatus == my_kvs[0].key) {
             if (gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN)) {
-                IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+                IAddFeedbackStrTo(pAt_feedback_str, "Status:On\n");
             } else {
-                IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
+                IAddFeedbackStrTo(pAt_feedback_str, "Status:Off\n");
             }
         } else
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -159,7 +161,7 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
 
             case kKeyEeprom:
                 ULOG_DEBUG("kKeyEeprom\n");
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, get_eeprom_version(str_buff, sizeof(str_buff)));
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%s\n", pAt_Kv_List->pList[i].key.pData, get_eeprom_version(str_buff, sizeof(str_buff)));
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -273,19 +275,19 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
         flip_t tmp = h_v_flip_get();
         switch (tmp) {
         case v_0_h_0:
-            IAddFeedbackStrTo(pAt_feedback_str, "CeilingFront\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Status:CeilingFront\n");
             break;
         case v_0_h_1:
-            IAddFeedbackStrTo(pAt_feedback_str, "CeilingRear\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Status:CeilingRear\n");
             break;
         case v_1_h_0:
-            IAddFeedbackStrTo(pAt_feedback_str, "TableFront\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Status:TableFront\n");
             break;
         case v_1_h_1:
-            IAddFeedbackStrTo(pAt_feedback_str, "TableRear\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Status:TableRear\n");
             break;
         default:
-            IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Status:InvalidKey\n");
             return;
         }
     }
@@ -361,7 +363,7 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
             return;
         }
     } else {
-        IAddFeedbackStrTo(pAt_feedback_str, "%s\n", get_test_pattern());
+        IAddFeedbackStrTo(pAt_feedback_str, "Status:%s\n", get_test_pattern());
     }
 }
 
@@ -906,7 +908,7 @@ IAtOperationRegister(kCmdEeprom, pAt_Kv_List, pAt_feedback_str)
         if (true == i2c_muti_read(&BL24C64A, addr, (uint8_t*)eeprom_data, size)) {
             memory_endian_conversion(eeprom_data, size);
             IntToAscii(eeprom_data, ascii_buff, 1, size);
-            IAddFeedbackStrTo(pAt_feedback_str, "%s\n", ascii_buff);
+            IAddFeedbackStrTo(pAt_feedback_str, "Data:%s\n", ascii_buff);
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
         }
@@ -933,9 +935,9 @@ IAtOperationRegister(kCmdSilentAsyncMessages, pAt_Kv_List, pAt_feedback_str)
         }
     } else {
         if (get_sig(sys_sig, sig_slient_async_msg) == true) {
-            IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Status:On\n");
         } else {
-            IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
+            IAddFeedbackStrTo(pAt_feedback_str, "Status:Off\n");
         }
     }
 }
@@ -958,9 +960,9 @@ IAtOperationRegister(kCmdFlashBootb, pAt_Kv_List, pAt_feedback_str)
     } else {
         if (kKeyStatus == my_kvs[0].value) {
             if (SET == gpio_output_bit_get(RDC200A_BOOTB_IN_PORT, RDC200A_BOOTB_IN_PIN))
-                IAddFeedbackStrTo(pAt_feedback_str, "On\n");
+                IAddFeedbackStrTo(pAt_feedback_str, "Status:On\n");
             else
-                IAddFeedbackStrTo(pAt_feedback_str, "Off\n");
+                IAddFeedbackStrTo(pAt_feedback_str, "Status:Off\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
         }

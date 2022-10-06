@@ -27,19 +27,18 @@ void ThreadFirstConsumer(void* pvParameters)
     xEventGroupWaitBits(sys_sig, (0x00000001 << sig_mcu_init_ok), pdFALSE, pdTRUE, 0xFFFF);
     ULOG_DEBUG("%s\n", __func__);
 
-    // TODO: verify it
-    //  if (!check_boot_done())
-    //      EXCUTE_ONCE(ULOG_ERROR("error to power on"));
+    if (!check_boot_done()) {
+        EXCUTE_ONCE(ULOG_ERROR("error to power on"));
+    } else {
+        gpio_bit_set(MCU_GPIO_INT_PORT, MCU_GPIO_INT_PIN);
+    }
+
     while (1) {
-        // ULOG_DEBUG("ThreadFirstConsumer min free stack size %d\r\n",(int)uxTaskGetStackHighWaterMark(NULL));
         vTaskDelay(500);
 
-        // TODO: verify check_video_input func
         if (get_sig(sys_sig, sig_system)) {
-            // TODO: fix it
-            //  set_sig(sys_sig, sig_rdc200a_status, (gpio_input_bit_get(RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN) == SET) && check_video_input());
-            set_sig(sys_sig, sig_rdc200a_status, check_video_input());
-            if (get_sig(sys_sig, sig_rdc200a_status)) {
+            set_sig(sys_sig, sig_rdc200a_status, (gpio_input_bit_get(RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN) == RESET));
+            if (check_video_input()) {
                 EXCUTE_ONCE(ULOG_INFO("rdc200a decode MIPI success!\n"));
             }
         }
