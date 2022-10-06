@@ -278,7 +278,7 @@ char* get_rdc200a_version(char* buff, size_t size)
     rtiVC_GetRdcDeviceID(&id, &rev);
     major = (RDC_REG_GET(0x0002) & 0xf0) >> 4;
     minor = RDC_REG_GET(0x0003);
-    snprintf(buff, size, "%#x_%x.%x", id, major, minor);
+    snprintf(buff, size, "V%x_%x.%x", id, major, minor);
     return buff;
 }
 
@@ -288,8 +288,15 @@ char* get_rdp250h_version(char* buff, size_t size)
     uint16_t rev;
 
     rtiVC_GetPanelDeviceID(VC_PANEL_PORT_0, &id, &rev);
-    snprintf(buff, size, "%#x_%#x", id, rev);
+    snprintf(buff, size, "V%x_%x", id, rev);
     return buff;
+}
+
+char* get_eeprom_version(char* buff,size_t size){
+    uint16_t major = (eeprom.version &0xffff0000)>>4;
+    uint16_t minor = (eeprom.version &0x0000ffff);
+
+    snprintf(buff, size, "V%x.%x",major,minor);
 }
 
 bool check_video_input(void)
@@ -513,6 +520,19 @@ bool get_i2c_temperature(temperature_i2c_t* p_temp)
     quick_sort(p_temp->buff, 0, sensor_num - 1);
     p_temp->temperature = p_temp->buff[5 / 2 + 1];
     return ret;
+}
+
+float get_rdp250h_register_temperature()
+{
+    float temperature[MAX_NUM_VC_PANEL_PORT] = { 0 };
+
+    VC_PANEL_TEMPERATURE_INFO_T tinfo[MAX_NUM_VC_PANEL_PORT] = { 0 };
+
+    rtiVC_prepare_panel();
+    rtiVC_GetTemperature(VC_PANEL_CTRL_PORT_0, tinfo);
+    temperature[0] = (float)(tinfo[0].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+    // temperature[1] = (float)(tinfo[1].temperature) / VC_TEMPERATURE_DEGREE_DIV;
+    return temperature[0];
 }
 
 void laser_on(void)

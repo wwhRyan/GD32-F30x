@@ -95,6 +95,7 @@ bool spi_flash_erase(size_t WriteAddr, size_t size);
 
 char* get_rdc200a_version(char* buff, size_t size);
 char* get_rdp250h_version(char* buff, size_t size);
+char* get_eeprom_version(char* buff,size_t size);
 bool check_video_input(void);
 bool h_v_flip_set(flip_t filp);
 flip_t h_v_flip_get(void);
@@ -114,6 +115,7 @@ uint8_t get_idu_value(float current);
 float get_current_value(uint8_t idu);
 float get_temperature(temperature_t* p_temp);
 bool get_i2c_temperature(temperature_i2c_t* p_temp);
+float get_rdp250h_register_temperature(void);
 
 void reload_idu_current(void);
 

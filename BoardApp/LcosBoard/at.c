@@ -143,7 +143,7 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
                 break;
             case kKeyLightEngineBoard:
                 ULOG_DEBUG("kKeyLightEngineBoard\n");
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:VER1-%01X.VER0-%01X\n", pAt_Kv_List->pList[i].key.pData,
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:V%01X.%01X\n", pAt_Kv_List->pList[i].key.pData,
                     gpio_output_bit_get(HW_VER1_PORT, HW_VER1_PIN), gpio_output_bit_get(HW_VER0_PORT, HW_VER0_PIN));
                 break;
 
@@ -159,7 +159,7 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
 
             case kKeyEeprom:
                 ULOG_DEBUG("kKeyEeprom\n");
-                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, eeprom.version);
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%d\n", pAt_Kv_List->pList[i].key.pData, get_eeprom_version(str_buff, sizeof(str_buff)));
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
@@ -404,6 +404,9 @@ IAtOperationRegister(kCmdTemperature, pAt_Kv_List, pAt_feedback_str)
                 break;
             case kKeyI2cEnv:
                 IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)temperature_i2c[evn_sensor].temperature / 10);
+                break;
+            case kKeyRegLcos:
+                IAddKeyValueStrTo(pAt_feedback_str, "%s:%.1f\n", pAt_Kv_List->pList[i].key.pData, (float)get_rdp250h_register_temperature());
                 break;
             default:
                 IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");

@@ -56,6 +56,7 @@ Temperature,NtcBlue,int,Empty
 ,I2cRed,int,Empty
 ,I2cLcos,int,Empty
 ,I2cEnv,int,Empty
+,RegLcos,int,Empty
 CwSpeed,ScatteringWheel,int,Empty
 Reset,Status,enum,Factory
 ,,enum,User
