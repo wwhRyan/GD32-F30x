@@ -24,7 +24,7 @@ asAtProtocol output_obj;
 extern const Uarter uart0_output;
 extern const Uarter uart1_debug;
 
-//TODO: 偶尔串口会卡顿，发送的信息，隔一条才回复
+// TODO: 偶尔串口会卡顿，发送的信息，隔一条才回复
 void ThreadUartEvent(void* pvParameters)
 {
     system_ipc_init();

@@ -25,6 +25,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h>
 
 extern const SoftwareI2C raontech_i2c;
 extern const dac_t laser_dac;
@@ -299,6 +300,7 @@ char* get_eeprom_version(char* buff, size_t size)
     uint16_t minor = (eeprom.version & 0x0000ffff);
 
     snprintf(buff, size, "V%x.%x", major, minor);
+    return buff;
 }
 
 bool check_video_input(void)
@@ -502,8 +504,11 @@ float get_temperature(temperature_t* p_temp)
     float measure_temp = get_ntc_temperature(p_temp->p_ntc, voltage);
     array_shift(p_temp->buff, sensor_num, 4);
     p_temp->buff[sensor_num - 1] = (int)(measure_temp * 10);
-    quick_sort(p_temp->buff, 0, sensor_num - 1);
-    p_temp->temperature = p_temp->buff[5 / 2 + 1];
+
+    int sort_buff[5]; /* store temperature * 10 for filtering */
+    memcpy(sort_buff, p_temp->buff, sizeof(sort_buff));
+    quick_sort(sort_buff, 0, 5 - 1);
+    p_temp->temperature = sort_buff[5 / 2 + 1];
     return (float)p_temp->temperature / 10;
 }
 

@@ -38,9 +38,10 @@ void ThreadFirstConsumer(void* pvParameters)
 
         if (get_sig(sys_sig, sig_system)) {
             set_sig(sys_sig, sig_rdc200a_status, (gpio_input_bit_get(RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN) == RESET));
-            if (check_video_input()) {
-                EXCUTE_ONCE(ULOG_INFO("rdc200a decode MIPI success!\n"));
-            }
+            /* check video active pixel */
+            // if (check_video_input()) {
+            //     EXCUTE_ONCE(ULOG_INFO("rdc200a decode MIPI success!\n"));
+            // }
         }
 
         set_sig(sys_sig, sig_light_status, gpio_output_bit_get(LD_EN_H_PORT, LD_EN_H_PIN));
