@@ -581,8 +581,6 @@ IAtOperationRegister(kCmdSpiFlash, pAt_Kv_List, pAt_feedback_str)
             switch (my_kvs[i].key) {
             case kKeyAddr:
                 ret = sscanf(my_kvs[i].value, "%X", &addr);
-                if (addr > 0xFFFF)
-                    goto SPIFLASH_VALUE_ERROR;
                 break;
             case kKeyCrc:
                 ret = sscanf(my_kvs[i].value, "%X", &at_crc);

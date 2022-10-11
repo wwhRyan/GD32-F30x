@@ -524,8 +524,11 @@ bool get_i2c_temperature(temperature_i2c_t* p_temp)
 
     array_shift(p_temp->buff, sensor_num, 4);
     p_temp->buff[sensor_num - 1] = temperature;
-    quick_sort(p_temp->buff, 0, sensor_num - 1);
-    p_temp->temperature = p_temp->buff[5 / 2 + 1];
+
+    int sort_buff[5]; /* store temperature * 10 for filtering */
+    memcpy(sort_buff, p_temp->buff, sizeof(sort_buff));
+    quick_sort(sort_buff, 0, 5 - 1);
+    p_temp->temperature = sort_buff[5 / 2 + 1];
     return ret;
 }
 
@@ -563,14 +566,13 @@ void laser_dac_set(float current)
 // DISCHARGE2 voltage big --> little
 // DISCHARGE current big --> little
 
+// TODO:using timer to do it
 inline void R_to_G()
 {
     laser_dac_set(G_CURRENT);
 
-    // gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
     gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
-    DelayUs(100); // 100 -> 72us; 40 -> 28us
-    // gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
+    DelayUs(2);
     gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
 
@@ -578,11 +580,11 @@ inline void G_to_B()
 {
     laser_dac_set(B_CURRENT);
 
-    gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
-    gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
-    DelayUs(100);
-    gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
-    gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
+    // gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
+    // gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
+    // DelayUs(100);
+    // gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
+    // gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
 
 inline void B_to_R()
@@ -590,10 +592,11 @@ inline void B_to_R()
     laser_dac_set(R_CURRENT);
 
     gpio_bit_set(DISCHARGE_PORT, DISCHARGE_PIN);
-    gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
+    // gpio_bit_set(DISCHARGE2_PORT, DISCHARGE2_PIN);
     DelayUs(200);
+    // gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
+    DelayUs(150);
     gpio_bit_reset(DISCHARGE_PORT, DISCHARGE_PIN);
-    gpio_bit_reset(DISCHARGE2_PORT, DISCHARGE2_PIN);
 }
 
 // RGBG

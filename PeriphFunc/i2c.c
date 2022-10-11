@@ -10,6 +10,7 @@
  */
 #include "i2c.h"
 #include "systick.h"
+#include "utils.h"
 
 #define OPTION_WRITE 0
 #define OPTION_READ 1
@@ -225,7 +226,7 @@ static bool m_SoftI2cWaitAck(const SoftwareI2C *psI2c)
 		if (i >= 250)
 		{
 			m_SoftI2cStop(psI2c);
-			printf("slave no ack\r\n");
+			EXCUTE_ONCE(printf("slave no ack\n"));
 			return false;
 		}
 	}
