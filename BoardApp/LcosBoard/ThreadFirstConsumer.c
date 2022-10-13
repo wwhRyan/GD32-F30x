@@ -70,9 +70,12 @@ void ThreadFirstConsumer(void* pvParameters)
         Set_fan_timer_pwm(&cw_wheel_pwm, cw_pwm);
         // output_printf("speed=%d\r\n", Get_fan_timer_FG(&cw_wheel_fg) * 30);
 
-        if (cw_wheel_fg.p_st_calc->idle_flag == true)
+        if (cw_wheel_fg.p_st_calc->idle_flag == true) {
+            /* 若为true，色轮未触发IO中断 */
             cw_wheel_fg.p_st_calc->fre = 0;
-        cw_wheel_fg.p_st_calc->idle_flag = true;
+            EXCUTE_ONCE(ULOG_ERROR("CW wheel speed is zero\n"));
+        }
+        cw_wheel_fg.p_st_calc->idle_flag = true; /* 主循环中置位为true，中断置位为false */
 
         while (get_sig(sys_sig, sig_system) == false) // system is off do nothing.
         {

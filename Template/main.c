@@ -61,7 +61,7 @@ int main(void)
 #if 1 /* 优先级为4，最高 */
 void TimerCallFunc(TimerHandle_t xTimer)
 {
-#if 0
+#ifdef DEBUG
     ULOG_DEBUG("ThreadUartEvent min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(ThreadUartEventHandle));
     ULOG_DEBUG("ThreadFirstConsumer min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(ThreadFirstConsumerHandle));
     ULOG_DEBUG("ThreadSecondConsumer min free stack size %d\r\n", (int)uxTaskGetStackHighWaterMark(ThreadSecondConsumerHandle));

@@ -518,14 +518,15 @@ IAtOperationRegister(kCmdLogInfo, pAt_Kv_List, pAt_feedback_str)
         }
     } else {
         if (kKeyStatus == my_kvs[0].key) {
-            line_t line_tmp[32] = { 0 };
-            int read_number = my_kvs[0].value > sizeof(line_tmp) ? sizeof(line_tmp) : my_kvs[0].value;
-            int feedback_number = file_burst_read(&eeprom_log, line_tmp, read_number);
+            line_t line_tmp = { 0 };
+            int read_number = my_kvs[0].value > file_line_cnt(&eeprom_log) ? file_line_cnt(&eeprom_log) : my_kvs[0].value;
             /* Text:%s include '\n' */
-            if (feedback_number != 0) {
-                for (int i = 0; i < feedback_number; i++) {
-                    output_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", line_tmp[i].time / 60 / 60, (line_tmp[i].time / 60) % 60, line_tmp[i].time % 60, line_tmp[i].text);
-                    debug_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", line_tmp[i].time / 60 / 60, (line_tmp[i].time / 60) % 60, line_tmp[i].time % 60, line_tmp[i].text);
+            if (read_number != 0) {
+                for (int i = 0; i < read_number; i++) {
+                    file_read(&eeprom_log, &line_tmp, i);
+                    output_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", line_tmp.time / 60 / 60, (line_tmp.time / 60) % 60, line_tmp.time % 60, line_tmp.text);
+                    debug_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", line_tmp.time / 60 / 60, (line_tmp.time / 60) % 60, line_tmp.time % 60, line_tmp.text);
+                    memset(&line_tmp, 0, sizeof(line_tmp));
                 }
             } else {
                 output_printf("AT+LogInfo#Time:%.2d-%02d-%02d,Text:%s", 0, 0, 0, "Null");

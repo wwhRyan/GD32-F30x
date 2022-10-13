@@ -49,6 +49,28 @@ void ThreadSecondConsumer(void* pvParameters)
             /* The adc cannot know whether the connection is abnormal */
             for (int i = 0; i < sensor_num; i++) {
                 get_temperature(&temperature[i]);
+                if (temperature[i].temperature < 0) {
+                    switch (i) {
+                    case blue_sensor:
+                        EXCUTE_ONCE(ULOG_ERROR("blue_sensor NTC not connect\n"));
+                        break;
+                    case red_sensor:
+                        EXCUTE_ONCE(ULOG_ERROR("red_sensor NTC not connect\n"));
+                        break;
+                    case green_sensor:
+                        EXCUTE_ONCE(ULOG_ERROR("green_sensor NTC not connect\n"));
+                        break;
+                    case lcos_sensor:
+                        EXCUTE_ONCE(ULOG_ERROR("lcos_sensor NTC not connect\n"));
+                        break;
+                    case evn_sensor:
+                        EXCUTE_ONCE(ULOG_ERROR("evn_sensor NTC not connect\n"));
+                        break;
+                    default:
+                        E_assert(0);
+                        break;
+                    }
+                }
             }
             for (int i = 0; i < sensor_num; i++) {
                 if (get_i2c_temperature(&temperature_i2c[i]) == false) {
