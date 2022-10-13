@@ -36,6 +36,8 @@ void ThreadFirstConsumer(void* pvParameters)
     while (1) {
         vTaskDelay(500);
 
+        EXCUTE_ONCE(check_panel_connect());
+
         if (get_sig(sys_sig, sig_system)) {
             set_sig(sys_sig, sig_rdc200a_status, (gpio_input_bit_get(RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN) == RESET));
             /* check video active pixel */

@@ -9,7 +9,7 @@
  *
  */
 
-#include "basicApp.h"
+#include "BoardInit.h"
 #include "eeprom.h"
 #include "gd32f30x.h"
 #include "gd32f30x_gpio.h"
@@ -290,6 +290,19 @@ char* get_rdc200a_version(char* buff, size_t size)
     minor = RDC_REG_GET(0x0003);
     snprintf(buff, size, "V%x_%x.%x", id, major, minor);
     return buff;
+}
+
+bool check_panel_connect()
+{
+    uint16_t id;
+    uint16_t rev;
+
+    set_sig(sys_sig, sig_raontech_i2c_errno, true);
+    rtiVC_GetPanelDeviceID(VC_PANEL_PORT_0, &id, &rev);
+
+    if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
+        ULOG_ERROR("RDP250H panel not connect\n");
+    }
 }
 
 char* get_rdp250h_version(char* buff, size_t size)

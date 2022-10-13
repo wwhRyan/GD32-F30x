@@ -88,6 +88,7 @@ bool set_reg_block(uint8_t dev_addr, uint16_t reg_addr, uint8_t* reg_val, size_t
 void set_panel_reg_block(uint16_t reg_addr, uint8_t* buff, size_t size);
 void get_panel_reg_block(uint16_t reg_addr, uint8_t* buff, size_t size);
 bool check_boot_done(void);
+bool check_panel_connect(void);
 bool power_on(void);
 void power_off(void);
 bool power_resume(void);
