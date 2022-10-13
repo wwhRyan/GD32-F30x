@@ -3,6 +3,8 @@
 */
 
 #include "rti_vc_common.h"
+#include "BoardInit.h"
+#include "utils.h"
 
 #define RDP_I2C_OP_WRITE	0
 #define RDP_I2C_OP_READ		1
@@ -215,8 +217,10 @@ void RDP_REG_SET(int panel_port, U16_T reg, U8_T val)
 			RDC_REG_SET(0x0554, 0x00); /* Clear done_flag */
 
 			err_flag = (int)(result_flags >> 1);
-			if (err_flag)
+			if (err_flag) {
 				EMSG("[RDP_%d] Register write error (%d)\n", panel_port, -err_flag);
+				set_sig(sys_sig, sig_raontech_i2c_errno, false);
+			}
 
 			return;
 		}
@@ -225,6 +229,7 @@ void RDP_REG_SET(int panel_port, U16_T reg, U8_T val)
 	} while (--retry_cnt);
 
 	EMSG("[RDP_%d] Register write timeout\n", panel_port);
+	set_sig(sys_sig, sig_raontech_i2c_errno, false);
 }
 
 U8_T RDP_REG_GET(int panel_port, U16_T reg)
@@ -266,8 +271,10 @@ U8_T RDP_REG_GET(int panel_port, U16_T reg)
 			err_flag = (int)(result_flags >> 1);
 			if (!err_flag)
 				rdata = RDC_REG_GET(0x0553);
-			else
+			else {
 				EMSG("[RDP_%d] Register read error (%d)\n", panel_port, -err_flag);
+				set_sig(sys_sig, sig_raontech_i2c_errno, false);
+			}
 
 			return rdata;
 		}
@@ -276,6 +283,7 @@ U8_T RDP_REG_GET(int panel_port, U16_T reg)
 	} while (--retry_cnt);
 
 	EMSG("[RDP_%d] Register read timeout\n", panel_port);
+	set_sig(sys_sig, sig_raontech_i2c_errno, false);
 	return 0xFF;
 }
 

@@ -42,12 +42,12 @@ void ThreadUartEvent(void* pvParameters)
     ULOG_INFO("RDC200A init\n");
     int ret;
     ret = rtiVC_Initialize(RDC200A_ADDR);
-    if (ret != 0)
+    if (ret != 0 || !get_sig(sys_sig, sig_raontech_i2c_errno))
         ULOG_ERROR("VC init error (%d)\n", ret);
 
     // Open device
     ret = rtiVC_OpenDevice();
-    if (ret)
+    if (ret != 0 || !get_sig(sys_sig, sig_raontech_i2c_errno))
         ULOG_ERROR("VC open device error (%d)\n", ret);
 
     ULOG_INFO("AtLib init\n");

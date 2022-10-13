@@ -132,6 +132,8 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
+    set_sig(sys_sig, sig_raontech_i2c_errno, true);
+
     char str_buff[32] = { 0 };
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         ULOG_DEBUG("no support setting!\n");
@@ -168,6 +170,11 @@ IAtOperationRegister(kCmdVersion, pAt_Kv_List, pAt_feedback_str)
                 return;
             }
         }
+    }
+    if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
+        IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        ULOG_ERROR("RAONTECH I2C error\n");
+        return;
     }
 }
 
@@ -254,6 +261,7 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
+    set_sig(sys_sig, sig_raontech_i2c_errno, true);
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyCeilingFront == my_kvs[0].value) {
@@ -270,6 +278,7 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
+            return;
         }
     } else {
         flip_t tmp = h_v_flip_get();
@@ -291,12 +300,18 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
             return;
         }
     }
+
+    if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
+        IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        ULOG_ERROR("RAONTECH I2C error\n");
+    }
 }
 
 IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Enum my_kvs[1];
     ICastAtKvListTo(kAtValueEnum, pAt_Kv_List, my_kvs);
+    set_sig(sys_sig, sig_raontech_i2c_errno, true);
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyOff != my_kvs[0].value) {
@@ -357,7 +372,6 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
         } else if (kKeyOff == my_kvs[0].value) {
             off_testpattern();
             IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
-            return;
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
             return;
@@ -365,12 +379,19 @@ IAtOperationRegister(kCmdTestPattern, pAt_Kv_List, pAt_feedback_str)
     } else {
         IAddFeedbackStrTo(pAt_feedback_str, "Status:%s\n", get_test_pattern());
     }
+
+    if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
+        IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        ULOG_ERROR("RAONTECH I2C error\n");
+        return;
+    }
 }
 
 IAtOperationRegister(kCmdTemperature, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
+    set_sig(sys_sig, sig_raontech_i2c_errno, true);
 
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
@@ -415,6 +436,11 @@ IAtOperationRegister(kCmdTemperature, pAt_Kv_List, pAt_feedback_str)
                 return;
             }
         }
+    }
+    if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
+        IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        ULOG_ERROR("RAONTECH I2C error\n");
+        return;
     }
 }
 
@@ -571,6 +597,7 @@ IAtOperationRegister(kCmdSpiFlash, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
+    set_sig(sys_sig, sig_raontech_i2c_errno, true);
 
     size_t addr, at_crc, size = 0;
     uint8_t buff[256] = { 0 };
@@ -639,6 +666,12 @@ IAtOperationRegister(kCmdSpiFlash, pAt_Kv_List, pAt_feedback_str)
             IAddFeedbackStrTo(pAt_feedback_str, "Data:%s\n", string);
         }
     }
+
+    if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
+        IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        ULOG_ERROR("RAONTECH I2C error\n");
+        return;
+    }
     return;
 SPIFLASH_VALUE_ERROR:
     clear_sig(sys_sig, sig_update_rdc200a);
@@ -649,7 +682,7 @@ IAtOperationRegister(kCmdSpiFlashErase, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
-
+    set_sig(sys_sig, sig_raontech_i2c_errno, true);
     size_t addr, size = 0;
     int ret = 0;
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
@@ -680,12 +713,19 @@ IAtOperationRegister(kCmdSpiFlashErase, pAt_Kv_List, pAt_feedback_str)
     } else {
         IAddFeedbackStrTo(pAt_feedback_str, "InvalidOperator\n");
     }
+
+    if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
+        IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        ULOG_ERROR("RAONTECH I2C error\n");
+        return;
+    }
 }
 
 IAtOperationRegister(kCmdRdc200a, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
+    set_sig(sys_sig, sig_raontech_i2c_errno, true);
 
     size_t size = 0;
     size_t addr = 0;
@@ -748,6 +788,12 @@ IAtOperationRegister(kCmdRdc200a, pAt_Kv_List, pAt_feedback_str)
             IAddFeedbackStrTo(pAt_feedback_str, "Data:%s\n", string);
         }
     }
+
+    if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
+        IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        ULOG_ERROR("RAONTECH I2C error\n");
+        return;
+    }
     return;
 RDC200A_VALUE_ERROR:
     IAddFeedbackStrTo(pAt_feedback_str, "InvalidValue\n");
@@ -757,6 +803,7 @@ IAtOperationRegister(kCmdRdp250h, pAt_Kv_List, pAt_feedback_str)
 {
     asAtKvUnit_Str my_kvs[MAX_KV_COUPLES_NUM];
     ICastAtKvListTo(kAtValueStr, pAt_Kv_List, my_kvs);
+    set_sig(sys_sig, sig_raontech_i2c_errno, true);
 
     size_t size = 0;
     size_t addr = 0;
@@ -813,6 +860,12 @@ IAtOperationRegister(kCmdRdp250h, pAt_Kv_List, pAt_feedback_str)
         get_panel_reg_block(addr, data, size);
         IntToAscii(data, string, 1, size);
         IAddFeedbackStrTo(pAt_feedback_str, "Data:%s\n", string);
+    }
+
+    if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
+        IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
+        ULOG_ERROR("RAONTECH I2C error\n");
+        return;
     }
     return;
 RDC250H_VALUE_ERROR:

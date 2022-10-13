@@ -41,6 +41,7 @@ void system_ipc_init(void)
     clear_sig(sys_sig, sig_rdc200a_status);
     set_sig(sys_sig, sig_lightsource, true);
     set_sig(sys_sig, sig_system, true);
+    set_sig(sys_sig, sig_raontech_i2c_errno, true);
     clear_sig(sys_sig, sig_light_status);
     clear_sig(sys_sig, sig_update_rdc200a);
     clear_sig(sys_sig, sig_update_firmware);

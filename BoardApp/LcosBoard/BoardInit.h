@@ -66,6 +66,7 @@ typedef enum sys_sig_t {
     sig_update_firmware,
     sig_eeprom_write,
     sig_mcu_init_ok,
+    sig_raontech_i2c_errno, /* true is ok, false is error happen! */
 } sys_sig_t;
 
 /*<! Red laser NTC !>*/
