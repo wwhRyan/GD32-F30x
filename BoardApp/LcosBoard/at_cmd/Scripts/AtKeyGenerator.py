@@ -57,9 +57,9 @@ if len(dic) != atnum:
 else:
     print("hash check value ok.")
 
+hashtable.sort(order='value')
+
 #  Create 'C' Source & Header File
-
-
 class ctemplate:
     __fileName = ' '
     __sourceName = ' '
