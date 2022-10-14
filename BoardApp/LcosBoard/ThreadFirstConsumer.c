@@ -32,7 +32,7 @@ void ThreadFirstConsumer(void* pvParameters)
     } else {
         gpio_bit_set(MCU_GPIO_INT_PORT, MCU_GPIO_INT_PIN);
     }
-
+    h_v_flip_set((flip_t)eeprom.flip_mode);
     while (1) {
         vTaskDelay(500);
 

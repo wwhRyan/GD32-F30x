@@ -38,6 +38,7 @@ typedef struct eeprom_t {
     float green; /* addr 0x10 */
     float blue; /* addr 0x14 */
     uint32_t light_source_time; /* addr 0x18 */
+    uint32_t flip_mode;
     char Sn_LightEngine[32]; /* addr 0x1c */
     char Sn_SourceLight[32]; /* addr 0x3C */
     char Sn_Projector[32]; /* addr 0x5C */
@@ -52,6 +53,7 @@ typedef enum eeprom_idx_t
     idx_green,
     idx_blue,
     idx_light_source_time,
+    idx_filp_mode,
     idx_Sn_LightEngine,
     idx_Sn_SourceLight,
     idx_Sn_Projector,

@@ -266,20 +266,26 @@ IAtOperationRegister(kCmdInstallationMode, pAt_Kv_List, pAt_feedback_str)
     if (kAtControlType == IGetAtCmdType(&at_obj)) {
         if (kKeyCeilingFront == my_kvs[0].value) {
             h_v_flip_set(v_0_h_0);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+            eeprom.flip_mode = (uint32_t)v_0_h_0;
+
         } else if (kKeyCeilingRear == my_kvs[0].value) {
             h_v_flip_set(v_0_h_1);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+            eeprom.flip_mode = (uint32_t)v_0_h_1;
+
         } else if (kKeyTableFront == my_kvs[0].value) {
             h_v_flip_set(v_1_h_0);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+            eeprom.flip_mode = (uint32_t)v_1_h_0;
+
         } else if (kKeyTableRear == my_kvs[0].value) {
             h_v_flip_set(v_1_h_1);
-            IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+            eeprom.flip_mode = (uint32_t)v_1_h_1;
+
         } else {
             IAddFeedbackStrTo(pAt_feedback_str, "InvalidKey\n");
             return;
         }
+        IAddFeedbackStrTo(pAt_feedback_str, "Ok\n");
+        eeprom_block_write(&BL24C64A, (const mem_t*)&eeprom_mem[idx_filp_mode], true);
     } else {
         flip_t tmp = h_v_flip_get();
         switch (tmp) {
