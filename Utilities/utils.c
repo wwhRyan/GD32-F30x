@@ -21,6 +21,7 @@
 extern eeprom_t eeprom;
 extern const Uarter uart0_output;
 SemaphoreHandle_t uart_Semaphore = NULL;
+SemaphoreHandle_t output_uart_Semaphore = NULL;
 SemaphoreHandle_t i2c_Semaphore = NULL;
 SemaphoreHandle_t lcos_i2c_Semaphore = NULL;
 EventGroupHandle_t sys_sig = NULL;
@@ -30,6 +31,8 @@ void system_ipc_init(void)
 {
     uart_Semaphore = xSemaphoreCreateMutex();
     E_assert(uart_Semaphore != NULL);
+    output_uart_Semaphore = xSemaphoreCreateMutex();
+    E_assert(output_uart_Semaphore != NULL);
     i2c_Semaphore = xSemaphoreCreateMutex();
     E_assert(i2c_Semaphore != NULL);
     lcos_i2c_Semaphore = xSemaphoreCreateMutex();
@@ -75,11 +78,15 @@ void output_printf(const char* fmt, ...)
     char buf[1280] = { 0 };
 
     va_list args;
+
+    if (xSemaphoreTake(output_uart_Semaphore, (TickType_t)0xFFFF) == pdFALSE)
+        return;
     va_start(args, fmt);
     vsnprintf(buf, sizeof(buf), fmt, args);
     va_end(args);
 
     uarter_send(&uart0_output, buf, strlen(buf));
+    xSemaphoreGive(output_uart_Semaphore);
 }
 
 /* printf is not thread safety, but can output freeRTOS bug. */

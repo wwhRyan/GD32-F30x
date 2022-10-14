@@ -107,21 +107,28 @@ void uarter_init(const Uarter *pUarter)
     memset(pUarter->p_rx_buffer->buffer, 0, DMA_BUFFER_SIZE * BUFF_CACHE_SIZE * sizeof(uint8_t));
 }
 
+static inline bool is_circular_array_full(int head, int tail, int size)
+{
+    return (((head - tail + size) % size) == (size - 1));
+}
+
 // NOTE: data must be lesser than DMA_BUFFER_SIZE
-void uarter_IRQ(const Uarter *pUarter)
+void uarter_IRQ(const Uarter* pUarter)
 {
     E_assert(pUarter != NULL);
-    if (RESET != usart_interrupt_flag_get(pUarter->uart_base, pUarter->uart_interrupt_flag))
-    {
+    if (RESET != usart_interrupt_flag_get(pUarter->uart_base, pUarter->uart_interrupt_flag)) {
         dma_channel_disable(pUarter->dma_base, pUarter->dma_rx_channel);
         usart_interrupt_flag_clear(pUarter->uart_base, pUarter->uart_interrupt_flag);
         usart_data_receive(pUarter->uart_base);
 
         pUarter->p_rx_buffer->count[pUarter->p_rx_buffer->head] = abs(DMA_BUFFER_SIZE - dma_transfer_number_get(pUarter->dma_base, pUarter->dma_rx_channel));
 
-        pUarter->p_rx_buffer->head++;
-        if (pUarter->p_rx_buffer->head >= BUFF_CACHE_SIZE)
-            pUarter->p_rx_buffer->head = 0;
+        /* When the old buffer is not processed completely, the received data overwrites the latest head */
+        if (!is_circular_array_full(pUarter->p_rx_buffer->head, pUarter->p_rx_buffer->tail, BUFF_CACHE_SIZE)) {
+            pUarter->p_rx_buffer->head++;
+            if (pUarter->p_rx_buffer->head >= BUFF_CACHE_SIZE)
+                pUarter->p_rx_buffer->head = 0;
+        }
 
         dma_memory_address_config(pUarter->dma_base, pUarter->dma_rx_channel, (uint32_t)&pUarter->p_rx_buffer->buffer[pUarter->p_rx_buffer->head]);
         // dma_transfer_number_config(pUarter->dma_base, pUarter->dma_rx_channel, DMA_BUFFER_SIZE);
@@ -141,11 +148,18 @@ int GetRxlen(const Uarter *pUarter)
     return (int)pUarter->p_rx_buffer->count[pUarter->p_rx_buffer->tail];
 }
 
-void ClearRxData(const Uarter *pUarter)
+void ClearRxData(const Uarter* pUarter)
 {
     E_assert(pUarter != NULL);
     pUarter->p_rx_buffer->count[pUarter->p_rx_buffer->tail] = 0;
     memset(pUarter->p_rx_buffer->buffer[pUarter->p_rx_buffer->tail], 0, DMA_BUFFER_SIZE);
+
+    //A string sent by the host may be received twice(for unknow reason?), 
+    //which will cause the serial port not to receive(tail larger than head, mcu misunderstanding buffer is full), 
+    //fixing:add the tail cannot be larger than the head.
+    if (pUarter->p_rx_buffer->tail == pUarter->p_rx_buffer->head)
+        return;
+
     pUarter->p_rx_buffer->tail++;
     if (pUarter->p_rx_buffer->tail >= BUFF_CACHE_SIZE)
         pUarter->p_rx_buffer->tail = 0;
