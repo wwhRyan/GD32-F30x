@@ -519,25 +519,37 @@ float get_ntc_temperature(const ntc_t* ntc, float Voltage)
     return (298.15 * ntc->B) / (298.15 * log(ntc_R / ntc->normal_R) + ntc->B) - 273.15;
 }
 
-float get_temperature(temperature_t* p_temp)
+bool get_temperature(temperature_t* p_temp)
 {
     uint16_t value = get_ntc_adc_sample(p_temp->p_ntc_adc_config);
     float voltage = (double)value * 3.3 / 4095;
+
+    /* voltage ~= 3.3 when NTC is not connect! */
+    if (voltage >= 3.0) {
+        p_temp->temperature = -100 * 10;
+        return false;
+    }
+
     float measure_temp = get_ntc_temperature(p_temp->p_ntc, voltage);
     array_shift(p_temp->buff, sensor_num, 4);
+    EXCUTE_ONCE(memset(p_temp->buff, (int)measure_temp, sizeof(int) * 5));
     p_temp->buff[sensor_num - 1] = (int)(measure_temp * 10);
 
     int sort_buff[5]; /* store temperature * 10 for filtering */
     memcpy(sort_buff, p_temp->buff, sizeof(sort_buff));
     quick_sort(sort_buff, 0, 5 - 1);
     p_temp->temperature = sort_buff[5 / 2 + 1];
-    return (float)p_temp->temperature / 10;
+    return true;
 }
 
 bool get_i2c_temperature(temperature_i2c_t* p_temp)
 {
     uint8_t value[2] = { 0 };
     bool ret = i2c_muti_read(p_temp->p_i2c, 0x00, value, sizeof(value));
+    if (!ret) {
+        p_temp->temperature = -100 * 10;
+        return false;
+    }
 
     int temperature = (value[0] & 0x7f) * 10; // temperature 定点一个小数点
     temperature += (((value[1] >> 4) & 0x0f) * 10) / 16;
@@ -545,13 +557,14 @@ bool get_i2c_temperature(temperature_i2c_t* p_temp)
         temperature = -temperature;
 
     array_shift(p_temp->buff, sensor_num, 4);
+    EXCUTE_ONCE(memset(p_temp->buff, (int)temperature, sizeof(int) * 5));
     p_temp->buff[sensor_num - 1] = temperature;
 
     int sort_buff[5]; /* store temperature * 10 for filtering */
     memcpy(sort_buff, p_temp->buff, sizeof(sort_buff));
     quick_sort(sort_buff, 0, 5 - 1);
     p_temp->temperature = sort_buff[5 / 2 + 1];
-    return ret;
+    return true;
 }
 
 float get_rdp250h_register_temperature()

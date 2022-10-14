@@ -48,8 +48,7 @@ void ThreadSecondConsumer(void* pvParameters)
         if (get_sig(sys_sig, sig_system) == true) {
             /* The adc cannot know whether the connection is abnormal */
             for (int i = 0; i < sensor_num; i++) {
-                get_temperature(&temperature[i]);
-                if (temperature[i].temperature < 0) {
+                if (!get_temperature(&temperature[i])) {
                     switch (i) {
                     case blue_sensor:
                         EXCUTE_ONCE(ULOG_ERROR("blue_sensor NTC not connect\n"));

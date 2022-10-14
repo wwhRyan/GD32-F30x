@@ -114,7 +114,7 @@ void laser_dac_set(float current);
 
 uint8_t get_idu_value(float current);
 float get_current_value(uint8_t idu);
-float get_temperature(temperature_t* p_temp);
+bool get_temperature(temperature_t* p_temp);
 bool get_i2c_temperature(temperature_i2c_t* p_temp);
 float get_rdp250h_register_temperature(void);
 
