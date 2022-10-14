@@ -9,8 +9,6 @@
  * 
  */
 #include "i2c.h"
-#include "systick.h"
-#include "utils.h"
 
 #define OPTION_WRITE 0
 #define OPTION_READ 1
@@ -38,13 +36,13 @@ static bool m_SoftI2cBurst(const SoftwareI2C *psI2c, uint8_t option,
 
 void INewSoftwareI2C(const SoftwareI2C *psI2c)
 {
-	E_assert(psI2c != NULL);
+    E_assert(psI2c->scl_pin != NULL || psI2c->scl_port != NULL || psI2c->scl_pin != NULL || psI2c->sda_pin != NULL);
 
-	gpio_init(psI2c->sda_port, GPIO_MODE_OUT_OD, GPIO_OSPEED_50MHZ, psI2c->sda_pin);
-	gpio_init(psI2c->scl_port, GPIO_MODE_OUT_OD, GPIO_OSPEED_50MHZ, psI2c->scl_pin);
+    gpio_init(psI2c->sda_port, GPIO_MODE_OUT_OD, GPIO_OSPEED_50MHZ, psI2c->sda_pin);
+    gpio_init(psI2c->scl_port, GPIO_MODE_OUT_OD, GPIO_OSPEED_50MHZ, psI2c->scl_pin);
 
-	gpio_bit_write(psI2c->sda_port, psI2c->sda_pin, SET);
-	gpio_bit_write(psI2c->scl_port, psI2c->scl_pin, SET);
+    gpio_bit_write(psI2c->sda_port, psI2c->sda_pin, SET);
+    gpio_bit_write(psI2c->scl_port, psI2c->scl_pin, SET);
 }
 
 static bool m_SoftI2cSclHigh(const SoftwareI2C *psI2c)
@@ -70,24 +68,6 @@ static bool m_SoftI2cSdaLow(const SoftwareI2C *psI2c)
 	gpio_bit_write(psI2c->sda_port, psI2c->sda_pin, RESET);
 	return true;
 }
-
-#if 0 // not used because of the using rtos
-void DelayUs(uint32_t nus)
-{
-    uint32_t temp = 0;
-    if (nus == 0)
-        return;
-    SysTick->LOAD = nus * rcu_clock_freq_get(CK_SYS);       //时间加载
-    SysTick->VAL = 0x00;                      //清空计数器
-    SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk; //开始倒数
-    do
-    {
-        temp = SysTick->CTRL;
-    } while ((temp & 0x01) && !(temp & (1 << 16))); //等待时间到达
-    SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;      //关闭计数器
-    SysTick->VAL = 0x00;                            //清空计数器
-}
-#endif
 
 void DelayUs(uint32_t nus)
 {

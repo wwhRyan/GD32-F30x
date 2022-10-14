@@ -93,7 +93,7 @@ void uarter_init(const Uarter *pUarter)
     }
 
     /* enable USART interrupt */
-    nvic_irq_enable(pUarter->Irqn, 0, 0);
+    nvic_irq_enable(pUarter->Irqn, 2, 0);
     usart_interrupt_enable(pUarter->uart_base, pUarter->uart_interrupt_type);
 
     /* initial buffer */

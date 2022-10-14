@@ -300,9 +300,10 @@ bool check_panel_connect()
     set_sig(sys_sig, sig_raontech_i2c_errno, true);
     rtiVC_GetPanelDeviceID(VC_PANEL_PORT_0, &id, &rev);
 
-    if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
-        ULOG_ERROR("RDP250H panel not connect\n");
-    }
+    if (!get_sig(sys_sig, sig_raontech_i2c_errno))
+        return false;
+    else
+        return true;
 }
 
 char* get_rdp250h_version(char* buff, size_t size)

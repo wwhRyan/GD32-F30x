@@ -36,7 +36,10 @@ void ThreadFirstConsumer(void* pvParameters)
     while (1) {
         vTaskDelay(500);
 
-        EXCUTE_ONCE(check_panel_connect());
+        EXCUTE_ONCE({
+            if (check_panel_connect() == false)
+                ULOG_ERROR("RDP250H panel not connect\n");
+        });
 
         if (get_sig(sys_sig, sig_system)) {
             set_sig(sys_sig, sig_rdc200a_status, (gpio_input_bit_get(RDC200A_BOOT_OUT_PORT, RDC200A_BOOT_OUT_PIN) == RESET));
@@ -70,7 +73,6 @@ void ThreadFirstConsumer(void* pvParameters)
         if (cw_pwm > 100)
             cw_pwm = 100;
         Set_fan_timer_pwm(&cw_wheel_pwm, cw_pwm);
-        // output_printf("speed=%d\r\n", Get_fan_timer_FG(&cw_wheel_fg) * 30);
 
         if (cw_wheel_fg.p_st_calc->idle_flag == true) {
             /* 若为true，色轮未触发IO中断 */
