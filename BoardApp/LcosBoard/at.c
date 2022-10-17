@@ -442,6 +442,8 @@ IAtOperationRegister(kCmdTemperature, pAt_Kv_List, pAt_feedback_str)
                 return;
             }
         }
+
+        pAt_feedback_str->pData = strrpc(pAt_feedback_str->pData, "-100.0", "Null");
     }
     if (!get_sig(sys_sig, sig_raontech_i2c_errno)) {
         IAddFeedbackStrTo(pAt_feedback_str, "ExecuteFailed\n");
