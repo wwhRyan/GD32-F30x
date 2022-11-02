@@ -32,6 +32,9 @@ void ThreadUartEvent(void* pvParameters)
     ULOG_INFO("log enable\n");
     ULOG_DEBUG("%s\n", __func__);
 
+    vTaskDelay(10);
+    ULOG_INFO("rdc200a 3.3V 1.8V EN pull up\n");
+    gpio_bit_set(RDC200A_VCC_EN_PORT, RDC200A_VCC_EN_PIN);
     vTaskDelay(1);
     ULOG_INFO("rdc200a_reset_pin pull up\n");
     gpio_bit_set(RDC200A_RESET_PORT, RDC200A_RESET_PIN);

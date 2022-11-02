@@ -32,6 +32,7 @@
 #endif
 
 // configMINIMAL_STACK_SIZE
+/* 实际占用内存 = sizeof(uint32_t) * usStackDepth */
 #define THREAD_UART_EVENT_STACK_SIZE (512 * 3)
 #define THREAD_FIRST_CONSUMER_STACK_SIZE (256 * 3)
 #define THREAD_SECOND_CONSUMER_STACK_SIZE (256 * 3)

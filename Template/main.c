@@ -43,7 +43,7 @@ int main(void)
     E_assert(xTaskCreate(ThreadFirstConsumer, "firstconsumerthread", THREAD_FIRST_CONSUMER_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2, &ThreadFirstConsumerHandle));
     E_assert(xTaskCreate(ThreadSecondConsumer, "secondconsumerthread", THREAD_SECOND_CONSUMER_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, &ThreadSecondConsumerHandle));
 
-#if 1
+#if 0
     TimerHandle_t xTimer;
 
     xTimer = xTimerCreate("timer", pdMS_TO_TICKS(20000), pdTRUE, NULL, TimerCallFunc);
@@ -58,7 +58,7 @@ int main(void)
         ;
 }
 
-#if 1 /* 优先级为4，最高 */
+#if 0 /* 优先级为0，最低，后续可以移动至空闲任务钩子函数 */
 void TimerCallFunc(TimerHandle_t xTimer)
 {
 #ifdef DEBUG
