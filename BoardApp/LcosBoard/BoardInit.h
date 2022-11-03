@@ -13,7 +13,7 @@
 #define EXECTHREAD_H
 
 #include "file.h"
-#define MCU_VERSION "V1.1"
+#define MCU_VERSION "V1.3"
 
 #include "adc_mcu.h"
 #include "basicApp.h"
