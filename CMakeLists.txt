@@ -44,5 +44,6 @@ endif()
 # add MCU build c flags
 add_definitions(-DDEBUG -DATHENA_OV_LCOS)
 add_definitions(-DGD32F30X_HD)
+add_definitions(-DULOG_TEST)
 
 add_subdirectory(Template)
